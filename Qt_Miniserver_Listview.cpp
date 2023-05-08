@@ -17,6 +17,7 @@ Qt_Miniserver_Listview::Qt_Miniserver_Listview(QWidget* parent)
     // Add the tree view to the main window's layout
     vBox->addWidget(treeView);
 
+
 }
 
 
@@ -95,6 +96,11 @@ void Qt_Miniserver_Listview::addCMiniserverToModel(const CMiniserver& miniserver
 
 
 
+}
+
+void Qt_Miniserver_Listview::asignMiniserverList(QList<CMiniserver> miniservers)
+{
+    this->miniserverlist = &miniservers;
 }
 
 Qt_Miniserver_Listview::~Qt_Miniserver_Listview()

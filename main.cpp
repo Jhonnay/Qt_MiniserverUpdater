@@ -14,6 +14,8 @@
 #include <QFile>
 #include <QDebug>
 #include "CApplicationSettings.h"
+#include "CWebService.h"
+#include "CLoxAppJson.h"
 
 QList<CMiniserver> parseMiniserverJsonFile(const QString& fileName);
 ApplicationSettings parseApplicationSettingsJsonFile(const QString& filePath);
@@ -45,7 +47,23 @@ int main(int argc, char* argv[])
         treeViewMiniserver->setData(miniserverlist);
     }
 
+    //CMiniserver testkofferZuhause = CMiniserver("504F94A06212", "admin", "admin!", "TBD", "TBD", "TBD", "Black", "TBD", "TBD", "MS6212","5");
 
+    //WebServices Test
+    //QString cloudDNSLink = CWebService::getCloudDNSLink(miniservers[0]);
+    //QString version = CWebService::sendCommandRest_Version_Remote_Cloud(miniservers[0], "dev/sys/version", "value");
+    //QString wholeVersionResponse = CWebService::sendCommandRest_Version_Remote_Cloud(miniservers[0], "dev/sys/version", "");
+    //QString versionLocal = CWebService::sendCommandRest_Version_Local_Gen1(miniservers[2], "dev/sys/version", "value");
+    //QString wholeVersionResponseLocal = CWebService::sendCommandRest_Version_Local_Gen1(miniservers[2], "dev/sys/version", "");
+    //CLoxAppJson loxappRemote = CWebService::sendCommandRest_LoxAppJson_Remote_Cloud(miniservers[2], "data/LoxAPP3.json"); 
+    //CLoxAppJson loxappLocal = CWebService::sendCommandRest_LoxAppJson_Local_Gen1(miniservers[2], "data/LoxAPP3.json");
+    //
+    //QString versionLocalTestkoffer = CWebService::sendCommandRest_Version_Local_Gen1(testkofferZuhause, "dev/sys/version", "value");
+    //QString wholeVersionResponseTestkoffer = CWebService::sendCommandRest_Version_Local_Gen1(testkofferZuhause, "dev/sys/version", "");
+    //
+    //testkofferZuhause.setLocalIP("192.168.178.60");
+    //QString versionLocalTestkofferIP = CWebService::sendCommandRest_Version_Local_Gen1(testkofferZuhause, "dev/sys/version", "value");
+    //QString wholeVersionResponseTestkofferIP = CWebService::sendCommandRest_Version_Local_Gen1(testkofferZuhause, "dev/sys/version", "");
 
 
     QVBoxLayout* vBox = new QVBoxLayout();
