@@ -3,17 +3,20 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_Qt_MiniserverUpdater.h"
 #include "CMiniserver.h"
+#include "CMiniserver.h"
+#include "Qt_ComboBoxItem.h"
+#include "MyConstants.h"
 
 
-class Qt_Miniserver_Listview : public QWidget
+class Qt_Miniserver_Listview : public QTreeWidget
 {
     Q_OBJECT
 
 public:
     explicit Qt_Miniserver_Listview(QWidget* parent = nullptr);
-    void setData(std::vector<CMiniserver> data);
-    void addCMiniserverToModel(const CMiniserver& miniserver, QStandardItemModel* model);
-    void asignMiniserverList(QList<CMiniserver> miniservers);
+    void addMiniserver(const CMiniserver& miniserver,int index);
+    void setMiniservers(QList<CMiniserver>* list);
+    void asignMiniserverList(QList<CMiniserver>* miniservers);
     ~Qt_Miniserver_Listview();
 
 public slots:
@@ -22,7 +25,8 @@ public slots:
     void RefreshButtonClicked();
 
 private:
-    QVBoxLayout* vBox;
-    QTreeView* treeView;
+
     QList<CMiniserver>* miniserverlist;
+    void setupColumns();
+
 };

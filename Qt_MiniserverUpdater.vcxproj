@@ -94,12 +94,14 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
+    <ClCompile Include="Qt_ComboBoxItem.cpp" />
     <ClCompile Include="Qt_Menubar.cpp" />
     <ClCompile Include="Qt_Miniserver_Listview.cpp" />
     <ClCompile Include="Qt_Statusbar.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <QtRcc Include="Qt_MiniserverUpdater.qrc" />
     <QtUic Include="Qt_Bottom_Action_Buttons.ui" />
+    <QtUic Include="Qt_ComboBoxItem.ui" />
     <QtUic Include="Qt_Menubar.ui" />
     <QtUic Include="Qt_MiniserverUpdater.ui" />
     <QtMoc Include="Qt_MiniserverUpdater.h" />
@@ -125,6 +127,7 @@
     <QtMoc Include="Qt_Menubar.h" />
     <QtMoc Include="Qt_Miniserver_Listview.h" />
     <QtMoc Include="Qt_Statusbar.h" />
+    <QtMoc Include="Qt_ComboBoxItem.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -82,6 +82,9 @@
     <ClCompile Include="Qt_Statusbar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Qt_ComboBoxItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CApplicationSettings.h">
@@ -125,6 +128,9 @@
     <QtMoc Include="Qt_Statusbar.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="Qt_ComboBoxItem.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="Qt_Bottom_Action_Buttons.ui">
@@ -137,6 +143,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="Qt_Statusbar.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Qt_ComboBoxItem.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

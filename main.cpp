@@ -7,6 +7,7 @@
 #include "Qt_Bottom_Action_Buttons.h"
 #include "Qt_Menubar.h"
 #include "Qt_Statusbar.h"
+#include "Qt_MiniserverUpdater.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -19,7 +20,7 @@
 
 QList<CMiniserver> parseMiniserverJsonFile(const QString& fileName);
 ApplicationSettings parseApplicationSettingsJsonFile(const QString& filePath);
-
+QString checkIfApplicationSettingsExist(QString applicationSettingsFileName);
 
 int main(int argc, char* argv[])
 {
@@ -27,29 +28,32 @@ int main(int argc, char* argv[])
 
     std::cout << "Hello, World!" << std::endl;
 
-    std::vector <CMiniserver> miniserverlist;
-    QList<CMiniserver> miniservers = parseMiniserverJsonFile("C:\\Users\\musatbe\\AppData\\Roaming\\WPF_MiniserverUpdater\\configuration Firma.json");
-    ApplicationSettings applicationSettings = parseApplicationSettingsJsonFile("C:\\Users\\musatbe\\AppData\\Roaming\\WPF_MiniserverUpdater\\ApplicationSettings.json");
+    //MainWindow
+    Qt_MiniserverUpdater* mainwindow = new Qt_MiniserverUpdater();
 
-    for (const auto& miniserver : miniservers) {
-        miniserverlist.push_back(miniserver);
+    QString applicationSettingsPath = checkIfApplicationSettingsExist("ApplicationSettings.json");
+    if (!applicationSettingsPath.isEmpty()) {
+        ApplicationSettings applicationSettings = parseApplicationSettingsJsonFile(applicationSettingsPath);
+        if (applicationSettings.getBUseDefaultConfig()) {
+            mainwindow->setConfigEXEPath(QString::fromStdString(applicationSettings.getStrDefaultConfigPath()));
+        }
+        if (applicationSettings.getBUseDefaultConfiguration()) {
+            QList<CMiniserver> miniservers = parseMiniserverJsonFile(QString::fromStdString(applicationSettings.getStrDefaultConfigurationPath()));
+            mainwindow->setMiniserverList(&miniservers);
+        }
     }
 
-    Qt_Bottom_Action_Buttons* bottom_buttons = new Qt_Bottom_Action_Buttons();
-    Qt_Menubar* menubar = new Qt_Menubar();
-    Qt_Statusbar* statusbar = new Qt_Statusbar();
-    Qt_Miniserver_Listview* treeViewMiniserver = new Qt_Miniserver_Listview();
+    //mainWindow.setCentralWidget(centralWidget);
+    mainwindow->setWindowTitle("Miniserver Updater (c) Musat Version 0.1");
+    mainwindow->resize(1000, 600);
+    mainwindow->show();
 
-    if (applicationSettings.getBUseDefaultConfig()) {
-        statusbar->setConfigExePath(QString::fromStdString(applicationSettings.getStrDefaultConfigPath()));
-    }
-    if (applicationSettings.getBUseDefaultConfiguration()) {
-        treeViewMiniserver->setData(miniserverlist);
-    }
 
-    //CMiniserver testkofferZuhause = CMiniserver("504F94A06212", "admin", "admin!", "TBD", "TBD", "TBD", "Black", "TBD", "TBD", "MS6212","5");
+
+
 
     //WebServices Test
+    //CMiniserver testkofferZuhause = CMiniserver("504F94A06212", "admin", "admin!", "TBD", "TBD", "TBD", "Black", "TBD", "TBD", "MS6212","5");
     //QString cloudDNSLink = CWebService::getCloudDNSLink(miniservers[0]);
     //QString version = CWebService::sendCommandRest_Version_Remote_Cloud(miniservers[0], "dev/sys/version", "value");
     //QString wholeVersionResponse = CWebService::sendCommandRest_Version_Remote_Cloud(miniservers[0], "dev/sys/version", "");
@@ -66,23 +70,7 @@ int main(int argc, char* argv[])
     //QString wholeVersionResponseTestkofferIP = CWebService::sendCommandRest_Version_Local_Gen1(testkofferZuhause, "dev/sys/version", "");
 
 
-    QVBoxLayout* vBox = new QVBoxLayout();
-    vBox->addWidget(menubar);
-    vBox->addWidget(treeViewMiniserver);
-    vBox->addWidget(bottom_buttons);
-    vBox->addWidget(statusbar);
-    vBox->setSpacing(0);
-    vBox->setContentsMargins(0, 0, 0, 0);
-    //vBox->insertStretch(-1, 1);
 
-    QWidget* centralWidget = new QWidget();
-    centralWidget->setLayout(vBox);
-
-    QMainWindow mainWindow;
-    mainWindow.setCentralWidget(centralWidget);
-    mainWindow.setWindowTitle("Miniserver Updater (c) Musat Version 0.1");
-    mainWindow.resize(1000, 600);
-    mainWindow.show();
 
 
     return a.exec();
@@ -164,5 +152,23 @@ ApplicationSettings parseApplicationSettingsJsonFile(const QString& filePath)
 }
 
 
+QString checkIfApplicationSettingsExist(QString applicationSettingsFileName) {
+    QString roamingPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    
+    QDir dir(roamingPath);
+    if (!dir.exists()) {
+        //dir.mkpath(".");
+        return "";
+    }
+    
 
+    QString filePath = roamingPath + "/" + applicationSettingsFileName;
+    QFile file(filePath);
+    if (file.exists()) {
+        return filePath;
+    }
+    else {
+        return "";
+    }
+}
 
