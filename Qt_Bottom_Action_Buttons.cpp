@@ -55,6 +55,7 @@ void Qt_Bottom_Action_Buttons::onButtonUpdateClicked()
 	MultiByteToWideChar(CP_UTF8, 0, message, -1, wideMessage, 256);
 	OutputDebugString(wideMessage);
 	emit buttonUpdateClicked();
+	btnUpdate->setDisabled(true);
 }
 
 void Qt_Bottom_Action_Buttons::onButtonRefreshClicked()

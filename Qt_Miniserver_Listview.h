@@ -17,6 +17,7 @@ public:
     void addMiniserver(const CMiniserver& miniserver,int index);
     void setMiniservers(QList<CMiniserver>* list);
     void asignMiniserverList(QList<CMiniserver>* miniservers);
+    int getRealIndexfromSerialNumber(QString serialnumber);
     ~Qt_Miniserver_Listview();
 
 public slots:
@@ -32,7 +33,7 @@ private:
     QList<CMiniserver>* miniserverlist;
     void setupColumns();
     void comboBoxLanguageChanged(QTreeWidgetItem* item, int column);
-    int getRealIndexfromSerialNumber(QString serialnumber);
+    
 
 
 };

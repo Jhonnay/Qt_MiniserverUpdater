@@ -22,7 +22,7 @@ public:
 
 public slots:
     void onConnectConfigClicked(QTreeWidgetItem* item);
-    void onConnectRefreshClicked();
+    void onRefreshClicked();
 
 private:
     QList<CMiniserver>* miniservers;
