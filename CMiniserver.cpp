@@ -151,16 +151,16 @@ void CMiniserver::setConfigLanguage(const std::string& language)
 std::string CMiniserver::toString() const
 {
     std::string str = "CMiniserver {";
-    str += "serialNumber: " + serialNumber + ", ";
-    str += "adminUser: " + adminUser + ", ";
-    str += "adminPassword: " + adminPassword + ", ";
-    str += "miniserverVersion: " + miniserverVersion + ", ";
-    str += "miniserverStatus: " + miniserverStatus + ", ";
-    str += "updatelevel: " + updatelevel + ", ";
-    str += "versionColor: " + versionColor + ", ";
-    str += "miniserverProject: " + miniserverProject + ", ";
-    str += "miniserverConfiguration: " + miniserverConfiguration + ", ";
-    str += "localIP: " + localIP + " }";
-    str += "configLanguage: " + configLanguage + " }";
+    str += serialNumber + ", ";
+    str += adminUser + ", ";
+    str += adminPassword + ", ";
+    str += miniserverVersion + ", ";
+    str += miniserverStatus + ", ";
+    str += updatelevel + ", ";
+    str += versionColor + ", ";
+    str += miniserverProject + ", ";
+    str += miniserverConfiguration + ", ";
+    str += localIP + " ";
+    str += "Lang:" + CConfig::LanguageList.at(stoi(configLanguage)).toStdString() + " }";
     return str;
 }

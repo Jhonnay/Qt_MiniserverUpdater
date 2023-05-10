@@ -1,4 +1,6 @@
 #pragma once
+#include "CConfig.h"
+
 class CMiniserver
 {
 private:

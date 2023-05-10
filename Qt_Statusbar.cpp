@@ -108,7 +108,7 @@ Qt_Statusbar::Qt_Statusbar(QWidget* parent)
     updateProgress(100, "Downloading file");
 }
 
-QString Qt_Statusbar::getSelectedFilePath() const
+QString Qt_Statusbar::getSelectedFilePath()
 {
     return exefilePath;
 }

@@ -21,12 +21,18 @@ public:
 
 public slots:
     //void miniserverlistChanged();
-    
+   
     void RefreshButtonClicked();
+
+signals:
+    void connectConfigClicked(QTreeWidgetItem* item);
 
 private:
 
     QList<CMiniserver>* miniserverlist;
     void setupColumns();
+    void comboBoxLanguageChanged(QTreeWidgetItem* item, int column);
+    int getRealIndexfromSerialNumber(QString serialnumber);
+
 
 };

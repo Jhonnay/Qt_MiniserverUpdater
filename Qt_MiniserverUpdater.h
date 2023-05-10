@@ -7,6 +7,7 @@
 #include "Qt_Miniserver_Listview.h"
 #include "CApplicationSettings.h"
 #include "Qt_Statusbar.h"
+#include "CConfig.h"
 
 class Qt_MiniserverUpdater : public QMainWindow
 {
@@ -18,6 +19,10 @@ public:
 
     void setMiniserverList(QList<CMiniserver>* list);
     void setConfigEXEPath(QString path);
+
+public slots:
+    void onConnectConfigClicked(QTreeWidgetItem* item);
+    void onConnectRefreshClicked();
 
 private:
     QList<CMiniserver>* miniservers;

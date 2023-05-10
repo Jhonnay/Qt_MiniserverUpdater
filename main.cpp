@@ -30,6 +30,7 @@ int main(int argc, char* argv[])
 
     //MainWindow
     Qt_MiniserverUpdater* mainwindow = new Qt_MiniserverUpdater();
+    QList<CMiniserver> miniservers;
 
     QString applicationSettingsPath = checkIfApplicationSettingsExist("ApplicationSettings.json");
     if (!applicationSettingsPath.isEmpty()) {
@@ -38,7 +39,7 @@ int main(int argc, char* argv[])
             mainwindow->setConfigEXEPath(QString::fromStdString(applicationSettings.getStrDefaultConfigPath()));
         }
         if (applicationSettings.getBUseDefaultConfiguration()) {
-            QList<CMiniserver> miniservers = parseMiniserverJsonFile(QString::fromStdString(applicationSettings.getStrDefaultConfigurationPath()));
+            miniservers = parseMiniserverJsonFile(QString::fromStdString(applicationSettings.getStrDefaultConfigurationPath()));
             mainwindow->setMiniserverList(&miniservers);
         }
     }

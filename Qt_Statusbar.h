@@ -16,7 +16,7 @@ class Qt_Statusbar : public QWidget
 
 public:
     Qt_Statusbar(QWidget* parent = nullptr);
-    QString getSelectedFilePath() const;
+    QString getSelectedFilePath();
 
 public slots:
     QString getConfigExePath();
