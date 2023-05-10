@@ -49,20 +49,24 @@ void Qt_MiniserverUpdater::setConfigEXEPath(QString path)
 void Qt_MiniserverUpdater::onRefreshClicked()
 {
     //(*miniservers)[0].setLocalIP("Test0");
-    QList<QTreeWidgetItem*> selected = treeViewMiniserver->selectedItems();
-    treeViewMiniserver->setMiniservers(miniservers); //set everyone to TBD and outdated info. 
-    treeViewMiniserver->setDisabled(true);
-    for (int i = 0; i < selected.count(); ++i) {
-        int realIndex = treeViewMiniserver->getRealIndexfromSerialNumber(selected[i]->text(1));
-        if (!(*miniservers)[i].getLocalIP().empty()) {
-            (*miniservers)[i].setMiniserverVersion(CWebService::sendCommandRest_Version_Local_Gen1((*miniservers)[i], "dev/sys/version", "value").toStdString());
+    const QList<QTreeWidgetItem*> selected = treeViewMiniserver->selectedItems();
+    //treeViewMiniserver->setMiniservers(miniservers); //set everyone to TBD and outdated info. 
+    //treeViewMiniserver->setDisabled(true);
+    QString serialNumber;
+    for (int i = 0; i < selected.count(); ++i) 
+    {
+        QTreeWidgetItem* widget = selected[i];
+        serialNumber = widget->text(1);
+        int realIndex = treeViewMiniserver->getRealIndexfromSerialNumber(serialNumber); //here might be problem
+        if (!(*miniservers)[realIndex].getLocalIP().empty()) {
+            (*miniservers)[realIndex].setMiniserverVersion(CWebService::sendCommandRest_Version_Local_Gen1((*miniservers)[realIndex], "dev/sys/version", "value").toStdString());
         }
         else {
-            (*miniservers)[i].setMiniserverVersion(CWebService::sendCommandRest_Version_Remote_Cloud((*miniservers)[i], "dev/sys/version", "value").toStdString());
+            (*miniservers)[realIndex].setMiniserverVersion(CWebService::sendCommandRest_Version_Remote_Cloud((*miniservers)[realIndex], "dev/sys/version", "value").toStdString());
         }
        
     }
-    treeViewMiniserver->setMiniservers(miniservers);
+    treeViewMiniserver->setMiniservers(miniservers); //another Function where TBD and outdated info every time. 
     treeViewMiniserver->setDisabled(false);
     
     //Disable Buttons except CANCEL
