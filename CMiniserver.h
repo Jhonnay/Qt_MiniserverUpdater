@@ -70,6 +70,9 @@ public:
     std::string getConfigLanguage() const;
     void setConfigLanguage(const std::string& language);
 
+    static QString formatMiniserverVersionQString(QString unformatedQString);
+
     //toString Function
     std::string toString() const;
+    static void printAllMiniserversToDebug(QList<CMiniserver>* miniservers);
 };

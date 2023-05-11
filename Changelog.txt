@@ -1,0 +1,18 @@
+
+Known Issues: 
+Pressing enter on Local IP "QLineEdit" does not leave TextEditMode
+Pressing up / down arrow key ín LocalIP field selects the next line
+
+
+V0.1
+*Fixed:
+	 Changing Language after List was sorted does not work. --> Index should be determined for QList*, when changing Data underneath. 
+	 setminiserverlist --> TBD and outdated info every time. 
+*Added/Changed:
+	added changelog file to repo
+	added setMiniserversInitial() & setMiniserversInitial() functions.
+	added formatMiniserverVersionQString()
+	added QlineEdit for LocalIP
+	added coloring of versionnumber when using setMiniserversInitial() & setMiniserversInitial()
+	set languagebox to fixed size
+	other improvements

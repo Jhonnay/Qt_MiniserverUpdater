@@ -22,7 +22,7 @@ Qt_Bottom_Action_Buttons::Qt_Bottom_Action_Buttons(QWidget* parent)
 	hBox->addWidget(btnAdd);
 	hBox->addWidget(btnCancel);
 	hBox->addWidget(checkbox_handsfreemode);
-	hBox->setContentsMargins(8, 0, 200, 8);
+	hBox->setContentsMargins(8, 8, 200, 8);
 
 	setLayout(hBox);
 
@@ -81,4 +81,12 @@ void Qt_Bottom_Action_Buttons::onButtonCancelClicked()
 void Qt_Bottom_Action_Buttons::onCheckBoxHandsfreeClicked()
 {
 	emit checkBoxHandsfreeClicked();
+}
+
+void Qt_Bottom_Action_Buttons::setDisabledAllExceptCancel(bool setting)
+{
+	this->setDisabled(setting);
+	if (setting) {
+		this->btnCancel->setDisabled(!setting);
+	}
 }

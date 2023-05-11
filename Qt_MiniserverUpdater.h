@@ -16,13 +16,17 @@ class Qt_MiniserverUpdater : public QMainWindow
 public:
     Qt_MiniserverUpdater(QWidget* parent = nullptr);
     ~Qt_MiniserverUpdater();
-
+    
     void setMiniserverList(QList<CMiniserver>* list);
     void setConfigEXEPath(QString path);
+    QList<QString> getSelectedSerialNumbers(QList<QTreeWidgetItem*> selectedItems);
+    
 
 public slots:
     void onConnectConfigClicked(QTreeWidgetItem* item);
+    void onLocalIPTextChanged(QTreeWidgetItem* item);
     void onRefreshClicked();
+
 
 private:
     QList<CMiniserver>* miniservers;

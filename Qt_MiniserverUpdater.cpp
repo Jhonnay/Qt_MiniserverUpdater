@@ -25,6 +25,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QWidget *parent)
 
     connect(treeViewMiniserver, &Qt_Miniserver_Listview::connectConfigClicked, this, &Qt_MiniserverUpdater::onConnectConfigClicked);
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonRefreshClicked, this, &Qt_MiniserverUpdater::onRefreshClicked);
+    connect(treeViewMiniserver, &Qt_Miniserver_Listview::localIPTextChanged, this, &Qt_MiniserverUpdater::onLocalIPTextChanged);
 
     this->setCentralWidget(centralWidget);
 
@@ -38,7 +39,7 @@ Qt_MiniserverUpdater::~Qt_MiniserverUpdater()
 void Qt_MiniserverUpdater::setMiniserverList(QList<CMiniserver>* list)
 {
     this->miniservers = list;
-    treeViewMiniserver->setMiniservers(list);
+    treeViewMiniserver->setMiniserversInitial(list);
 }
 
 void Qt_MiniserverUpdater::setConfigEXEPath(QString path)
@@ -46,43 +47,79 @@ void Qt_MiniserverUpdater::setConfigEXEPath(QString path)
     statusbar->setConfigExePath(path);
 }
 
+QList<QString> Qt_MiniserverUpdater::getSelectedSerialNumbers(QList<QTreeWidgetItem*> selectedItems)
+{
+    QList<QString> listOfSerialNumbers;
+    for (int i = 0; i < selectedItems.count(); ++i) {
+        listOfSerialNumbers.append(selectedItems[i]->text(1));
+    }
+    return listOfSerialNumbers;
+}
+
+
+
 void Qt_MiniserverUpdater::onRefreshClicked()
 {
-    //(*miniservers)[0].setLocalIP("Test0");
-    const QList<QTreeWidgetItem*> selected = treeViewMiniserver->selectedItems();
+    treeViewMiniserver->sortByColumn(-1, Qt::AscendingOrder);
+    treeViewMiniserver->update();
+    QList<QTreeWidgetItem*>  selected = treeViewMiniserver->selectedItems();
+    QList<QString> selectedSerialNumbers = getSelectedSerialNumbers(selected);
+
     //treeViewMiniserver->setMiniservers(miniservers); //set everyone to TBD and outdated info. 
-    //treeViewMiniserver->setDisabled(true);
-    QString serialNumber;
-    for (int i = 0; i < selected.count(); ++i) 
-    {
-        QTreeWidgetItem* widget = selected[i];
-        serialNumber = widget->text(1);
-        int realIndex = treeViewMiniserver->getRealIndexfromSerialNumber(serialNumber); //here might be problem
+    treeViewMiniserver->setDisabled(true);
+    bottom_buttons->setDisabledAllExceptCancel(true);
+
+    for (int i = 0; i < selectedSerialNumbers.count(); ++i){
+    
+        int realIndex = treeViewMiniserver->getRealIndexfromSerialNumber(selectedSerialNumbers[i]); //here might be problem
         if (!(*miniservers)[realIndex].getLocalIP().empty()) {
-            (*miniservers)[realIndex].setMiniserverVersion(CWebService::sendCommandRest_Version_Local_Gen1((*miniservers)[realIndex], "dev/sys/version", "value").toStdString());
+            QString unformatedVersionString = CWebService::sendCommandRest_Version_Local_Gen1((*miniservers)[realIndex], "dev/sys/version", "value");
+            (*miniservers)[realIndex].setMiniserverVersion(CMiniserver::formatMiniserverVersionQString(unformatedVersionString).toStdString());
         }
         else {
-            (*miniservers)[realIndex].setMiniserverVersion(CWebService::sendCommandRest_Version_Remote_Cloud((*miniservers)[realIndex], "dev/sys/version", "value").toStdString());
+            QString unformatedVersionString  = CWebService::sendCommandRest_Version_Remote_Cloud((*miniservers)[realIndex], "dev/sys/version", "value");
+            (*miniservers)[realIndex].setMiniserverVersion(CMiniserver::formatMiniserverVersionQString(unformatedVersionString).toStdString());
         }
        
     }
-    treeViewMiniserver->setMiniservers(miniservers); //another Function where TBD and outdated info every time. 
+ 
+    treeViewMiniserver->setMiniserversUpdateContents(miniservers);
     treeViewMiniserver->setDisabled(false);
+    bottom_buttons->setDisabledAllExceptCancel(false);
     
-    //Disable Buttons except CANCEL
+    
     
 
 }
 
-void Qt_MiniserverUpdater::onConnectConfigClicked(QTreeWidgetItem* item) {
-
+void Qt_MiniserverUpdater::onLocalIPTextChanged(QTreeWidgetItem* item)
+{
+    //TODO: Connect / Load / LOUT
+    int rowIndex = treeViewMiniserver->indexFromItem(item).row();
+    QString serialnumber = item->text(1);
+    int realIndex = treeViewMiniserver->getRealIndexfromSerialNumber(serialnumber);
     
+    QLineEdit* lineEdit = qobject_cast<QLineEdit*>(item->treeWidget()->itemWidget(item, 7));
+    if (lineEdit) {
+        QString ipAddress = lineEdit->text();
+        (*miniservers)[realIndex].setLocalIP(ipAddress.toStdString());
+        std::string message = "Local IP  changed to: " + serialnumber.toStdString() + "Index: " + std::to_string(rowIndex) + " RealIndex: " + std::to_string(realIndex);
+        qDebug() << message;
+        CMiniserver::printAllMiniserversToDebug(miniservers);
+        return; //if everything was OK. 
+    }
+
+    //TODO: Show Dialog
+    //if comboboxitem = Null OR LanguageList does not contain String
+    std::string message = "Could not change IP of real Index: " + realIndex;
+    qDebug() << message;
+}
+
+void Qt_MiniserverUpdater::onConnectConfigClicked(QTreeWidgetItem* item) {    
     //TODO: Connect / Load / LOUT
     int index = treeViewMiniserver->indexFromItem(item).row();
     std::string message = "Connect Config Button clicked! Index: " + std::to_string(index);
-    wchar_t wideMessage[256];
-    MultiByteToWideChar(CP_UTF8, 0, message.c_str(), -1, wideMessage, 256);
-    OutputDebugString(wideMessage);
+    qDebug() << message;
 
     Qt_ComboBoxItem* comboBoxItem = qobject_cast<Qt_ComboBoxItem*>(item->treeWidget()->itemWidget(item, 8));
     if (comboBoxItem) {

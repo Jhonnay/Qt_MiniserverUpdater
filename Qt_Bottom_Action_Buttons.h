@@ -24,6 +24,8 @@ public:
 
 	void onCheckBoxHandsfreeClicked();
 
+	void setDisabledAllExceptCancel(bool setting);
+
 signals:
 	void buttonUpdateClicked();
 	void buttonRefreshClicked();

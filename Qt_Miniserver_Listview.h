@@ -14,8 +14,10 @@ class Qt_Miniserver_Listview : public QTreeWidget
 
 public:
     explicit Qt_Miniserver_Listview(QWidget* parent = nullptr);
-    void addMiniserver(const CMiniserver& miniserver,int index);
-    void setMiniservers(QList<CMiniserver>* list);
+    void addMiniserverInitial(const CMiniserver& miniserver,int index);
+    void addMiniserverUpdateContent(const CMiniserver& miniserver, int index);
+    void setMiniserversInitial(QList<CMiniserver>* list);
+    void setMiniserversUpdateContents(QList<CMiniserver>* list);
     void asignMiniserverList(QList<CMiniserver>* miniservers);
     int getRealIndexfromSerialNumber(QString serialnumber);
     ~Qt_Miniserver_Listview();
@@ -27,12 +29,15 @@ public slots:
 
 signals:
     void connectConfigClicked(QTreeWidgetItem* item);
+    void localIPTextChanged(QTreeWidgetItem* item);
 
 private:
 
     QList<CMiniserver>* miniserverlist;
     void setupColumns();
     void comboBoxLanguageChanged(QTreeWidgetItem* item, int column);
+
+    void NewFunction();
     
 
 

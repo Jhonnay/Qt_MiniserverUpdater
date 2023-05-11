@@ -17,7 +17,7 @@ Qt_Miniserver_Listview::Qt_Miniserver_Listview(QWidget* parent)
 
 }
 
-void Qt_Miniserver_Listview::addMiniserver(const CMiniserver& miniserver,int index) 
+void Qt_Miniserver_Listview::addMiniserverInitial(const CMiniserver& miniserver,int index) 
 {
     QTreeWidgetItem* item = new QTreeWidgetItem(this);
     item->setText(0, QString::fromStdString(MyConstants::Strings::StartUp_Listview_MS_Status));
@@ -33,11 +33,53 @@ void Qt_Miniserver_Listview::addMiniserver(const CMiniserver& miniserver,int ind
         emit connectConfigClicked(item);
         });
     setItemWidget(item, 6, button);
+    
+    QLineEdit* lineEditlocalIP = new QLineEdit(QString::fromStdString(miniserver.getLocalIP()), this);
+    lineEditlocalIP->setFrame(false);
+    connect(lineEditlocalIP, &QLineEdit::textChanged, this, [this, item]() {
+        emit localIPTextChanged(item);
+        });
+    setItemWidget(item, 7, lineEditlocalIP);
+    
+    Qt_ComboBoxItem* comboBoxLanguage = new Qt_ComboBoxItem(item, 8);
+    connect(comboBoxLanguage, &Qt_ComboBoxItem::currentTextChanged, this, [this, item]() {
+        emit comboBoxLanguageChanged(item, 8);
+        });
+    setItemWidget(item, 8, comboBoxLanguage);
+    comboBoxLanguage->setCurrentIndex(std::stoi(miniserver.getConfigLanguage()));
 
-    // Create a combo box in the "Language" column
-    
-    
-    item->setText(7, QString::fromStdString(miniserver.getLocalIP()));
+    item->setForeground(2, QColor(miniserver.getVersionColor().c_str()));
+    QFont font;
+    font.setBold(true);
+    item->setFont(2, font);
+
+    addTopLevelItem(item);
+}
+
+void Qt_Miniserver_Listview::addMiniserverUpdateContent(const CMiniserver& miniserver, int index)
+{
+    QTreeWidgetItem* item = new QTreeWidgetItem(this);
+    item->setText(0, QString::fromStdString(miniserver.getMiniserverStatus()));
+    item->setText(1, QString::fromStdString(miniserver.getSerialNumber()));
+    item->setText(2, QString::fromStdString(miniserver.getMiniserverVersion()));
+    item->setText(3, QString::fromStdString(miniserver.getMiniserverProject()));
+    item->setText(4, QString::fromStdString(miniserver.getMiniserverConfiguration()));
+    item->setText(5, QString::fromStdString(miniserver.getUpdatelevel()));
+
+    // Create a push button in the "Action" column
+    QPushButton* button = new QPushButton("Connect Config", this);
+    connect(button, &QPushButton::clicked, this, [this, item]() {
+        emit connectConfigClicked(item);
+        });
+    setItemWidget(item, 6, button);
+
+    QLineEdit* lineEditlocalIP = new QLineEdit(QString::fromStdString(miniserver.getLocalIP()), this);
+    lineEditlocalIP->setFrame(false);
+    connect(lineEditlocalIP, &QLineEdit::textChanged, this, [this, item]() {
+        emit localIPTextChanged(item);
+        });
+    setItemWidget(item, 7, lineEditlocalIP);
+
     Qt_ComboBoxItem* comboBoxLanguage = new Qt_ComboBoxItem(item, 8);
     connect(comboBoxLanguage, &Qt_ComboBoxItem::currentTextChanged, this, [this, item]() {
         emit comboBoxLanguageChanged(item, 8);
@@ -45,13 +87,16 @@ void Qt_Miniserver_Listview::addMiniserver(const CMiniserver& miniserver,int ind
     setItemWidget(item, 8, comboBoxLanguage);
     comboBoxLanguage->setCurrentIndex(std::stoi(miniserver.getConfigLanguage()));
     item->setForeground(2, QColor(miniserver.getVersionColor().c_str()));
+    QFont font;
+    font.setBold(true);
+    item->setFont(2, font);
 
     addTopLevelItem(item);
 }
 
 
 
-void Qt_Miniserver_Listview::setMiniservers(QList<CMiniserver>* list)
+void Qt_Miniserver_Listview::setMiniserversInitial(QList<CMiniserver>* list)
 {
     
     if (list) {
@@ -59,12 +104,33 @@ void Qt_Miniserver_Listview::setMiniservers(QList<CMiniserver>* list)
         asignMiniserverList(list);
         int index = 0;
         for (auto& miniserver : *list) {
-            addMiniserver(miniserver, index);
+            addMiniserverInitial(miniserver, index);
             index++;
+            
+        }
+        for (int j = 0; j < 9; j++) {
+            this->resizeColumnToContents(j);
         }
         update();
     }
         
+}
+
+void Qt_Miniserver_Listview::setMiniserversUpdateContents(QList<CMiniserver>* list)
+{
+    if (list) {
+        clear();
+        asignMiniserverList(list);
+        int index = 0;
+        for (auto& miniserver : *list) {
+            addMiniserverUpdateContent(miniserver, index);
+            index++;
+        }
+        for (int j = 0; j < 9; j++) {
+            this->resizeColumnToContents(j);
+        }
+        update();
+    }
 }
 
 
@@ -93,20 +159,11 @@ void Qt_Miniserver_Listview::comboBoxLanguageChanged(QTreeWidgetItem* item, int 
         if (comboBoxItem) {
             QString comboBoxText = comboBoxItem->currentText();
             std::string message = "Language changed:" + comboBoxText.toStdString() + " Index: " + std::to_string(index) + " Real Index: " + std::to_string(realIndex)  + "\n";
-            wchar_t wideMessage[512];
-            MultiByteToWideChar(CP_UTF8, 0, message.c_str(), -1, wideMessage, 512);
-            OutputDebugString(wideMessage);
+            qDebug() << message;
             if (CConfig::LanguageList.contains(comboBoxText)) {
                 QString LanguageListIndex = QString::number(CConfig::LanguageList.indexOf(comboBoxText));
                 (*miniserverlist)[realIndex].setConfigLanguage(LanguageListIndex.toStdString());
-                for (int i = 0; i < miniserverlist->count(); ++i)
-                {
-                    std::string message = " Index: " + std::to_string(i) + " - " + (*miniserverlist)[i].toString() + "\n";
-                    wchar_t wideMessage[512];
-                    MultiByteToWideChar(CP_UTF8, 0, message.c_str(), -1, wideMessage, 512);
-                    OutputDebugString(wideMessage);
-                }
-
+                CMiniserver::printAllMiniserversToDebug(miniserverlist);
                 return;
             }
         }
@@ -114,12 +171,12 @@ void Qt_Miniserver_Listview::comboBoxLanguageChanged(QTreeWidgetItem* item, int 
       
     //TODO: Show Dialog
     std::string message = " ERROR! : Language could not be changed at Index" + std::to_string(index) + "\n";
-    wchar_t wideMessage[512];
-    MultiByteToWideChar(CP_UTF8, 0, message.c_str(), -1, wideMessage, 512);
-    OutputDebugString(wideMessage);
+    qDebug() << message;
    
     
 }
+
+
 
 int Qt_Miniserver_Listview::getRealIndexfromSerialNumber(QString serialnumber)
 {

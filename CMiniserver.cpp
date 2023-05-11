@@ -147,6 +147,26 @@ void CMiniserver::setConfigLanguage(const std::string& language)
 }
 
 
+QString CMiniserver::formatMiniserverVersionQString(QString unformatedQString) {
+    QString formattedQString = "0.0.0.0";
+
+    if (unformatedQString.length() == 8) {
+        int unformatedInt = unformatedQString.toInt();
+        int v1 = (unformatedInt / 1000000) % 100;
+        int v2 = (unformatedInt / 10000) % 100;
+        int v3 = (unformatedInt / 100) % 100;
+        int v4 = unformatedInt % 100;
+
+        QString part1 = QString::number(v1);
+        QString part2 = QString::number(v2);
+        QString part3 = QString::number(v3);
+        QString part4 = QString::number(v4);
+
+        formattedQString = part1 + "." + part2 + "." + part3 + "." + part4;
+    }
+
+    return formattedQString;
+}
 
 std::string CMiniserver::toString() const
 {
@@ -163,4 +183,13 @@ std::string CMiniserver::toString() const
     str += localIP + " ";
     str += "Lang:" + CConfig::LanguageList.at(stoi(configLanguage)).toStdString() + " }";
     return str;
+}
+
+void CMiniserver::printAllMiniserversToDebug(QList<CMiniserver>* miniservers)
+{
+    for (int i = 0; i < miniservers->count(); ++i)
+    {
+        std::string message = " Index: " + std::to_string(i) + " - " + (*miniservers)[i].toString() + "\n";
+        qDebug() << message;
+    }
 }

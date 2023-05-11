@@ -99,3 +99,4 @@ void CConfig::LoadFromMiniserver()
 {
     sendCommand("127.0.0.1", 7770, "L");
 }
+

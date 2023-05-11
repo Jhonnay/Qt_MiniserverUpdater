@@ -75,7 +75,7 @@ QString CWebService::sendCommandRest_Version_Remote_Cloud(CMiniserver miniserver
 {
     QString receivedData = "error";
     QString url = CWebService::getCloudDNSLink(miniserver);
-
+    qDebug() << "Url: " << url;
     if (!url.isEmpty()) {
         url = url + command;
         QNetworkAccessManager* manager = new QNetworkAccessManager();
@@ -131,6 +131,7 @@ QString CWebService::sendCommandRest_Version_Remote_Cloud(CMiniserver miniserver
         
 
     }
+    qDebug() << "Data: " << receivedData;
     return receivedData;
     
 }
@@ -140,7 +141,7 @@ QString CWebService::sendCommandRest_Version_Local_Gen1(CMiniserver miniserver, 
 {
     QString receivedData = "error";
     QString url = "http://" + QString::fromStdString(miniserver.getLocalIP()) + "/" + command;
-
+    qDebug() << "Url: " << url;
     
     QNetworkAccessManager* manager = new QNetworkAccessManager();
     QNetworkRequest request;
@@ -193,6 +194,7 @@ QString CWebService::sendCommandRest_Version_Local_Gen1(CMiniserver miniserver, 
 
         delete manager;
     }
+    qDebug() << "Data: " << receivedData;
     return receivedData;
 }
 
