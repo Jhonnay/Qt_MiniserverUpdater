@@ -4,7 +4,7 @@
 #include "ui_Qt_MiniserverUpdater.h"
 #include "Qt_Menubar.h"
 #include "Qt_Bottom_Action_Buttons.h"
-#include "Qt_Miniserver_Listview.h"
+#include "Qt_MiniserverTableView.h"
 #include "CApplicationSettings.h"
 #include "Qt_Statusbar.h"
 #include "CConfig.h"
@@ -15,6 +15,7 @@ class Qt_MiniserverUpdater : public QMainWindow
 
 public:
     Qt_MiniserverUpdater(QWidget* parent = nullptr);
+    Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, QWidget* parent = nullptr);
     ~Qt_MiniserverUpdater();
     
     void setMiniserverList(QList<CMiniserver>* list);
@@ -34,7 +35,7 @@ private:
 
     QVBoxLayout* vBox;
     Qt_Menubar* menubar;
-    Qt_Miniserver_Listview* treeViewMiniserver;
+    Qt_MiniserverTableView* tableViewMiniserver;
     Qt_Bottom_Action_Buttons* bottom_buttons;
     Qt_Statusbar* statusbar; 
     QWidget* centralWidget; 

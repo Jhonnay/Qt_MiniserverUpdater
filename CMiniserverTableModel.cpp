@@ -38,7 +38,7 @@ QVariant CMiniserverTableModel::data(const QModelIndex& index, int role) const
         case 8: return QString::fromStdString(miniserver.getConfigLanguage());
         }
     }
-    else if (role == Qt::BackgroundRole && index.column() == 2)
+    else if (role == Qt::ForegroundRole && index.column() == 2)
     {
         return QColor(QString::fromStdString(miniserver.getVersionColor()));
     }
@@ -55,11 +55,11 @@ QVariant CMiniserverTableModel::headerData(int section, Qt::Orientation orientat
     {
         switch (section)
         {
-        case 0: return "Miniserver Status";
+        case 0: return "Status";
         case 1: return "Serial Number";
-        case 2: return "Miniserver Version";
-        case 3: return "Miniserver Project";
-        case 4: return "Miniserver Configuration";
+        case 2: return "Version";
+        case 3: return "Project";
+        case 4: return "Configuration";
         case 5: return "Update Level";
         case 6: return "Action";
         case 7: return "Local IP";

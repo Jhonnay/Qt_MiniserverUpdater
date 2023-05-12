@@ -27,10 +27,11 @@ int main(int argc, char* argv[])
     QApplication a(argc, argv);
 
     std::cout << "Hello, World!" << std::endl;
-
-    //MainWindow
-    Qt_MiniserverUpdater* mainwindow = new Qt_MiniserverUpdater();
+    
     QList<CMiniserver> miniservers;
+    //MainWindow
+    Qt_MiniserverUpdater* mainwindow = new Qt_MiniserverUpdater(&miniservers, nullptr);
+    
 
     QString applicationSettingsPath = checkIfApplicationSettingsExist("ApplicationSettings.json");
     if (!applicationSettingsPath.isEmpty()) {

@@ -3,18 +3,16 @@
 Qt_MiniserverTableView::Qt_MiniserverTableView(QWidget *parent)
 	: QTableView(parent)
 {
-	ui.setupUi(this);
+    Qt_MiniserverTableView(NULL, this); //does not work
 }
 
-Qt_MiniserverTableView::~Qt_MiniserverTableView()
-{}
 
 
 Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, QWidget* parent)
     : QTableView(parent), m_model(new CMiniserverTableModel(miniservers, this))
 {
     setModel(m_model);
-    setSelectionMode(QAbstractItemView::SingleSelection);
+    setSelectionMode(QAbstractItemView::ExtendedSelection);
     setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // Set up the "Connect Config" push button delegate
@@ -24,7 +22,8 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
         auto button = qobject_cast<QPushButton*>(editor);
         if (button)
         {
-            // Perform the "Connect Config" action for the selected row
+            std::string message = "Action Button pressed";
+            qDebug() << message;
             // ...
         }
         });
@@ -35,3 +34,5 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
 }
 
 
+Qt_MiniserverTableView::~Qt_MiniserverTableView()
+{}
