@@ -85,6 +85,15 @@
     <ClCompile Include="Qt_ComboBoxItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CMiniserverTableModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Qt_MiniserverTableView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CComboBoxLanguageDelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CApplicationSettings.h">
@@ -134,6 +143,15 @@
     <QtMoc Include="Qt_ComboBoxItem.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="CMiniserverTableModel.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Qt_MiniserverTableView.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="CComboBoxLanguageDelegate.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="Qt_Bottom_Action_Buttons.ui">
@@ -149,6 +167,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="Qt_ComboBoxItem.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Qt_MiniserverTableView.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

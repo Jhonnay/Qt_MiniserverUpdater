@@ -83,8 +83,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CComboBoxLanguageDelegate.cpp" />
     <ClCompile Include="CLoxAppJson.cpp" />
     <ClCompile Include="CMiniserver.cpp" />
+    <ClCompile Include="CMiniserverTableModel.cpp" />
     <ClCompile Include="CurrentUser.cpp" />
     <ClCompile Include="CWebService.cpp" />
     <ClCompile Include="MyConstants.cpp" />
@@ -96,6 +98,7 @@
     </ClCompile>
     <ClCompile Include="Qt_ComboBoxItem.cpp" />
     <ClCompile Include="Qt_Menubar.cpp" />
+    <ClCompile Include="Qt_MiniserverTableView.cpp" />
     <ClCompile Include="Qt_Miniserver_Listview.cpp" />
     <ClCompile Include="Qt_Statusbar.cpp" />
     <ClCompile Include="stdafx.cpp" />
@@ -103,6 +106,7 @@
     <QtUic Include="Qt_Bottom_Action_Buttons.ui" />
     <QtUic Include="Qt_ComboBoxItem.ui" />
     <QtUic Include="Qt_Menubar.ui" />
+    <QtUic Include="Qt_MiniserverTableView.ui" />
     <QtUic Include="Qt_MiniserverUpdater.ui" />
     <QtMoc Include="Qt_MiniserverUpdater.h" />
     <ClCompile Include="CApplicationSettings.cpp" />
@@ -118,9 +122,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CApplicationSettings.h" />
+    <QtMoc Include="CComboBoxLanguageDelegate.h" />
     <ClInclude Include="CConfig.h" />
     <ClInclude Include="CLoxAppJson.h" />
     <ClInclude Include="CMiniserver.h" />
+    <QtMoc Include="CMiniserverTableModel.h" />
     <ClInclude Include="CurrentUser.h" />
     <ClInclude Include="CWebService.h" />
     <ClInclude Include="MyConstants.h" />
@@ -129,6 +135,7 @@
     <QtMoc Include="Qt_Miniserver_Listview.h" />
     <QtMoc Include="Qt_Statusbar.h" />
     <QtMoc Include="Qt_ComboBoxItem.h" />
+    <QtMoc Include="Qt_MiniserverTableView.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
