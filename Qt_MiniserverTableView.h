@@ -15,9 +15,13 @@ public:
 	Qt_MiniserverTableView(QWidget *parent = nullptr);
 	explicit Qt_MiniserverTableView(QList<CMiniserver>* miniservers, QWidget* parent = nullptr);
 	~Qt_MiniserverTableView();
+	CMiniserverTableModel* getMiniserverModel();
+	
+
 
 private slots: 
 	void handleConnectConfigClicked(const QModelIndex& index);
+	
 
 	
 signals:

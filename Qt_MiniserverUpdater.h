@@ -20,12 +20,12 @@ public:
     
     void setMiniserverList(QList<CMiniserver>* list);
     void setConfigEXEPath(QString path);
-    QList<QString> getSelectedSerialNumbers(QList<QTreeWidgetItem*> selectedItems);
+    
     
 
 public slots:
     void onConnectConfigClicked(CMiniserver* miniserver);
-    void onLocalIPTextChanged(QTreeWidgetItem* item);
+   
     void onRefreshClicked();
     void onConnectConfig();
 

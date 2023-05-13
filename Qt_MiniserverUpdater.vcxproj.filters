@@ -97,6 +97,9 @@
     <ClCompile Include="CConnectConfigButtonDelegate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CUPDListener.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CApplicationSettings.h">
@@ -157,6 +160,9 @@
     </QtMoc>
     <QtMoc Include="CConnectConfigButtonDelegate.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="CUPDListener.h">
+      <Filter>Source Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

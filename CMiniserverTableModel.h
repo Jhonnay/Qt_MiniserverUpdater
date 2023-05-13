@@ -15,6 +15,7 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     Qt::ItemFlags flags(const QModelIndex& index) const override;
     bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
+    
     QList<CMiniserver>* miniserverlist;
     
 
@@ -24,6 +25,7 @@ signals:
 
 public slots:
     void onConnectConfigClicked();
+    //void sort(int column, Qt::SortOrder order);
 
     
 };

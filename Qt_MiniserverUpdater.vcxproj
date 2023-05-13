@@ -89,6 +89,7 @@
     <ClCompile Include="CLoxAppJson.cpp" />
     <ClCompile Include="CMiniserver.cpp" />
     <ClCompile Include="CMiniserverTableModel.cpp" />
+    <ClCompile Include="CUPDListener.cpp" />
     <ClCompile Include="CurrentUser.cpp" />
     <ClCompile Include="CWebService.cpp" />
     <ClCompile Include="MyConstants.cpp" />
@@ -130,6 +131,7 @@
     <ClInclude Include="CLoxAppJson.h" />
     <ClInclude Include="CMiniserver.h" />
     <QtMoc Include="CMiniserverTableModel.h" />
+    <QtMoc Include="CUPDListener.h" />
     <ClInclude Include="CurrentUser.h" />
     <ClInclude Include="CWebService.h" />
     <ClInclude Include="MyConstants.h" />

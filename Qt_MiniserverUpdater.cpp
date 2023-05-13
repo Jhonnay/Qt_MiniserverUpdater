@@ -1,5 +1,6 @@
 #include "Qt_MiniserverUpdater.h"
 #include "CWebService.h"
+#include "MyConstants.h"
 
 Qt_MiniserverUpdater::Qt_MiniserverUpdater(QWidget* parent )
     : QMainWindow(parent)
@@ -27,6 +28,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     centralWidget = new QWidget();
     centralWidget->setLayout(vBox);
 
+    
     //connect(tableViewMiniserver, &Qt_MiniserverTableView::connectConfigClicked, this, &Qt_MiniserverUpdater::onConnectConfigClicked);
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonRefreshClicked, this, &Qt_MiniserverUpdater::onRefreshClicked);
     //connect(tableViewMiniserver, &Qt_MiniserverTableView::localIPTextChanged, this, &Qt_MiniserverUpdater::onLocalIPTextChanged);
@@ -42,6 +44,11 @@ Qt_MiniserverUpdater::~Qt_MiniserverUpdater()
 
 void Qt_MiniserverUpdater::setMiniserverList(QList<CMiniserver>* list)
 {
+    for (int i = 0; i < list->count(); i++) {
+        (*list)[i].setMiniserverStatus(MyConstants::Strings::StartUp_Listview_MS_Status);
+        (*list)[i].setMiniserverVersion(MyConstants::Strings::StartUp_Listview_MS_Version);
+        (*list)[i].setVersionColor("darkblue");
+    }
     this->miniservers = list;
     tableViewMiniserver->setModel(new CMiniserverTableModel(list,this));
     tableViewMiniserver->resizeColumnsToContents();
@@ -52,103 +59,50 @@ void Qt_MiniserverUpdater::setConfigEXEPath(QString path)
     statusbar->setConfigExePath(path);
 }
 
-QList<QString> Qt_MiniserverUpdater::getSelectedSerialNumbers(QList<QTreeWidgetItem*> selectedItems)
-{
-    QList<QString> listOfSerialNumbers;
-    for (int i = 0; i < selectedItems.count(); ++i) {
-        listOfSerialNumbers.append(selectedItems[i]->text(1));
-    }
-    return listOfSerialNumbers;
-}
+
 
 
 
 void Qt_MiniserverUpdater::onRefreshClicked()
 {
-    //tableViewMiniserver->sortByColumn(-1, Qt::AscendingOrder);
-    //tableViewMiniserver->update();
-    //QList<QTreeWidgetItem*>  selected = tableViewMiniserver->selectedItems();
-    //QList<QString> selectedSerialNumbers = getSelectedSerialNumbers(selected);
+    const QModelIndexList selectedIndexes =  tableViewMiniserver->selectionModel()->selectedRows();
 
-    ////tableViewMiniserver->setMiniservers(miniservers); //set everyone to TBD and outdated info. 
-    //tableViewMiniserver->setDisabled(true);
-    //bottom_buttons->setDisabledAllExceptCancel(true);
+    for (const QModelIndex& index : selectedIndexes)
+    {
+        // Get the row number of the selected index
+        int row = index.row();
 
-    //for (int i = 0; i < selectedSerialNumbers.count(); ++i){
-    //
-    //    int realIndex = tableViewMiniserver->getRealIndexfromSerialNumber(selectedSerialNumbers[i]); //here might be problem
-    //    if (!(*miniservers)[realIndex].getLocalIP().empty()) {
-    //        QString unformatedVersionString = CWebService::sendCommandRest_Version_Local_Gen1((*miniservers)[realIndex], "dev/sys/version", "value");
-    //        (*miniservers)[realIndex].setMiniserverVersion(CMiniserver::formatMiniserverVersionQString(unformatedVersionString).toStdString());
-    //    }
-    //    else {
-    //        QString unformatedVersionString  = CWebService::sendCommandRest_Version_Remote_Cloud((*miniservers)[realIndex], "dev/sys/version", "value");
-    //        (*miniservers)[realIndex].setMiniserverVersion(CMiniserver::formatMiniserverVersionQString(unformatedVersionString).toStdString());
-    //    }
-    //   
-    //}
- 
-    //tableViewMiniserver->setMiniserversUpdateContents(miniservers);
-    //tableViewMiniserver->setDisabled(false);
-    //bottom_buttons->setDisabledAllExceptCancel(false);
-    
-    
-    
+        // Get the data for the selected row
+        CMiniserver& miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
+        qDebug() << "Selected row: " << miniserver.getSerialNumber().c_str();
+        if (!miniserver.getLocalIP().empty()) {
+            QString unformatedVersionString = CWebService::sendCommandRest_Version_Local_Gen1(miniserver, "dev/sys/version", "value");
+            miniserver.setMiniserverVersion(CMiniserver::formatMiniserverVersionQString(unformatedVersionString).toStdString());
+        }
+        else {
+            QString unformatedVersionString  = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "dev/sys/version", "value");
+            miniserver.setMiniserverVersion(CMiniserver::formatMiniserverVersionQString(unformatedVersionString).toStdString());
+        }
+        emit tableViewMiniserver->getMiniserverModel()->dataChanged(index, index);
+    }
+
+    tableViewMiniserver->update();
+
+    qDebug() << "Printing all miniservers after RefreshButton was clicked!";
+    for (int i = 0; i < miniservers->count(); i++) {
+        qDebug() << "Row: " << i << " - " << miniservers->at(i).toString();
+    }
 
 }
 
 void Qt_MiniserverUpdater::onConnectConfig()
 {
 
+
 }
 
 void Qt_MiniserverUpdater::onConnectConfigClicked(CMiniserver* miniserver) {
     qDebug() << miniserver->toString();
 }
-
-void Qt_MiniserverUpdater::onLocalIPTextChanged(QTreeWidgetItem* item)
-{
-    ////TODO: Connect / Load / LOUT
-    //int rowIndex = tableViewMiniserver->indexFromItem(item).row();
-    //QString serialnumber = item->text(1);
-    //int realIndex = tableViewMiniserver->getRealIndexfromSerialNumber(serialnumber);
-    //
-    //QLineEdit* lineEdit = qobject_cast<QLineEdit*>(item->treeWidget()->itemWidget(item, 7));
-    //if (lineEdit) {
-    //    QString ipAddress = lineEdit->text();
-    //    (*miniservers)[realIndex].setLocalIP(ipAddress.toStdString());
-    //    std::string message = "Local IP  changed to: " + serialnumber.toStdString() + "Index: " + std::to_string(rowIndex) + " RealIndex: " + std::to_string(realIndex);
-    //    qDebug() << message;
-    //    CMiniserver::printAllMiniserversToDebug(miniservers);
-    //    return; //if everything was OK. 
-    //}
-
-    ////TODO: Show Dialog
-    ////if comboboxitem = Null OR LanguageList does not contain String
-    //std::string message = "Could not change IP of real Index: " + realIndex;
-    //qDebug() << message;
-}
-
-//void Qt_MiniserverUpdater::onConnectConfigClicked(QTreeWidgetItem* item) {    
-    ////TODO: Connect / Load / LOUT
-    //int index = tableViewMiniserver->indexFromItem(item).row();
-    //std::string message = "Connect Config Button clicked! Index: " + std::to_string(index);
-    //qDebug() << message;
-
-    //Qt_ComboBoxItem* comboBoxItem = qobject_cast<Qt_ComboBoxItem*>(item->treeWidget()->itemWidget(item, 8));
-    //if (comboBoxItem) {
-    //    QString comboBoxText = comboBoxItem->currentText();
-    //    if (CConfig::LanguageList.contains(comboBoxText)) {
-    //        QString LanguageListIndex = QString::number(CConfig::LanguageList.indexOf(comboBoxText));
-    //        CConfig::startConfig_Language(statusbar->getConfigExePath(), LanguageListIndex);
-    //        return; //if everything was OK. 
-    //    }
-    //}
-    //
-    ////TODO: Show Dialog
-    ////if comboboxitem = Null OR LanguageList does not contain String
-    //CConfig::startConfig_Language(statusbar->getConfigExePath(), NULL);
-
-//}
 
 

@@ -19,6 +19,8 @@ public:
 	void Disconnect();
 	void Update();
 	void LoadFromMiniserver();
+
+	void closeConfig();
 	
 };
 

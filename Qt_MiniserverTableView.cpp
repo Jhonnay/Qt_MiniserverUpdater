@@ -13,13 +13,15 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
     : QTableView(parent), m_model(new CMiniserverTableModel(miniservers, this))
 {
     setModel(m_model);
-    setSelectionMode(QAbstractItemView::SingleSelection);
+    setSelectionMode(QAbstractItemView::MultiSelection);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     verticalHeader()->setMinimumWidth(35);
     setSortingEnabled(true);
-    //horizontalHeader()->setSectionsMovable(true);     //set Header moveable
-    
+    setEditTriggers(QAbstractItemView::AllEditTriggers); //enable single click for edit mode
+    //setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::EditKeyPressed);
+    horizontalHeader()->setSectionsMovable(true);     //set Header moveable
+    //connect(horizontalHeader(), &QHeaderView::sectionClicked, m_model, &CMiniserverTableModel::sort);
     //Test
     //QPalette palette;
     //palette.setColor(QPalette::Highlight, QColor(200, 225, 255)); // set light blue color for selection
@@ -43,6 +45,11 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
 Qt_MiniserverTableView::~Qt_MiniserverTableView()
 {}
 
+CMiniserverTableModel* Qt_MiniserverTableView::getMiniserverModel()
+{
+    return this->m_model;
+}
+
 
 void Qt_MiniserverTableView::handleConnectConfigClicked(const QModelIndex& index) {
     int row = index.row();
@@ -57,3 +64,6 @@ void Qt_MiniserverTableView::handleConnectConfigClicked(const QModelIndex& index
     const CMiniserver& miniserver = m_model->miniserverlist->at(_index.row());
     emit  ConnectConfigClicked(_index, miniserver);
 }
+
+
+
