@@ -7,6 +7,7 @@
 class Qt_Bottom_Action_Buttons : public QWidget
 {
 	Q_OBJECT
+		
 
 public:
 	explicit Qt_Bottom_Action_Buttons(QWidget* parent = nullptr);

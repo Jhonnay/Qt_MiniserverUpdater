@@ -35,12 +35,17 @@ QVariant CMiniserverTableModel::data(const QModelIndex& index, int role) const
         case 4: return QString::fromStdString(miniserver.getMiniserverConfiguration());
         case 5: return QString::fromStdString(miniserver.getUpdatelevel());
         case 7: return QString::fromStdString(miniserver.getLocalIP());
-        case 8: return QString::fromStdString(miniserver.getConfigLanguage());
+        case 8: return CConfig::LanguageList.at(stoi(miniserver.getConfigLanguage()));
         }
     }
     else if (role == Qt::ForegroundRole && index.column() == 2)
     {
         return QColor(QString::fromStdString(miniserver.getVersionColor()));
+    }
+    else if (role == Qt::FontRole && index.column() == 2) {
+        QFont font;
+        font.setBold(true);
+        return font;
     }
 
     return QVariant();
@@ -91,14 +96,35 @@ bool CMiniserverTableModel::setData(const QModelIndex& index, const QVariant& va
 
         switch (index.column())
         {
-        case 7: miniserver.getLocalIP() = value.toString().toStdString(); break;
-        case 8: miniserver.getConfigLanguage() = value.toString().toStdString(); break;
+        case 7: miniserver.setLocalIP(value.toString().toStdString()); break;
+        case 8: miniserver.setConfigLanguage(value.toString().toStdString()); break;
         default: return false;
         }
+        //Debug
+        qDebug() << "Data Changed @ Row:  " << index.row() << " Column: " << index.column() << " - " <<
+            miniserver.toString();
+
+        for (int i = 0; i < miniserverlist->count(); i++) {
+            qDebug() << "Row: "  << i << " - " << miniserverlist->at(i).toString();
+        }
+        
 
         emit dataChanged(index, index);
         return true;
     }
 
     return false;
+}
+
+void CMiniserverTableModel::onConnectConfigClicked()
+{
+    // Get the row and column of the clicked button
+    QModelIndex index = qobject_cast<QPushButton*>(sender())->property("index").value<QModelIndex>();
+    int row = index.row();
+
+    // Get the corresponding miniserver
+    const CMiniserver& miniserver = miniserverlist->at(row);
+
+    // Emit the signal
+    emit connectConfigClicked(miniserver);
 }

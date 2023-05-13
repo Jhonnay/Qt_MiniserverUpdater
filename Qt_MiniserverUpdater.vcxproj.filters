@@ -94,6 +94,9 @@
     <ClCompile Include="CComboBoxLanguageDelegate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CConnectConfigButtonDelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CApplicationSettings.h">
@@ -150,6 +153,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="CComboBoxLanguageDelegate.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="CConnectConfigButtonDelegate.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

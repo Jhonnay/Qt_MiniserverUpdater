@@ -44,6 +44,7 @@ void Qt_MiniserverUpdater::setMiniserverList(QList<CMiniserver>* list)
 {
     this->miniservers = list;
     tableViewMiniserver->setModel(new CMiniserverTableModel(list,this));
+    tableViewMiniserver->resizeColumnsToContents();
 }
 
 void Qt_MiniserverUpdater::setConfigEXEPath(QString path)
@@ -96,6 +97,15 @@ void Qt_MiniserverUpdater::onRefreshClicked()
 
 }
 
+void Qt_MiniserverUpdater::onConnectConfig()
+{
+
+}
+
+void Qt_MiniserverUpdater::onConnectConfigClicked(CMiniserver* miniserver) {
+    qDebug() << miniserver->toString();
+}
+
 void Qt_MiniserverUpdater::onLocalIPTextChanged(QTreeWidgetItem* item)
 {
     ////TODO: Connect / Load / LOUT
@@ -119,7 +129,7 @@ void Qt_MiniserverUpdater::onLocalIPTextChanged(QTreeWidgetItem* item)
     //qDebug() << message;
 }
 
-void Qt_MiniserverUpdater::onConnectConfigClicked(QTreeWidgetItem* item) {    
+//void Qt_MiniserverUpdater::onConnectConfigClicked(QTreeWidgetItem* item) {    
     ////TODO: Connect / Load / LOUT
     //int index = tableViewMiniserver->indexFromItem(item).row();
     //std::string message = "Connect Config Button clicked! Index: " + std::to_string(index);
@@ -139,6 +149,6 @@ void Qt_MiniserverUpdater::onConnectConfigClicked(QTreeWidgetItem* item) {
     ////if comboboxitem = Null OR LanguageList does not contain String
     //CConfig::startConfig_Language(statusbar->getConfigExePath(), NULL);
 
-}
+//}
 
 

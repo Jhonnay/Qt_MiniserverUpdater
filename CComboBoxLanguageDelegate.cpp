@@ -14,9 +14,9 @@ QWidget* CComboBoxLanguageDelegate::createEditor(QWidget* parent, const QStyleOp
     Q_UNUSED(option)
         Q_UNUSED(index)
 
-        QComboBox* comboBox = new QComboBox(parent);
+    QComboBox* comboBox = new QComboBox(parent);
     comboBox->addItems(CConfig::LanguageList);
-    comboBox->setEditable(false);
+    comboBox->setEditable(true);
 
     return comboBox;
 }
@@ -36,6 +36,16 @@ void CComboBoxLanguageDelegate::setModelData(QWidget* editor, QAbstractItemModel
     QComboBox* comboBox = qobject_cast<QComboBox*>(editor);
     if (comboBox)
     {
-        model->setData(index, comboBox->currentText(), Qt::EditRole);
+        QString languageAsInteger;
+        if (CConfig::LanguageList.contains(comboBox->currentText())) {
+            languageAsInteger = QString::number(CConfig::LanguageList.indexOf(comboBox->currentText()));
+            
+        }
+        else
+        {
+            languageAsInteger = QString::number(CConfig::LanguageList.indexOf("ENU")); //default
+        }
+        model->setData(index, languageAsInteger, Qt::EditRole);
+        
     }
 }

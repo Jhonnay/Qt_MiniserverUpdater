@@ -24,9 +24,10 @@ public:
     
 
 public slots:
-    void onConnectConfigClicked(QTreeWidgetItem* item);
+    void onConnectConfigClicked(CMiniserver* miniserver);
     void onLocalIPTextChanged(QTreeWidgetItem* item);
     void onRefreshClicked();
+    void onConnectConfig();
 
 
 private:

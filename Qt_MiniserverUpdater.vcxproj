@@ -34,6 +34,7 @@
     <QtInstall>6.5.0_msvc2019_64</QtInstall>
     <QtModules>charts;concurrent;core;gui;help;network;networkauth;uitools;webenginecore;websockets;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
+    <QtToolsDesignTime>false</QtToolsDesignTime>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>6.5.0_msvc2019_64</QtInstall>
@@ -84,6 +85,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CComboBoxLanguageDelegate.cpp" />
+    <ClCompile Include="CConnectConfigButtonDelegate.cpp" />
     <ClCompile Include="CLoxAppJson.cpp" />
     <ClCompile Include="CMiniserver.cpp" />
     <ClCompile Include="CMiniserverTableModel.cpp" />
@@ -124,6 +126,7 @@
     <ClInclude Include="CApplicationSettings.h" />
     <QtMoc Include="CComboBoxLanguageDelegate.h" />
     <ClInclude Include="CConfig.h" />
+    <QtMoc Include="CConnectConfigButtonDelegate.h" />
     <ClInclude Include="CLoxAppJson.h" />
     <ClInclude Include="CMiniserver.h" />
     <QtMoc Include="CMiniserverTableModel.h" />
