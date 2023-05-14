@@ -1,4 +1,5 @@
 #include "CMiniserverTableModel.h"
+#include "CConnectConfigButtonDelegate.h"
 
 CMiniserverTableModel::CMiniserverTableModel(QList<CMiniserver>* miniservers, QObject* parent)
     : QAbstractTableModel(parent), miniserverlist(miniservers)
@@ -81,12 +82,14 @@ Qt::ItemFlags CMiniserverTableModel::flags(const QModelIndex& index) const
 
     if (index.isValid())
     {
-        if (index.column() == 7 || index.column() == 8)
+        if (index.column() == 6 ||index.column() == 7 || index.column() == 8)
             return defaultFlags | Qt::ItemIsEditable;
     }
 
     return defaultFlags;
 }
+
+
 
 bool CMiniserverTableModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {

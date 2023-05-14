@@ -85,11 +85,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CComboBoxLanguageDelegate.cpp" />
+    <ClCompile Include="CConfigMSUpdate.cpp" />
     <ClCompile Include="CConnectConfigButtonDelegate.cpp" />
     <ClCompile Include="CLoxAppJson.cpp" />
     <ClCompile Include="CMiniserver.cpp" />
     <ClCompile Include="CMiniserverTableModel.cpp" />
-    <ClCompile Include="CUPDListener.cpp" />
+    <ClCompile Include="CUDPListener.cpp" />
     <ClCompile Include="CurrentUser.cpp" />
     <ClCompile Include="CWebService.cpp" />
     <ClCompile Include="MyConstants.cpp" />
@@ -128,10 +129,11 @@
     <QtMoc Include="CComboBoxLanguageDelegate.h" />
     <ClInclude Include="CConfig.h" />
     <QtMoc Include="CConnectConfigButtonDelegate.h" />
+    <ClInclude Include="CConfigMSUpdate.h" />
     <ClInclude Include="CLoxAppJson.h" />
     <ClInclude Include="CMiniserver.h" />
     <QtMoc Include="CMiniserverTableModel.h" />
-    <QtMoc Include="CUPDListener.h" />
+    <QtMoc Include="CUDPListener.h" />
     <ClInclude Include="CurrentUser.h" />
     <ClInclude Include="CWebService.h" />
     <ClInclude Include="MyConstants.h" />

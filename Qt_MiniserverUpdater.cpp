@@ -1,6 +1,8 @@
 #include "Qt_MiniserverUpdater.h"
 #include "CWebService.h"
 #include "MyConstants.h"
+#include "CConfigMSUpdate.h"
+#include <QTimer>
 
 Qt_MiniserverUpdater::Qt_MiniserverUpdater(QWidget* parent )
     : QMainWindow(parent)
@@ -11,10 +13,10 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
 {
     miniservers = miniserverList;
     vBox = new QVBoxLayout(this);
-    menubar = new Qt_Menubar();
+    menubar = new Qt_Menubar(this);
     tableViewMiniserver = new Qt_MiniserverTableView(miniservers,this);
-    bottom_buttons = new Qt_Bottom_Action_Buttons(); 
-    statusbar = new Qt_Statusbar();
+    bottom_buttons = new Qt_Bottom_Action_Buttons(this); 
+    statusbar = new Qt_Statusbar(this);
     applicationSettings = NULL;
     
 
@@ -29,7 +31,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     centralWidget->setLayout(vBox);
 
     
-    //connect(tableViewMiniserver, &Qt_MiniserverTableView::connectConfigClicked, this, &Qt_MiniserverUpdater::onConnectConfigClicked);
+    connect(tableViewMiniserver, &Qt_MiniserverTableView::ConnectConfigClicked, this, &Qt_MiniserverUpdater::onConnectConfigClicked);
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonRefreshClicked, this, &Qt_MiniserverUpdater::onRefreshClicked);
     //connect(tableViewMiniserver, &Qt_MiniserverTableView::localIPTextChanged, this, &Qt_MiniserverUpdater::onLocalIPTextChanged);
 
@@ -52,6 +54,7 @@ void Qt_MiniserverUpdater::setMiniserverList(QList<CMiniserver>* list)
     this->miniservers = list;
     tableViewMiniserver->setModel(new CMiniserverTableModel(list,this));
     tableViewMiniserver->resizeColumnsToContents();
+    tableViewMiniserver->setColumnWidth(6, 100);
 }
 
 void Qt_MiniserverUpdater::setConfigEXEPath(QString path)
@@ -86,7 +89,9 @@ void Qt_MiniserverUpdater::onRefreshClicked()
         emit tableViewMiniserver->getMiniserverModel()->dataChanged(index, index);
     }
 
-    tableViewMiniserver->update();
+    QTimer::singleShot(0, tableViewMiniserver, &Qt_MiniserverTableView::update);
+    //this->update();
+    //tableViewMiniserver->update();
 
     qDebug() << "Printing all miniservers after RefreshButton was clicked!";
     for (int i = 0; i < miniservers->count(); i++) {
@@ -101,8 +106,41 @@ void Qt_MiniserverUpdater::onConnectConfig()
 
 }
 
-void Qt_MiniserverUpdater::onConnectConfigClicked(CMiniserver* miniserver) {
-    qDebug() << miniserver->toString();
+void Qt_MiniserverUpdater::onConnectConfigClicked(const QModelIndex& index, const CMiniserver& miniserver) {
+    qDebug() << miniserver.toString();
+
+    QString configPath = statusbar->getConfigExePath();
+    CConfigMSUpdate config;
+
+
+    if (configPath != "Current Config : not selected - double click to select") {
+        config.setUser(QString::fromStdString( miniserver.getAdminUser() ));
+        config.setPw(QString::fromStdString(miniserver.getAdminPassword()));
+        config.SetConfigPath(configPath);
+        config.SetConfigLanguage(QString::fromStdString(miniserver.getConfigLanguage()));
+        if (miniserver.getLocalIP() != "" || !miniserver.getLocalIP().empty()) {
+            config.setMsIP(QString::fromStdString(miniserver.getLocalIP()));
+        }
+        else {
+            config.setMsIP(QString::fromStdString(miniserver.getSerialNumber()));
+        }
+        int configCount = CConfigMSUpdate::getRunningConfigInstances();
+        if (configCount  == 0) {
+            config.OpenConfigLoadProject();
+        }
+        else {
+            QString message = QString::fromStdString(MyConstants::Strings::MessageBox_ConnectConfigButton_ConfigsOpen_Error_Part1) + QString::number(configCount) + QString::fromStdString(MyConstants::Strings::MessageBox_ConnectConfigButton_ConfigsOpen_Error_Part2);
+            QMessageBox::warning(nullptr, "Error", message);
+        }
+
+        
+    }
+    else
+    {
+        QMessageBox::warning(nullptr, "Error", "No Config Exe selected!");
+    }
+
+
 }
 
 

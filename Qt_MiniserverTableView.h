@@ -17,7 +17,9 @@ public:
 	~Qt_MiniserverTableView();
 	CMiniserverTableModel* getMiniserverModel();
 	
-
+public slots:
+	void update() { QTableView::update(); }
+	void repaint() { QTableView::repaint(); }
 
 private slots: 
 	void handleConnectConfigClicked(const QModelIndex& index);

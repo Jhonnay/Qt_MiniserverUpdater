@@ -97,7 +97,10 @@
     <ClCompile Include="CConnectConfigButtonDelegate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CUPDListener.cpp">
+    <ClCompile Include="CUDPListener.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CConfigMSUpdate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -124,6 +127,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MyConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CConfigMSUpdate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -161,8 +167,8 @@
     <QtMoc Include="CConnectConfigButtonDelegate.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="CUPDListener.h">
-      <Filter>Source Files</Filter>
+    <QtMoc Include="CUDPListener.h">
+      <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

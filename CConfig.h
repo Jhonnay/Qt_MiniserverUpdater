@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include <windows.h>
 
 
 class CConfig
@@ -13,6 +14,8 @@ public:
 	QProcess p;
 	static const QList<QString> LanguageList;
 	static void startConfig(QString configPath);
+	void startConfig(QString configPath, QString projectPath);
+	void startConfig_Language(QString configPath, QString projectPath, QString language);
 	static void startConfig_Language(QString configPath, QString Language);
 	static void killAllConfigs();
 	void sendCommand(const QString& ip, int port, const QString& msg);
@@ -21,6 +24,8 @@ public:
 	void LoadFromMiniserver();
 
 	void closeConfig();
+
+	QString getConfigFileVersion(const QString& fileName);
 	
 };
 

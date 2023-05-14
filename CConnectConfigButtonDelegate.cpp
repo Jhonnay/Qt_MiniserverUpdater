@@ -16,13 +16,14 @@ QWidget* CConnectConfigButtonDelegate::createEditor(QWidget* parent, const QStyl
    
 
     QPushButton* button = new QPushButton(parent);
-    button->setText("Connect Config");
+    button->setText("Connect");
     button->setProperty("indexRow", index.row());
     button->setFlat(true);
+    
 
-    connect(button, &QPushButton::pressed, [this, index]() {
-        emit clicked(index);
-        });
+    //emit directly. otherwise 2 clicks are necessary. 
+    emit clicked(index);
+       
 
     return button;
 }
@@ -59,5 +60,5 @@ void CConnectConfigButtonDelegate::paint(QPainter* painter, const QStyleOptionVi
     buttonOption.state = QStyle::State_Enabled | QStyle::State_Raised;
 
     QApplication::style()->drawControl(QStyle::CE_PushButtonBevel, &buttonOption, painter);
-    QApplication::style()->drawItemText(painter, option.rect, Qt::AlignCenter, option.palette, false, "Config");
+    QApplication::style()->drawItemText(painter, option.rect, Qt::AlignCenter, option.palette, false, "Connect");
 }

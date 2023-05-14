@@ -24,7 +24,7 @@ public:
     
 
 public slots:
-    void onConnectConfigClicked(CMiniserver* miniserver);
+    void onConnectConfigClicked(const QModelIndex& index, const CMiniserver& miniserver);
    
     void onRefreshClicked();
     void onConnectConfig();

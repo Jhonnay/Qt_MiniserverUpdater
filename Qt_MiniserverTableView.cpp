@@ -18,16 +18,19 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
     verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     verticalHeader()->setMinimumWidth(35);
     setSortingEnabled(true);
+    //setUpdatesEnabled(true);
     setEditTriggers(QAbstractItemView::AllEditTriggers); //enable single click for edit mode
     //setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::EditKeyPressed);
     horizontalHeader()->setSectionsMovable(true);     //set Header moveable
     //connect(horizontalHeader(), &QHeaderView::sectionClicked, m_model, &CMiniserverTableModel::sort);
+    //https://stackoverflow.com/questions/18831242/qt-start-editing-of-cell-after-one-click
     //Test
     //QPalette palette;
     //palette.setColor(QPalette::Highlight, QColor(200, 225, 255)); // set light blue color for selection
     //setPalette(palette);
     //QString styleSheet = "QTableView::item:selected { selection-background-color: rgba(255, 255, 255, 10); }";
     //setStyleSheet(styleSheet);
+    
 
 
     // Set up the "Connect Config" push button delegate
@@ -53,16 +56,16 @@ CMiniserverTableModel* Qt_MiniserverTableView::getMiniserverModel()
 
 void Qt_MiniserverTableView::handleConnectConfigClicked(const QModelIndex& index) {
     int row = index.row();
-    QPushButton* button = qobject_cast<QPushButton*>(sender());
+    CConnectConfigButtonDelegate* button = qobject_cast<CConnectConfigButtonDelegate*>(sender());
     if (!button)
         return;
 
-        QModelIndex _index = indexAt(button->geometry().center());
+    //QModelIndex _index = indexAt(button);
     if (!index.isValid())
         return;
 
-    const CMiniserver& miniserver = m_model->miniserverlist->at(_index.row());
-    emit  ConnectConfigClicked(_index, miniserver);
+    const CMiniserver& miniserver = m_model->miniserverlist->at(index.row());
+    emit  ConnectConfigClicked(index, miniserver);
 }
 
 
