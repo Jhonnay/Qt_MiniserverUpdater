@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include <windows.h>
+#pragma comment (lib, "version.lib")
 
 
 class CConfig
@@ -25,7 +26,7 @@ public:
 
 	void closeConfig();
 
-	QString getConfigFileVersion(const QString& fileName);
+	static QString getConfigFileVersion(const QString& fileName);
 	
 };
 

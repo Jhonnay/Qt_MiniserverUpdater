@@ -23,6 +23,11 @@ QWidget* CConnectConfigButtonDelegate::createEditor(QWidget* parent, const QStyl
 
     //emit directly. otherwise 2 clicks are necessary. 
     emit clicked(index);
+    //connecting in order to allow pressing the button when cell is already in editing mode
+    //not working
+    connect(button, &QPushButton::click, [this, index]() {
+        emit clicked(index);
+        });
        
 
     return button;
