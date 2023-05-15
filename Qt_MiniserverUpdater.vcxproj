@@ -118,7 +118,10 @@
     <ClCompile Include="Qt_MiniserverUpdater.cpp" />
     <ClCompile Include="main.cpp" />
     <None Include="cpp.hint" />
-    <None Include="EmptyProject.Loxone" />
+    <None Include="EmptyProject.Loxone">
+      <DeploymentContent>true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </None>
     <None Include="Qt_MiniserverUpdater.ico" />
     <QtUic Include="Qt_Miniserver_Listview.ui" />
     <QtUic Include="Qt_Statusbar.ui" />

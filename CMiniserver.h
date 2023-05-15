@@ -18,6 +18,9 @@ private:
 
 public:
     //Constructor
+
+    CMiniserver();
+
     CMiniserver(const std::string& serialNumber, const std::string& adminUser,
         const std::string& adminPassword, const std::string& miniserverVersion,
         const std::string& miniserverStatus, const std::string& updatelevel,

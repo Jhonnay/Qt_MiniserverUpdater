@@ -95,25 +95,41 @@ bool CMiniserverTableModel::setData(const QModelIndex& index, const QVariant& va
 {
     if (index.isValid() && role == Qt::EditRole)
     {
-        CMiniserver& miniserver = miniserverlist->operator[](index.row());
-
-        switch (index.column())
+        // Check if the passed value is a CMiniserver object
+        QVariant variant = value;
+        if (variant.canConvert<CMiniserver>())
         {
-        case 7: miniserver.setLocalIP(value.toString().toStdString()); break;
-        case 8: miniserver.setConfigLanguage(value.toString().toStdString()); break;
-        default: return false;
-        }
-        //Debug
-        qDebug() << "Data Changed @ Row:  " << index.row() << " Column: " << index.column() << " - " <<
-            miniserver.toString();
+            CMiniserver miniserver = variant.value<CMiniserver>();
+            miniserverlist->replace(index.row(), miniserver);
+            emit dataChanged(index, index);
+            //Debug
+            qDebug() << "Data Changed @ Row:  " << index.row() << " Column: " << index.column() << " - " <<
+                miniserver.toString();
 
-        for (int i = 0; i < miniserverlist->count(); i++) {
-            qDebug() << "Row: "  << i << " - " << miniserverlist->at(i).toString();
+            for (int i = 0; i < miniserverlist->count(); i++) {
+                qDebug() << "Row: " << i << " - " << miniserverlist->at(i).toString();
+            }
+            return true;
         }
-        
+        else {
+            CMiniserver& miniserver = miniserverlist->operator[](index.row());
 
-        emit dataChanged(index, index);
-        return true;
+            switch (index.column())
+            {
+            case 7: miniserver.setLocalIP(value.toString().toStdString()); break;
+            case 8: miniserver.setConfigLanguage(value.toString().toStdString()); break;
+            default: return false;
+            }
+            //Debug
+            qDebug() << "Data Changed @ Row:  " << index.row() << " Column: " << index.column() << " - " <<
+                miniserver.toString();
+
+            for (int i = 0; i < miniserverlist->count(); i++) {
+                qDebug() << "Row: " << i << " - " << miniserverlist->at(i).toString();
+            }
+            emit dataChanged(index, index);
+            return true;
+        }
     }
 
     return false;

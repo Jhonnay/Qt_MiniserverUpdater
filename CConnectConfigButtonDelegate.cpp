@@ -25,7 +25,7 @@ QWidget* CConnectConfigButtonDelegate::createEditor(QWidget* parent, const QStyl
     emit clicked(index);
     //connecting in order to allow pressing the button when cell is already in editing mode
     //not working
-    connect(button, &QPushButton::click, [this, index]() {
+    connect(button, &QPushButton::pressed, [this, index]() {
         emit clicked(index);
         });
        

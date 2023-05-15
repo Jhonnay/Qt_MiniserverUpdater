@@ -3,6 +3,21 @@
 #include "CMiniserver.h"
 
 
+CMiniserver::CMiniserver()
+{
+    serialNumber = "empty";
+    adminUser = "a";
+    adminPassword = "a";
+    miniserverStatus="empty";
+    updatelevel = "none";
+    versionColor = "black";
+    miniserverProject = "none";
+    miniserverConfiguration = "NAN";
+    localIP = "gone";
+    configLanguage = "5";
+
+}
+
 CMiniserver::CMiniserver(const std::string& serialNumber, const std::string& adminUser,
     const std::string& adminPassword, const std::string& miniserverVersion,
     const std::string& miniserverStatus, const std::string& updatelevel,

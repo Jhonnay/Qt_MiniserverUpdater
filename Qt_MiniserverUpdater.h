@@ -40,6 +40,7 @@ private:
     Qt_Bottom_Action_Buttons* bottom_buttons;
     Qt_Statusbar* statusbar; 
     QWidget* centralWidget; 
+    //CConfigMSUpdate* configMSUpdate;
     //Ui::Qt_MiniserverUpdaterClass ui;
 };
 

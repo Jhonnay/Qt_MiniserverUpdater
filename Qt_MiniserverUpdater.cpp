@@ -3,6 +3,7 @@
 #include "MyConstants.h"
 #include "CConfigMSUpdate.h"
 #include <QTimer>
+#include <QtConcurrent>
 
 Qt_MiniserverUpdater::Qt_MiniserverUpdater(QWidget* parent )
     : QMainWindow(parent)
@@ -76,7 +77,8 @@ void Qt_MiniserverUpdater::onRefreshClicked()
         int row = index.row();
 
         // Get the data for the selected row
-        CMiniserver& miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
+        //CMiniserver& miniserverPointer = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
+        CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
         qDebug() << "Selected row: " << miniserver.getSerialNumber().c_str();
         if (!miniserver.getLocalIP().empty()) {
             QString unformatedVersionString = CWebService::sendCommandRest_Version_Local_Gen1(miniserver, "dev/sys/version", "value");
@@ -86,10 +88,12 @@ void Qt_MiniserverUpdater::onRefreshClicked()
             QString unformatedVersionString  = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "dev/sys/version", "value");
             miniserver.setMiniserverVersion(CMiniserver::formatMiniserverVersionQString(unformatedVersionString).toStdString());
         }
-        emit tableViewMiniserver->getMiniserverModel()->dataChanged(index, index);
+        tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
+        //emit tableViewMiniserver->getMiniserverModel()->dataChanged(index, index);
+        QTimer::singleShot(0, tableViewMiniserver, &Qt_MiniserverTableView::update);
     }
 
-    QTimer::singleShot(0, tableViewMiniserver, &Qt_MiniserverTableView::update);
+    
     //this->update();
     //tableViewMiniserver->update();
 
@@ -111,7 +115,7 @@ void Qt_MiniserverUpdater::onConnectConfigClicked(const QModelIndex& index, cons
 
     QString configPath = statusbar->getConfigExePath();
     CConfigMSUpdate config;
-
+    //auto config = std::make_shared<CConfigMSUpdate>();
 
     if (configPath != "Current Config : not selected - double click to select") {
         config.setUser(QString::fromStdString( miniserver.getAdminUser() ));
@@ -126,7 +130,25 @@ void Qt_MiniserverUpdater::onConnectConfigClicked(const QModelIndex& index, cons
         }
         int configCount = CConfigMSUpdate::getRunningConfigInstances();
         if (configCount  == 0) {
-            config.OpenConfigLoadProject();
+            //CWorkerConnectConfig worker;
+            //QThread thread;
+            //worker.moveToThread(&thread);
+            //
+            //QObject::connect(&thread, &QThread::finished, &worker, &QObject::deleteLater);
+            //
+            //// Execute the function in the separate thread when triggered
+            //QMetaObject::invokeMethod(&worker, "processOpenConfigLoadProject", Qt::QueuedConnection, Q_ARG(CConfigMSUpdate, config));
+            //
+            //thread.start();
+            
+            QtConcurrent::run([&]() {
+                CConfigMSUpdate _config = CConfigMSUpdate(config.MsIP(), config.User(), config.Pw(), config.ConfigPath(), config.ConfigLanguage());
+                _config.OpenConfigLoadProject();
+            });
+            
+            QCoreApplication::processEvents();
+            //config.OpenConfigLoadProject();
+            
         }
         else {
             QString message = QString::fromStdString(MyConstants::Strings::MessageBox_ConnectConfigButton_ConfigsOpen_Error_Part1) + QString::number(configCount) + QString::fromStdString(MyConstants::Strings::MessageBox_ConnectConfigButton_ConfigsOpen_Error_Part2);

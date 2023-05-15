@@ -53,23 +53,34 @@ private:
     CConfig config;
 
 public:
+
+    CConfigMSUpdate() = default;
+    CConfigMSUpdate(const QString& msIP, const QString& user, const QString& pw, const QString& configPath, const QString& configLanguage)
+        : msIP(msIP),
+        user(user),
+        pw(pw),
+        configPath(configPath),
+        configLanguage(configLanguage)
+    {
+    }
+
     static int UpdateCycleState() { return updateCycleState; }
     static void SetUpdateCycleState(int value) { updateCycleState = value; }
     static bool Stop() { return stop; }
     static void SetStop(bool value) { stop = value; }
-    QString MsIP() { return msIP; }
+    QString MsIP() const { return msIP; }
     void setMsIP(QString value) { msIP = value; }
-    QString User() { return user; }
+    QString User() const { return user; }
     void setUser(QString value) { user = value; }
-    QString Pw() { return pw; }
+    QString Pw() const { return pw; }
     void setPw(QString value) { pw = value; }
-    QString ProjectPath() { return projectPath; }
+    QString ProjectPath() const { return projectPath; }
     void SetProjectPath(QString value) { projectPath = value; }
-    QString ConfigPath() { return configPath; }
+    QString ConfigPath() const { return configPath; }
     void SetConfigPath(QString value) { configPath = value; }
-    QString NewConfigInstallerPath() { return newConfigInstallerPath; }
+    QString NewConfigInstallerPath() const { return newConfigInstallerPath; }
     void SetNewConfigInstallerPath(QString value) { newConfigInstallerPath = value; }
-    QString ConfigLanguage() { return configPath; }
+    QString ConfigLanguage() const { return configLanguage; }
     void SetConfigLanguage(QString value) { configLanguage = value; }
     
 
