@@ -51,6 +51,7 @@ private:
     QString newConfigInstallerPath = nullptr;
     QString configLanguage;
     CConfig config;
+    QString localhost = "127.0.0.1";
 
 public:
 
@@ -88,6 +89,8 @@ public:
     void OpenConfigLoadProject();
 
     void PrintConfigMsVersions(CUDPListener& udpL);
+
+    int performMiniserverUpdate();
 
     static int getRunningConfigInstances();
 

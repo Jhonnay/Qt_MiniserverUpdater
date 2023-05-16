@@ -36,7 +36,7 @@ void CUDPListener::run()
         if (datagram == "") {
             continue;//the first datagramm is always emty resulting in a crash. 
         }
-        qDebug() << "Received datagram: " << datagram;
+        //qDebug() << "Received datagram: " << datagram;
         // Parse status from received data
         m_autoStatus.nDocState = datagram[0];
         m_autoStatus.bAllClientsRunning = datagram[4];

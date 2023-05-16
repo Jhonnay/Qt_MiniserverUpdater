@@ -50,12 +50,10 @@ Qt_Bottom_Action_Buttons::~Qt_Bottom_Action_Buttons()
 
 void Qt_Bottom_Action_Buttons::onButtonUpdateClicked()
 {
-	const char* message = "Update Button pressed!\n";
-	wchar_t wideMessage[256];
-	MultiByteToWideChar(CP_UTF8, 0, message, -1, wideMessage, 256);
-	OutputDebugString(wideMessage);
+	qDebug() << "Update Button pressed!";
+
 	emit buttonUpdateClicked();
-	btnUpdate->setDisabled(true);
+	//btnUpdate->setDisabled(true);
 }
 
 void Qt_Bottom_Action_Buttons::onButtonRefreshClicked()

@@ -28,6 +28,8 @@ public slots:
    
     void onRefreshClicked();
     void onConnectConfig();
+    void onUpdateMiniserverClicked();
+
 
 
 private:

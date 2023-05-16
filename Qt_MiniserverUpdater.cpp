@@ -35,9 +35,9 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(tableViewMiniserver, &Qt_MiniserverTableView::ConnectConfigClicked, this, &Qt_MiniserverUpdater::onConnectConfigClicked);
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonRefreshClicked, this, &Qt_MiniserverUpdater::onRefreshClicked);
     //connect(tableViewMiniserver, &Qt_MiniserverTableView::localIPTextChanged, this, &Qt_MiniserverUpdater::onLocalIPTextChanged);
+    connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonUpdateClicked, this, &Qt_MiniserverUpdater::onUpdateMiniserverClicked);
 
     this->setCentralWidget(centralWidget);
-
 
     //ui.setupUi(this);
 }
@@ -108,6 +108,57 @@ void Qt_MiniserverUpdater::onConnectConfig()
 {
 
 
+}
+
+void Qt_MiniserverUpdater::onUpdateMiniserverClicked()
+{
+    const QModelIndexList selectedIndexes = tableViewMiniserver->selectionModel()->selectedRows();
+
+    for (const QModelIndex& index : selectedIndexes)
+    {
+        int row = index.row();
+        CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
+
+        QString configPath = statusbar->getConfigExePath();
+        CConfigMSUpdate config;
+        //auto config = std::make_shared<CConfigMSUpdate>();
+
+        if (configPath != "Current Config : not selected - double click to select") {
+            config.setUser(QString::fromStdString(miniserver.getAdminUser()));
+            config.setPw(QString::fromStdString(miniserver.getAdminPassword()));
+            config.SetConfigPath(configPath);
+            config.SetConfigLanguage(QString::fromStdString(miniserver.getConfigLanguage()));
+            if (miniserver.getLocalIP() != "" || !miniserver.getLocalIP().empty()) {
+                config.setMsIP(QString::fromStdString(miniserver.getLocalIP()));
+            }
+            else {
+                config.setMsIP(QString::fromStdString(miniserver.getSerialNumber()));
+            }
+            int configCount = CConfigMSUpdate::getRunningConfigInstances();
+            if (configCount == 0) {
+
+                QtConcurrent::run([&]() {
+                    CConfigMSUpdate _config = CConfigMSUpdate(config.MsIP(), config.User(), config.Pw(), config.ConfigPath(), config.ConfigLanguage());
+                    _config.OpenConfigLoadProject();
+                    _config.performMiniserverUpdate();
+                    });
+
+                QCoreApplication::processEvents();
+
+            }
+            else {
+                QString message = QString::fromStdString(MyConstants::Strings::MessageBox_ConnectConfigButton_ConfigsOpen_Error_Part1) + QString::number(configCount) + QString::fromStdString(MyConstants::Strings::MessageBox_ConnectConfigButton_ConfigsOpen_Error_Part2);
+                QMessageBox::warning(nullptr, "Error", message);
+            }
+
+
+        }
+        else
+        {
+            QMessageBox::warning(nullptr, "Error", "No Config Exe selected!");
+        }
+
+    }
 }
 
 void Qt_MiniserverUpdater::onConnectConfigClicked(const QModelIndex& index, const CMiniserver& miniserver) {

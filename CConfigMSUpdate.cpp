@@ -61,7 +61,7 @@ checkConnected:
         qDebug() << "Connection not established or not all Miniservers are running.";
         qDebug() << "DocState = " << udpListener.m_autoStatus.nDocState << " should be  =  " << DS_ONLINE;
         qDebug() << "Sleep 10s";
-        QThread::sleep(5);
+        QThread::sleep(10);
         if (errorCount < 5) {
             goto checkConnected;
         }
@@ -72,10 +72,15 @@ checkConnected:
         
     }
     config.LoadFromMiniserver();
+    qDebug() << "ErrorCoung = " << errorCount;
+    QThread::sleep(10);
+    errorCount = 0;
+    qDebug() << "ErrorCoung = " << errorCount;
 
 loadProject:
 
-    if (udpListener.m_autoStatus.nDocState == DS_ONLINE && udpListener.m_autoStatus.m_nCurrentState == AUTO_CONNECTED && udpListener.m_autoStatus.bAllClientsRunning == 1) {
+    if (udpListener.m_autoStatus.nDocState == DS_ONLINE && udpListener.m_autoStatus.m_nCurrentState == AUTO_CONNECTED && udpListener.m_autoStatus.bAllClientsRunning == 1
+        && udpListener.m_autoStatus.bIdentical == 1) {
         qDebug() << "Project successfully loaded from the MS. Next Step - Hurrrrraaaaayyyyyyyy";
         PrintConfigMsVersions(udpListener);
     }
@@ -83,6 +88,7 @@ loadProject:
     {
 
         qDebug() << "Project not loaded successfully. Trying again after Sleep 10s";
+        qDebug() << "Error Coung = " << errorCount;
         QThread::sleep(10);
         errorCount++;
         if (errorCount < 5) {
@@ -90,6 +96,7 @@ loadProject:
         }
         else {
             goto checkConnected;
+            errorCount = 0;
         }
         
     }
@@ -149,4 +156,150 @@ int CConfigMSUpdate::getRunningConfigInstances()
     CloseHandle(snapshot);
 
     return count;
+}
+
+
+int CConfigMSUpdate::performMiniserverUpdate() {
+
+    int updateCycleState = 0;
+    int counterCyclesTime = 0; // After 17 Minutes, stop update Progress in this application and show MessageBox and DO NOT KILL CONFIG!
+    int ret = -1;
+    int fails = 0;
+    bool oneMiniserverDidNotUpdate = false;
+
+    CUDPListener udpL = CUDPListener(nullptr, projectPath, configPath);
+    udpL.start();
+
+    if (udpL.m_autoStatus.nDocState == DS_ONLINE &&
+        udpL.m_autoStatus.m_nCurrentState == AUTO_CONNECTED &&
+        udpL.m_autoStatus.bAllClientsRunning == 1) {
+        updateCycleState = UPDATE_CYCLE_MS_UPDATE;
+        /* this function was coppied from WPF Project.Loading not necessary because we already load from the miniserver with
+         OpenConfigLoadProject()   */
+    }
+
+    while (updateCycleState < 6)
+    {
+        qDebug() << udpL.m_autoStatus.toString();
+        switch (updateCycleState)
+        {
+        case UPDATE_CYCLE_CHECK_CONNECTION_AND_LOAD_PROJECT:
+            qDebug() << "Checking if Connection with MS was established and all Clients are also Running.";
+            if (udpL.m_autoStatus.nDocState == DS_ONLINE)
+            {
+                
+
+                qDebug() << "Miniservers are connected and running. Going to next step - Loading From MS. Waiting 1000ms ...";
+                QThread::msleep(3000);
+                PrintConfigMsVersions(udpL);
+                config.LoadFromMiniserver();
+                QThread::msleep(7000);
+                updateCycleState++;
+            }
+            else
+            {
+                qDebug() << "Connection not established or not all Miniservers are running.";
+                qDebug() << "DocState = " << udpL.m_autoStatus.nDocState << " should be = " << DS_ONLINE;
+                qDebug() << "Sleep 5s";
+
+                fails++;
+                if (fails == 5)
+                {
+                    qDebug() << "Loading from Miniserver again after 5 fails";
+                    fails = 0;
+                    QString msg = "C," + msIP + "," + user + "," + pw;
+                    msg = msg.replace(":", ".");
+                    qDebug() << "Connecting to MS with: " << msIP << "," << user << "," << pw;
+                    config.sendCommand(localhost, 7770, msg); // Connect with MS
+                }
+                QThread::msleep(5000);
+            }
+            break;
+
+        case UPDATE_CYCLE_MS_UPDATE:
+            if (udpL.m_autoStatus.nDocState == DS_ONLINE &&
+                udpL.m_autoStatus.m_nCurrentState == AUTO_CONNECTED &&
+                udpL.m_autoStatus.bAllClientsRunning == 1)
+            {
+                qDebug() << "Project successfully loaded from the MS. Next Step update Firmware on all MS.";
+                config.Update();
+                updateCycleState++;
+                QThread::msleep(10000); // extra time until the update flag is set 
+
+                if (udpL.m_autoStatus.m_bUpdating != 1)
+                {
+                    qDebug() << "Miniserver not updating after 10s. Update command will be sent again!";
+                    updateCycleState--;
+                }
+            }
+            else
+            {
+                updateCycleState--;
+            }
+            break;
+
+        case UPDATE_CYCLE_CHECK_UPDATE:
+            if (udpL.m_autoStatus.nDocState == 1 &&
+                udpL.m_autoStatus.bAllClientsRunning == 1 &&
+                udpL.m_autoStatus.m_bUpdating == 0 &&
+                udpL.m_autoStatus.m_nCurrentState == 3)
+            {
+                qDebug() << "Update Complete. Next Step checking Versions of all Miniservers.";
+                updateCycleState++;
+            }
+            else
+            {
+                qDebug() << "Miniservers are still updating or restarting.";
+            }
+            break;
+
+
+        case UPDATE_CYCLE_CHECK_MS_VERSIONS:
+           foreach(QString version, udpL.m_versionsOfMiniservers)
+            {
+                if (udpL.m_versionConfig != version)
+                {
+                    oneMiniserverDidNotUpdate = true;
+                }
+            }
+
+            if (!oneMiniserverDidNotUpdate)
+            {
+                qDebug() << "\n" << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz");
+                qDebug() << "Versions of Config and Miniservers match";
+                PrintConfigMsVersions(udpL);
+                updateCycleState++;
+            }
+            break;
+
+        case UPDATE_CYCLE_DISCONNECT_CONFIG:
+            // Disconnecting
+            config.Disconnect();
+
+            // Check if disconnected!
+            qDebug() << "Disconnecting Config from Miniserver";
+            updateCycleState++;
+            break;
+
+        case UPDATE_CYCLE_CLOSE_CONFIG:
+            config.closeConfig();
+            qDebug() << "\n\n" << "Update Process complete.";
+            updateCycleState++;
+            ret = 1;
+            break;
+        }
+        qDebug() << "Waiting 1000ms ...";
+        counterCyclesTime += 1;
+        if (counterCyclesTime > (60 * 17))
+        {
+            updateCycleState = 99; // Set > 6 to escape Update While LOOP.
+        }
+        QThread::msleep(1000);
+    }
+
+    udpL.requestInterruption();
+    udpL.wait();
+
+    return ret;
+
 }
