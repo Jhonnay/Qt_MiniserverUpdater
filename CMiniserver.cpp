@@ -183,6 +183,22 @@ QString CMiniserver::formatMiniserverVersionQString(QString unformatedQString) {
     return formattedQString;
 }
 
+QString CMiniserver::unformatMiniserverVersionQString(const QString& version) {
+    QStringList parts = version.split('.');
+    QString convertedVersion;
+
+    for (const QString& part : parts) {
+        bool ok;
+        int num = part.toInt(&ok);
+        if (ok) {
+            convertedVersion += QString("%1").arg(num, 2, 10, QChar('0'));
+        }
+    }
+
+    return convertedVersion;
+}
+
+
 std::string CMiniserver::toString() const
 {
     std::string str = "CMiniserver {";

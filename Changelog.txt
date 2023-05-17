@@ -2,12 +2,14 @@
 Known Issues: 
 Pressing enter on Local IP "QLineEdit" does not leave TextEditMode
 Pressing up / down arrow key ín LocalIP field selects the next line
-
+known issues:
+* Update can be done only for one miniserver. 
+* Loading from Miniserver done twice when updating. 
 
 V0.1
 *Fixed:
 	 Changing Language after List was sorted does not work. --> Index should be determined for QList*, when changing Data underneath. 
-	 setminiserverlist --> TBD and outdated info every time. 
+	 
 *Added/Changed:
 	added changelog file to repo
 	added setMiniserversInitial() & setMiniserversInitial() functions.

@@ -26,7 +26,9 @@ public:
 
 	void closeConfig();
 
-	static QString getConfigFileVersion(const QString& fileName);
+	static QString getConfigFileVersionFormated(const QString& configPath);
+
+	static QString getConfigFileVersionUnformated(const QString& configPath);
 	
 };
 

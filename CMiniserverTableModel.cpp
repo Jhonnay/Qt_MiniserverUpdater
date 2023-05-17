@@ -101,14 +101,9 @@ bool CMiniserverTableModel::setData(const QModelIndex& index, const QVariant& va
         {
             CMiniserver miniserver = variant.value<CMiniserver>();
             miniserverlist->replace(index.row(), miniserver);
-            emit dataChanged(index, index);
-            //Debug
-            qDebug() << "Data Changed @ Row:  " << index.row() << " Column: " << index.column() << " - " <<
-                miniserver.toString();
-
-            for (int i = 0; i < miniserverlist->count(); i++) {
-                qDebug() << "Row: " << i << " - " << miniserverlist->at(i).toString();
-            }
+            emit dataChanged(this->index(index.row(), 0), this->index(index.row(), 8));
+            
+            printDebugDataChanged(index, miniserver);
             return true;
         }
         else {
@@ -120,19 +115,25 @@ bool CMiniserverTableModel::setData(const QModelIndex& index, const QVariant& va
             case 8: miniserver.setConfigLanguage(value.toString().toStdString()); break;
             default: return false;
             }
-            //Debug
-            qDebug() << "Data Changed @ Row:  " << index.row() << " Column: " << index.column() << " - " <<
-                miniserver.toString();
+            printDebugDataChanged(index, miniserver);
 
-            for (int i = 0; i < miniserverlist->count(); i++) {
-                qDebug() << "Row: " << i << " - " << miniserverlist->at(i).toString();
-            }
-            emit dataChanged(index, index);
+            //emit dataChanged(index, index);
+            emit dataChanged(this->index(index.row(), 0), this->index(index.row(), 8));
+
             return true;
         }
     }
 
     return false;
+}
+
+void CMiniserverTableModel::printDebugDataChanged(const QModelIndex& index, CMiniserver& miniserver)
+{
+    qDebug() << "Data Changed @ Row:  " << index.row() << " Column: " << index.column() << " - " << miniserver.toString();
+
+    for (int i = 0; i < miniserverlist->count(); i++) {
+        qDebug() << "Row: " << i << " - " << miniserverlist->at(i).toString();
+    }
 }
 
 void CMiniserverTableModel::onConnectConfigClicked()

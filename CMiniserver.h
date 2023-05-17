@@ -75,6 +75,8 @@ public:
 
     static QString formatMiniserverVersionQString(QString unformatedQString);
 
+    static QString unformatMiniserverVersionQString(const QString& version);
+
     //toString Function
     std::string toString() const;
     static void printAllMiniserversToDebug(QList<CMiniserver>* miniservers);

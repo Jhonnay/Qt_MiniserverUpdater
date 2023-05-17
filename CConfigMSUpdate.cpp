@@ -60,9 +60,9 @@ checkConnected:
         errorCount++;
         qDebug() << "Connection not established or not all Miniservers are running.";
         qDebug() << "DocState = " << udpListener.m_autoStatus.nDocState << " should be  =  " << DS_ONLINE;
-        qDebug() << "Sleep 10s";
-        QThread::sleep(10);
-        if (errorCount < 5) {
+        qDebug() << "Sleep 1s";
+        QThread::sleep(1);
+        if (errorCount < 50) {
             goto checkConnected;
         }
         else {
@@ -73,7 +73,7 @@ checkConnected:
     }
     config.LoadFromMiniserver();
     qDebug() << "ErrorCoung = " << errorCount;
-    QThread::sleep(10);
+    QThread::sleep(1);
     errorCount = 0;
     qDebug() << "ErrorCoung = " << errorCount;
 
@@ -87,11 +87,11 @@ loadProject:
     else
     {
 
-        qDebug() << "Project not loaded successfully. Trying again after Sleep 10s";
+        qDebug() << "Project not loaded successfully. Trying again after Sleep 1s";
         qDebug() << "Error Coung = " << errorCount;
-        QThread::sleep(10);
+        QThread::sleep(1);
         errorCount++;
-        if (errorCount < 5) {
+        if (errorCount < 50) {
             goto loadProject;
         }
         else {
@@ -193,7 +193,7 @@ int CConfigMSUpdate::performMiniserverUpdate() {
                 QThread::msleep(3000);
                 PrintConfigMsVersions(udpL);
                 config.LoadFromMiniserver();
-                QThread::msleep(7000);
+                QThread::msleep(3000);
                 updateCycleState++;
             }
             else
@@ -212,7 +212,7 @@ int CConfigMSUpdate::performMiniserverUpdate() {
                     qDebug() << "Connecting to MS with: " << msIP << "," << user << "," << pw;
                     config.sendCommand(localhost, 7770, msg); // Connect with MS
                 }
-                QThread::msleep(5000);
+                QThread::msleep(3000);
             }
             break;
 
@@ -257,9 +257,11 @@ int CConfigMSUpdate::performMiniserverUpdate() {
         case UPDATE_CYCLE_CHECK_MS_VERSIONS:
            foreach(QString version, udpL.m_versionsOfMiniservers)
             {
+               
                 if (udpL.m_versionConfig != version)
                 {
                     oneMiniserverDidNotUpdate = true;
+                    QMessageBox::warning(nullptr, "Error", "One Miniserver did not update! Update will be aborted!");
                 }
             }
 

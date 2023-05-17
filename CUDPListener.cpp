@@ -1,6 +1,7 @@
 #include "CUDPListener.h"
 #include "CConfig.h"
 #include <cstdint>
+#include "CConfigMSUpdate.h"
 
 CUDPListener::CUDPListener(QObject *parent, const QString& projectPath, const QString& configPath)
 	: QThread(parent)
@@ -9,6 +10,14 @@ CUDPListener::CUDPListener(QObject *parent, const QString& projectPath, const QS
     m_configPath = configPath;
     m_socket = new QUdpSocket();
     
+
+    m_autoStatus.nDocState = 0;
+    m_autoStatus.bAllClientsRunning = 0;
+    m_autoStatus.bIdentical = 0;
+    m_autoStatus.nMiniservers = 0;
+    m_autoStatus.m_bUpdating = 0;
+    m_autoStatus.m_nCurrentState = 0;
+    m_versionConfig = CConfig::getConfigFileVersionUnformated(configPath);
 }
 
 
@@ -34,7 +43,7 @@ void CUDPListener::run()
         };
 
         if (datagram == "") {
-            continue;//the first datagramm is always emty resulting in a crash. 
+            continue;//the first datagramm is always empty resulting in a crash. 
         }
         //qDebug() << "Received datagram: " << datagram;
         // Parse status from received data
@@ -74,7 +83,7 @@ void CUDPListener::run()
         qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz") << m_autoStatus.toString() << "MS Versions" << m_versionsOfMiniservers;
         
         // Get config file version
-        qDebug() << "Config Version:" << CConfig::getConfigFileVersion(m_configPath);
+        qDebug() << "Config Version:" << CConfig::getConfigFileVersionUnformated(m_configPath);
 
     }     
     

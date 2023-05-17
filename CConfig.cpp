@@ -141,8 +141,8 @@ void CConfig::closeConfig()
     qDebug() << "Task killed!";
 }
 
-QString CConfig::getConfigFileVersion(const QString& fileName) {
-    QFile file(fileName);
+QString CConfig::getConfigFileVersionFormated(const QString& configPath) {
+    QFile file(configPath);
     if (!file.exists()) return QString();
    
     DWORD handle;
@@ -162,4 +162,26 @@ QString CConfig::getConfigFileVersion(const QString& fileName) {
         .arg(HIWORD(info->dwFileVersionLS))
         .arg(LOWORD(info->dwFileVersionLS));
     
+}
+
+QString CConfig::getConfigFileVersionUnformated(const QString& configPath) {
+    QFile file(configPath);
+    if (!file.exists()) return QString();
+
+    DWORD handle;
+    DWORD size = GetFileVersionInfoSize(file.fileName().toStdWString().c_str(), &handle);
+    if (size == 0) return QString();
+
+    QByteArray data(size, 0);
+    if (!GetFileVersionInfo(file.fileName().toStdWString().c_str(), handle, size, data.data())) return QString();
+
+    VS_FIXEDFILEINFO* info = nullptr;
+    UINT len;
+    if (!VerQueryValue(data.constData(), L"\\", reinterpret_cast<void**>(&info), &len)) return QString();
+
+    return QString("%1%2%3%4")
+        .arg(HIWORD(info->dwFileVersionMS), 2, 10, QChar('0'))
+        .arg(LOWORD(info->dwFileVersionMS), 2, 10, QChar('0'))
+        .arg(HIWORD(info->dwFileVersionLS), 2, 10, QChar('0'))
+        .arg(LOWORD(info->dwFileVersionLS), 2, 10, QChar('0'));
 }

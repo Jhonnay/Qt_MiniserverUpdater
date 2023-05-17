@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Qt_Statusbar.h"
 #include <QFileDialog>
 #include <iostream>
@@ -74,8 +74,8 @@ Qt_Statusbar::Qt_Statusbar(QWidget* parent)
     fileLabel->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(fileLabel, &QLabel::customContextMenuRequested, this, [this](const QPoint& pos) {
         QMenu menu;
-        QAction* startConfigAction = menu.addAction("Start Config");
-        QMenu* languageMenu = menu.addMenu("Start Config Language");
+        QAction* startConfigAction = menu.addAction("✈ Start Config");
+        QMenu* languageMenu = menu.addMenu("📖 Start Config Language");
 
         // Add language options to the submenu
         for (int i = 0; i < CConfig::LanguageList.size(); i++) {
@@ -85,7 +85,7 @@ Qt_Statusbar::Qt_Statusbar(QWidget* parent)
                 });
         }
 
-        QAction* killConfigAction = menu.addAction("Kill Config Instances");
+        QAction* killConfigAction = menu.addAction("💣 Kill Config Instances");
 
         connect(startConfigAction, &QAction::triggered, this, [this]() {
             startConfig(fileLabel->text());

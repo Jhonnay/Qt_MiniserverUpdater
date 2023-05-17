@@ -73,29 +73,67 @@ void Qt_MiniserverUpdater::onRefreshClicked()
 
     for (const QModelIndex& index : selectedIndexes)
     {
+        CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
+        miniserver.setMiniserverStatus(MyConstants::Strings::StartUp_Listview_MS_Version);
+        tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
+        tableViewMiniserver->resizeColumnsToContents();
+        tableViewMiniserver->setColumnWidth(6, 100);
+    }
+    for (const QModelIndex& index : selectedIndexes)
+    {
         // Get the row number of the selected index
         int row = index.row();
+        QString unformatedVersionString;
+        QString updateLevel;
+        CLoxAppJson cloxapp;
 
-        // Get the data for the selected row
-        //CMiniserver& miniserverPointer = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
+        // Get the data for the selected 
         CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
+        miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information);
+        miniserver.setMiniserverVersion(MyConstants::Strings::StartUp_Listview_MS_Version);
+        miniserver.setVersionColor("Black");
+        tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
+        tableViewMiniserver->resizeColumnsToContents();
+        tableViewMiniserver->setColumnWidth(6, 100);
+
         qDebug() << "Selected row: " << miniserver.getSerialNumber().c_str();
+        
         if (!miniserver.getLocalIP().empty()) {
-            QString unformatedVersionString = CWebService::sendCommandRest_Version_Local_Gen1(miniserver, "dev/sys/version", "value");
-            miniserver.setMiniserverVersion(CMiniserver::formatMiniserverVersionQString(unformatedVersionString).toStdString());
+            unformatedVersionString = CWebService::sendCommandRest_Version_Local_Gen1(miniserver, "dev/sys/version", "value");
+            updateLevel = CWebService::sendCommandRest_Version_Local_Gen1(miniserver, "/dev/cfg/updatelevel", "value");
+            cloxapp = CWebService::sendCommandRest_LoxAppJson_Local_Gen1(miniserver, "data/LoxAPP3.json");
         }
         else {
-            QString unformatedVersionString  = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "dev/sys/version", "value");
-            miniserver.setMiniserverVersion(CMiniserver::formatMiniserverVersionQString(unformatedVersionString).toStdString());
+            unformatedVersionString  = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "dev/sys/version", "value");
+            updateLevel = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "/dev/cfg/updatelevel", "value");
+            cloxapp = CWebService::sendCommandRest_LoxAppJson_Remote_Cloud(miniserver, "data/LoxAPP3.json");
         }
+
+        miniserver.setMiniserverVersion(CMiniserver::formatMiniserverVersionQString(unformatedVersionString).toStdString());
+        miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information_successfull);
+        miniserver.setMiniserverProject(cloxapp.projectName + "/" + cloxapp.localUrl);
+        if (miniserver.getMiniserverVersion() == "0.0.0.0") {
+            miniserver.setMiniserverConfiguration(MyConstants::Strings::Listview_Refresh_MS_Configuration_Error);
+            miniserver.setUpdatelevel(MyConstants::Strings::Listview_Refresh_MS_Configuration_Error);
+            miniserver.setVersionColor("RED");
+        }else if (cloxapp.gatewayType == 0)
+        {
+            miniserver.setMiniserverConfiguration(MyConstants::Strings::Listview_Refresh_MS_Configuration_Standalone);
+        }
+        else
+        {
+            miniserver.setMiniserverConfiguration(MyConstants::Strings::Listview_Refresh_MS_Configuration_ClientGateway);
+
+        }
+
+
         tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
+        tableViewMiniserver->resizeColumnsToContents();
+        tableViewMiniserver->setColumnWidth(6, 100);
         //emit tableViewMiniserver->getMiniserverModel()->dataChanged(index, index);
-        QTimer::singleShot(0, tableViewMiniserver, &Qt_MiniserverTableView::update);
     }
 
     
-    //this->update();
-    //tableViewMiniserver->update();
 
     qDebug() << "Printing all miniservers after RefreshButton was clicked!";
     for (int i = 0; i < miniservers->count(); i++) {
@@ -113,16 +151,42 @@ void Qt_MiniserverUpdater::onConnectConfig()
 void Qt_MiniserverUpdater::onUpdateMiniserverClicked()
 {
     const QModelIndexList selectedIndexes = tableViewMiniserver->selectionModel()->selectedRows();
+    int configCount = CConfigMSUpdate::getRunningConfigInstances();
+    QString configPath = statusbar->getConfigExePath();
+
+    if (configPath == "Current Config : not selected - double click to select") {
+        QMessageBox::warning(nullptr, "Error", "No Config Exe selected!");
+        return;
+    }
+    if (configCount != 0) {
+        QString message = QString::fromStdString(MyConstants::Strings::MessageBox_ConnectConfigButton_ConfigsOpen_Error_Part1) + QString::number(configCount) + QString::fromStdString(MyConstants::Strings::MessageBox_ConnectConfigButton_ConfigsOpen_Error_Part2);
+        QMessageBox::warning(nullptr, "Error", message);
+        return;
+    }
+
+    //Update Listview for selected miniservers --> to be updated. 
+    for (const QModelIndex& index : selectedIndexes)
+    {
+        CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
+        miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Update_pending);
+        tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
+        tableViewMiniserver->resizeColumnsToContents();
+        tableViewMiniserver->setColumnWidth(6, 100);
+    }
 
     for (const QModelIndex& index : selectedIndexes)
     {
         int row = index.row();
         CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
+        miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_Updating_Emoji);
+        tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
+        tableViewMiniserver->resizeColumnsToContents();
+        tableViewMiniserver->setColumnWidth(6, 100);
 
-        QString configPath = statusbar->getConfigExePath();
+
+       
         CConfigMSUpdate config;
-        //auto config = std::make_shared<CConfigMSUpdate>();
-
+        
         if (configPath != "Current Config : not selected - double click to select") {
             config.setUser(QString::fromStdString(miniserver.getAdminUser()));
             config.setPw(QString::fromStdString(miniserver.getAdminPassword()));
@@ -134,13 +198,26 @@ void Qt_MiniserverUpdater::onUpdateMiniserverClicked()
             else {
                 config.setMsIP(QString::fromStdString(miniserver.getSerialNumber()));
             }
-            int configCount = CConfigMSUpdate::getRunningConfigInstances();
+            
             if (configCount == 0) {
 
                 QtConcurrent::run([&]() {
+                    const QModelIndex _index = index;
+                    const CMiniserver _miniserver = miniserver;
                     CConfigMSUpdate _config = CConfigMSUpdate(config.MsIP(), config.User(), config.Pw(), config.ConfigPath(), config.ConfigLanguage());
                     _config.OpenConfigLoadProject();
                     _config.performMiniserverUpdate();
+                    miniserver.setMiniserverStatus(MyConstants::Strings::Listview_Updated_MS_Status);
+                    QString newVersion;
+                    if (miniserver.getLocalIP() != "" || !miniserver.getLocalIP().empty()) {
+                        newVersion = CWebService::sendCommandRest_Version_Local_Gen1(miniserver, "dev/sys/version", "value");
+                    }
+                    else {
+                        newVersion = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "dev/sys/version", "value");
+                    }
+                    miniserver.setMiniserverVersion(newVersion.toStdString());
+                    tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
+                    tableViewMiniserver->resizeColumnsToContents();
                     });
 
                 QCoreApplication::processEvents();
@@ -181,16 +258,6 @@ void Qt_MiniserverUpdater::onConnectConfigClicked(const QModelIndex& index, cons
         }
         int configCount = CConfigMSUpdate::getRunningConfigInstances();
         if (configCount  == 0) {
-            //CWorkerConnectConfig worker;
-            //QThread thread;
-            //worker.moveToThread(&thread);
-            //
-            //QObject::connect(&thread, &QThread::finished, &worker, &QObject::deleteLater);
-            //
-            //// Execute the function in the separate thread when triggered
-            //QMetaObject::invokeMethod(&worker, "processOpenConfigLoadProject", Qt::QueuedConnection, Q_ARG(CConfigMSUpdate, config));
-            //
-            //thread.start();
             
             QtConcurrent::run([&]() {
                 CConfigMSUpdate _config = CConfigMSUpdate(config.MsIP(), config.User(), config.Pw(), config.ConfigPath(), config.ConfigLanguage());
@@ -198,15 +265,12 @@ void Qt_MiniserverUpdater::onConnectConfigClicked(const QModelIndex& index, cons
             });
             
             QCoreApplication::processEvents();
-            //config.OpenConfigLoadProject();
             
         }
         else {
             QString message = QString::fromStdString(MyConstants::Strings::MessageBox_ConnectConfigButton_ConfigsOpen_Error_Part1) + QString::number(configCount) + QString::fromStdString(MyConstants::Strings::MessageBox_ConnectConfigButton_ConfigsOpen_Error_Part2);
             QMessageBox::warning(nullptr, "Error", message);
         }
-
-        
     }
     else
     {

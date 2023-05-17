@@ -48,6 +48,7 @@ public:
         static const std::string Listview_ProjectName_Invalid_JSON;
         static const std::string Listview_MS_Status_AutoUpdate;
         static const std::string Listview_MS_Refresh_canceled;
+        static const std::string Listview_MS_Update_pending;
 
         /* Bottom Status Bar */
         static const std::string Statusbar_ProcessStatus_Refresh_inProgress_Text;
