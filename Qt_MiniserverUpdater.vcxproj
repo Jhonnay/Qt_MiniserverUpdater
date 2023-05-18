@@ -90,6 +90,7 @@
     <ClCompile Include="CLoxAppJson.cpp" />
     <ClCompile Include="CMiniserver.cpp" />
     <ClCompile Include="CMiniserverTableModel.cpp" />
+    <ClCompile Include="CRefreshWorker.cpp" />
     <ClCompile Include="CUDPListener.cpp" />
     <ClCompile Include="CUpdateWorker.cpp" />
     <ClCompile Include="CurrentUser.cpp" />
@@ -139,6 +140,7 @@
     <QtMoc Include="CMiniserverTableModel.h" />
     <QtMoc Include="CUDPListener.h" />
     <QtMoc Include="CUpdateWorker.h" />
+    <QtMoc Include="CRefreshWorker.h" />
     <ClInclude Include="CurrentUser.h" />
     <ClInclude Include="CWebService.h" />
     <ClInclude Include="MyConstants.h" />

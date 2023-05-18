@@ -9,6 +9,7 @@
 #include "Qt_Statusbar.h"
 #include "CConfig.h"
 #include "CUpdateWorker.h"
+#include "CRefreshWorker.h"
 
 class Qt_MiniserverUpdater : public QMainWindow
 {
@@ -32,9 +33,8 @@ public slots:
     void onUpdateMiniserverClicked();
     void onCancelUpdateClicked();
     void onUpdateMiniserversFinished();
-    
-
-
+    void onRefreshCancelClicked();
+    void onRefreshMiniserversFinished();
 
 private:
     QList<CMiniserver>* miniservers;
@@ -47,6 +47,7 @@ private:
     Qt_Statusbar* statusbar; 
     QWidget* centralWidget; 
     CUpdateWorker* updateWorker;
+    CRefreshWorker* refreshWorker;
 
     //CConfigMSUpdate* configMSUpdate;
     //Ui::Qt_MiniserverUpdaterClass ui;

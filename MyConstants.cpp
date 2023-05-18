@@ -35,7 +35,7 @@ const std::string MyConstants::Strings::Listview_MS_Status_retreiving_informatio
 const std::string MyConstants::Strings::Listview_MS_Status_Edited = "Miniserver modified ⚠";
 const std::string MyConstants::Strings::Listview_ProjectName_Invalid_JSON = "Invalid JSON";
 const std::string MyConstants::Strings::Listview_MS_Status_AutoUpdate = "Auto Update...";
-const std::string MyConstants::Strings::Listview_MS_Refresh_canceled = "canceled";
+const std::string MyConstants::Strings::Listview_MS_Refresh_canceled = "canceled ⛔";
 const std::string MyConstants::Strings::Listview_MS_Update_pending = "Update pending";
 
 /* Bottom Status Bar */

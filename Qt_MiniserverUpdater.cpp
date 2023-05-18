@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QtConcurrent>
 #include "CUpdateWorker.h"
+#include "CRefreshWorker.h"
 
 Qt_MiniserverUpdater::Qt_MiniserverUpdater(QWidget* parent )
     : QMainWindow(parent)
@@ -19,7 +20,8 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     tableViewMiniserver = new Qt_MiniserverTableView(miniservers,this);
     bottom_buttons = new Qt_Bottom_Action_Buttons(this); 
     statusbar = new Qt_Statusbar(this);
-    updateWorker = new CUpdateWorker(this, tableViewMiniserver, bottom_buttons, statusbar); //TODO 
+    updateWorker = new CUpdateWorker(this, tableViewMiniserver, bottom_buttons, statusbar);
+    refreshWorker = new CRefreshWorker(this, tableViewMiniserver, bottom_buttons, statusbar);
     applicationSettings = NULL;
     
 
@@ -41,7 +43,9 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonCancelClicked, this, &Qt_MiniserverUpdater::onCancelUpdateClicked);
     connect(updateWorker, &CUpdateWorker::updatingCompleted, this, &Qt_MiniserverUpdater::onUpdateMiniserversFinished);
     connect(updateWorker, &CUpdateWorker::updatingCanceled, this, &Qt_MiniserverUpdater::onCancelUpdateClicked);
-
+    connect(refreshWorker, &CRefreshWorker::refreshCompleted, this, &Qt_MiniserverUpdater::onRefreshMiniserversFinished);
+    connect(refreshWorker, &CRefreshWorker::refreshCanceled, this, &Qt_MiniserverUpdater::onRefreshCancelClicked);
+    connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonCancelClicked, this, &Qt_MiniserverUpdater::onRefreshCancelClicked);
 
 
     this->setCentralWidget(centralWidget);
@@ -70,92 +74,31 @@ void Qt_MiniserverUpdater::setConfigEXEPath(QString path)
     statusbar->setConfigExePath(path);
 }
 
+void Qt_MiniserverUpdater::onRefreshCancelClicked() {
+    this->refreshWorker->requestInterruption();
+    connect(refreshWorker, &CRefreshWorker::finished, this, &Qt_MiniserverUpdater::onRefreshMiniserversFinished);
+}
 
+
+void Qt_MiniserverUpdater::onRefreshMiniserversFinished() {
+    bottom_buttons->setDisabledAllExceptCancel(false);
+}
 
 
 
 void Qt_MiniserverUpdater::onRefreshClicked()
 {
-    const QModelIndexList selectedIndexes =  tableViewMiniserver->selectionModel()->selectedRows();
-
-    for (const QModelIndex& index : selectedIndexes)
-    {
-        CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
-        miniserver.setMiniserverStatus(MyConstants::Strings::StartUp_Listview_MS_Version);
-        tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
-        tableViewMiniserver->resizeColumnsToContents();
-        tableViewMiniserver->setColumnWidth(6, 100);
-    }
-    for (const QModelIndex& index : selectedIndexes)
-    {
-        // Get the row number of the selected index
-        int row = index.row();
-        QString unformatedVersionString;
-        QString updateLevel;
-        CLoxAppJson cloxapp;
-
-        // Get the data for the selected 
-        CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
-        miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information);
-        miniserver.setMiniserverVersion(MyConstants::Strings::StartUp_Listview_MS_Version);
-        miniserver.setVersionColor("Black");
-        tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
-        tableViewMiniserver->resizeColumnsToContents();
-        tableViewMiniserver->setColumnWidth(6, 100);
-
-        qDebug() << "Selected row: " << miniserver.getSerialNumber().c_str();
-        
-        if (!miniserver.getLocalIP().empty()) {
-            unformatedVersionString = CWebService::sendCommandRest_Version_Local_Gen1(miniserver, "dev/sys/version", "value");
-            updateLevel = CWebService::sendCommandRest_Version_Local_Gen1(miniserver, "/dev/cfg/updatelevel", "value");
-            cloxapp = CWebService::sendCommandRest_LoxAppJson_Local_Gen1(miniserver, "data/LoxAPP3.json");
-        }
-        else {
-            unformatedVersionString  = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "dev/sys/version", "value");
-            updateLevel = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "/dev/cfg/updatelevel", "value");
-            cloxapp = CWebService::sendCommandRest_LoxAppJson_Remote_Cloud(miniserver, "data/LoxAPP3.json");
-        }
-        
-        if (updateLevel.contains('"')) {
-            updateLevel = updateLevel.left(updateLevel.indexOf('"'));
-        }
-        miniserver.setMiniserverVersion(CMiniserver::formatMiniserverVersionQString(unformatedVersionString).toStdString());
-        miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information_successfull);
-        miniserver.setUpdatelevel(updateLevel.toStdString());
-        miniserver.setMiniserverProject(cloxapp.projectName + "/" + cloxapp.localUrl);
-        if (miniserver.getMiniserverVersion() == "0.0.0.0") {
-            miniserver.setMiniserverConfiguration(MyConstants::Strings::Listview_Refresh_MS_Configuration_Error);
-            miniserver.setUpdatelevel(MyConstants::Strings::Listview_Refresh_MS_Configuration_Error);
-            miniserver.setVersionColor("RED");
-        }else if (cloxapp.gatewayType == 0)
-        {
-            miniserver.setMiniserverConfiguration(MyConstants::Strings::Listview_Refresh_MS_Configuration_Standalone);
-        }
-        else
-        {
-            miniserver.setMiniserverConfiguration(MyConstants::Strings::Listview_Refresh_MS_Configuration_ClientGateway);
-
-        }
-
-
-        tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
-        tableViewMiniserver->resizeColumnsToContents();
-        tableViewMiniserver->setColumnWidth(6, 100);
-        //emit tableViewMiniserver->getMiniserverModel()->dataChanged(index, index);
-    }
-
+    bottom_buttons->setDisabledAllExceptCancel(true);
+    refreshWorker->start();
     
-
     qDebug() << "Printing all miniservers after RefreshButton was clicked!";
     for (int i = 0; i < miniservers->count(); i++) {
         qDebug() << "Row: " << i << " - " << miniservers->at(i).toString();
     }
-
 }
 
 void Qt_MiniserverUpdater::onConnectConfig()
 {
-
 
 }
 
@@ -195,7 +138,7 @@ void Qt_MiniserverUpdater::onConnectConfigClicked(const QModelIndex& index, cons
     qDebug() << miniserver.toString();
 
     QString configPath = statusbar->getConfigExePath();
-    CConfigMSUpdate config;
+   
     int configCount = CConfigMSUpdate::getRunningConfigInstances();
 
     if (configPath == "Current Config : not selected - double click to select") {
@@ -209,6 +152,7 @@ void Qt_MiniserverUpdater::onConnectConfigClicked(const QModelIndex& index, cons
         return;
     }
 
+    CConfigMSUpdate config;
     config.setUser(QString::fromStdString(miniserver.getAdminUser()));
     config.setPw(QString::fromStdString(miniserver.getAdminPassword()));
     config.SetConfigPath(configPath);
