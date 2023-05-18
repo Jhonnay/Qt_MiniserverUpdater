@@ -109,6 +109,9 @@
     <ClCompile Include="CRefreshWorker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CConnectConfigWorker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CApplicationSettings.h">
@@ -180,6 +183,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="CRefreshWorker.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="CConnectConfigWorker.h">
       <Filter>Source Files</Filter>
     </QtMoc>
   </ItemGroup>

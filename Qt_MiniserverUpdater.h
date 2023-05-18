@@ -10,6 +10,7 @@
 #include "CConfig.h"
 #include "CUpdateWorker.h"
 #include "CRefreshWorker.h"
+#include "CConnectConfigWorker.h"
 
 class Qt_MiniserverUpdater : public QMainWindow
 {
@@ -35,6 +36,9 @@ public slots:
     void onUpdateMiniserversFinished();
     void onRefreshCancelClicked();
     void onRefreshMiniserversFinished();
+    void onConnectConfigFinished();
+    void onCancelConnectConfigClicked();
+
 
 private:
     QList<CMiniserver>* miniservers;
@@ -48,6 +52,7 @@ private:
     QWidget* centralWidget; 
     CUpdateWorker* updateWorker;
     CRefreshWorker* refreshWorker;
+    CConnectConfigWorker* connectConfigWorker;
 
     //CConfigMSUpdate* configMSUpdate;
     //Ui::Qt_MiniserverUpdaterClass ui;

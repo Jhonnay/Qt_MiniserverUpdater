@@ -66,11 +66,17 @@ void CUpdateWorker::run()
         }
 
         //Load from Miniserver and Update
-        config.OpenConfigLoadProject();
-        config.performMiniserverUpdate();
+        config.OpenConfigLoadProject((QThread*)this);
+        int updateSuccessful = config.performMiniserverUpdate((QThread*)this);
         
         //Update Status to Updated
-        miniserver.setMiniserverStatus(MyConstants::Strings::Listview_Updated_MS_Status);
+        if (!isInterruptionRequested() && updateSuccessful == 1) {
+            miniserver.setMiniserverStatus(MyConstants::Strings::Listview_Updated_MS_Status);
+        }
+        else {
+            miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Refresh_canceled);
+        }
+        
 
         //TODO Refresh Minisever Information
         tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);

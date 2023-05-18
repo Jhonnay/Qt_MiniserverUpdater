@@ -87,6 +87,7 @@
     <ClCompile Include="CComboBoxLanguageDelegate.cpp" />
     <ClCompile Include="CConfigMSUpdate.cpp" />
     <ClCompile Include="CConnectConfigButtonDelegate.cpp" />
+    <ClCompile Include="CConnectConfigWorker.cpp" />
     <ClCompile Include="CLoxAppJson.cpp" />
     <ClCompile Include="CMiniserver.cpp" />
     <ClCompile Include="CMiniserverTableModel.cpp" />
@@ -135,6 +136,7 @@
     <ClInclude Include="CConfig.h" />
     <QtMoc Include="CConnectConfigButtonDelegate.h" />
     <ClInclude Include="CConfigMSUpdate.h" />
+    <QtMoc Include="CConnectConfigWorker.h" />
     <ClInclude Include="CLoxAppJson.h" />
     <ClInclude Include="CMiniserver.h" />
     <QtMoc Include="CMiniserverTableModel.h" />

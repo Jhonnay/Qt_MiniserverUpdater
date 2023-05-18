@@ -51,9 +51,6 @@ int main(int argc, char* argv[])
     mainwindow->show();
 
 
-
-
-
     //WebServices Test
     //CMiniserver testkofferZuhause = CMiniserver("504F94A06212", "admin", "admin!", "TBD", "TBD", "TBD", "Black", "TBD", "TBD", "MS6212","5");
     //QString cloudDNSLink = CWebService::getCloudDNSLink(miniservers[0]);
@@ -70,10 +67,6 @@ int main(int argc, char* argv[])
     //testkofferZuhause.setLocalIP("192.168.178.60");
     //QString versionLocalTestkofferIP = CWebService::sendCommandRest_Version_Local_Gen1(testkofferZuhause, "dev/sys/version", "value");
     //QString wholeVersionResponseTestkofferIP = CWebService::sendCommandRest_Version_Local_Gen1(testkofferZuhause, "dev/sys/version", "");
-
-
-
-
 
     return a.exec();
 }

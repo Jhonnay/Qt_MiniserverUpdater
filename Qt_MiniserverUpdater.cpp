@@ -22,6 +22,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     statusbar = new Qt_Statusbar(this);
     updateWorker = new CUpdateWorker(this, tableViewMiniserver, bottom_buttons, statusbar);
     refreshWorker = new CRefreshWorker(this, tableViewMiniserver, bottom_buttons, statusbar);
+    connectConfigWorker = new CConnectConfigWorker(this, tableViewMiniserver, bottom_buttons, statusbar);
     applicationSettings = NULL;
     
 
@@ -47,6 +48,9 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(refreshWorker, &CRefreshWorker::refreshCanceled, this, &Qt_MiniserverUpdater::onRefreshCancelClicked);
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonCancelClicked, this, &Qt_MiniserverUpdater::onRefreshCancelClicked);
 
+    connect(connectConfigWorker, &CConnectConfigWorker::connectingCompleted, this, &Qt_MiniserverUpdater::onRefreshMiniserversFinished);
+    connect(connectConfigWorker, &CConnectConfigWorker::connectingCanceled, this, &Qt_MiniserverUpdater::onCancelConnectConfigClicked);
+    connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonCancelClicked, this, &Qt_MiniserverUpdater::onCancelConnectConfigClicked);
 
     this->setCentralWidget(centralWidget);
 
@@ -72,6 +76,16 @@ void Qt_MiniserverUpdater::setMiniserverList(QList<CMiniserver>* list)
 void Qt_MiniserverUpdater::setConfigEXEPath(QString path)
 {
     statusbar->setConfigExePath(path);
+}
+
+
+void Qt_MiniserverUpdater::onCancelConnectConfigClicked() {
+    this->connectConfigWorker->requestInterruption();
+    connect(connectConfigWorker, &CConnectConfigWorker::finished, this, &Qt_MiniserverUpdater::onConnectConfigFinished);
+}
+
+void Qt_MiniserverUpdater::onConnectConfigFinished() {
+    bottom_buttons->setDisabledAllExceptCancel(false);
 }
 
 void Qt_MiniserverUpdater::onRefreshCancelClicked() {
@@ -138,7 +152,6 @@ void Qt_MiniserverUpdater::onConnectConfigClicked(const QModelIndex& index, cons
     qDebug() << miniserver.toString();
 
     QString configPath = statusbar->getConfigExePath();
-   
     int configCount = CConfigMSUpdate::getRunningConfigInstances();
 
     if (configPath == "Current Config : not selected - double click to select") {
@@ -151,26 +164,9 @@ void Qt_MiniserverUpdater::onConnectConfigClicked(const QModelIndex& index, cons
         QMessageBox::warning(nullptr, "Error", message);
         return;
     }
-
-    CConfigMSUpdate config;
-    config.setUser(QString::fromStdString(miniserver.getAdminUser()));
-    config.setPw(QString::fromStdString(miniserver.getAdminPassword()));
-    config.SetConfigPath(configPath);
-    config.SetConfigLanguage(QString::fromStdString(miniserver.getConfigLanguage()));
-    if (miniserver.getLocalIP() != "" || !miniserver.getLocalIP().empty()) {
-        config.setMsIP(QString::fromStdString(miniserver.getLocalIP()));
-    }
-    else {
-        config.setMsIP(QString::fromStdString(miniserver.getSerialNumber()));
-    }
-
-    QtConcurrent::run([&]() {
-        CConfigMSUpdate _config = CConfigMSUpdate(config.MsIP(), config.User(), config.Pw(), config.ConfigPath(), config.ConfigLanguage());
-        _config.OpenConfigLoadProject();
-        });
-
-    QCoreApplication::processEvents();
-
+    bottom_buttons->setDisabledAllExceptCancel(true);
+    connectConfigWorker->setMiniserver(miniserver);
+    connectConfigWorker->start();
 }
 
 

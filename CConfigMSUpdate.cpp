@@ -28,81 +28,112 @@
 //#define UPDATE_CYCLE_DISCONNECT_CONFIG 4
 //#define UPDATE_CYCLE_CLOSE_CONFIG 5
 
+#define LOADING_CYCLE_START_CONFIG  0
+#define LOADING_CYCLE_SEND_CONNECT 1
+#define LOADING_CYCLE_CHECK_CONNECTING 2
+#define LOADING_CYCLE_CHECK_CONNECTED 3
+#define LOADING_CYCLE_SEND_LOAD_COMMAND 4
+#define LOADING_CYCLE_CHECK_PROGRAM_IDENTICAL 5 
 
-void CConfigMSUpdate::OpenConfigLoadProject()
+void CConfigMSUpdate::OpenConfigLoadProject(QThread* thread)
 {
+    int loadingCycle = 0;
     int errorCount = 0;
-    qDebug() << "Starting Config: Config Path = " << configPath << ", Language" << CConfig::LanguageList.at(configLanguage.toInt())
-        << ", Projectpath: " << projectPath;
+    CUDPListener udpListener = CUDPListener(nullptr, projectPath, configPath);
+    QString connectCommand = QStringLiteral("C,%1,%2,%3").arg(msIP, user, pw).replace(":", ".");
 
-    config.startConfig_Language(configPath, projectPath, configLanguage);
-    QThread::sleep(5);
+    while (loadingCycle <= LOADING_CYCLE_CHECK_PROGRAM_IDENTICAL && !thread->isInterruptionRequested()) {
+        switch (loadingCycle) {
+        case LOADING_CYCLE_START_CONFIG:
+            errorCount = 0; 
+            qDebug() << "---------------------------- Starting Config: Config Path = " << configPath << ", Language" << CConfig::LanguageList.at(configLanguage.toInt()) << ", Projectpath: " << projectPath << "----------------------------";
+
+            config.startConfig_Language(configPath, projectPath, configLanguage);
+            udpListener.start();
+
+            loadingCycle++;
+            break;
+
+
+        case LOADING_CYCLE_SEND_CONNECT:
+            qDebug() << "---------------------------- Connecting to MS with:" << msIP << "," << user << "," << pw << "----------------------------";
+            config.sendCommand(QStringLiteral("127.0.0.1"), 7770, connectCommand); // Connect with MS
+            loadingCycle++;
+            break;
+        
+        case LOADING_CYCLE_CHECK_CONNECTING:
+            if (udpListener.m_autoStatus.m_nCurrentState <  AUTO_CONNECTING) {
+                errorCount++;
+                
+            }
+
+            if (udpListener.m_autoStatus.m_nCurrentState == AUTO_CONNECTED) {
+                errorCount = 0;
+                loadingCycle++;
+
+            }
+
+            if (errorCount > 2) { //5 seconds
+                loadingCycle--;
+                errorCount = 0;
+            }
+            break;
+
+        case LOADING_CYCLE_CHECK_CONNECTED:
+            if (udpListener.m_autoStatus.nDocState == DS_ONLINE) {
+                qDebug() << "---------------------------- Miniservers are connected and running. Going to next step - Loading From MS ----------------------------";
+                PrintConfigMsVersions(udpListener);
+                loadingCycle++;
+                break;
+            }
+            else
+            {
+                errorCount++;
+                qDebug() << "---------------------------- Connection not established or not all Miniservers are running.----------------------------";
+                qDebug() << "DocState = " << udpListener.m_autoStatus.nDocState << " should be  =  " << DS_ONLINE;
+                
+                if (errorCount > 10) {
+                    loadingCycle = LOADING_CYCLE_SEND_CONNECT;
+                }
+            }
+            break; 
+
+        case LOADING_CYCLE_SEND_LOAD_COMMAND:
+            qDebug() << "---------------------------- Loading from Miniserver ----------------------------";
+            errorCount = 0;
+            config.LoadFromMiniserver();
+            loadingCycle++;
+            break;
+
+
+        case LOADING_CYCLE_CHECK_PROGRAM_IDENTICAL:
+            if (udpListener.m_autoStatus.nDocState == DS_ONLINE && udpListener.m_autoStatus.m_nCurrentState == AUTO_CONNECTED && udpListener.m_autoStatus.bAllClientsRunning == 1
+                && udpListener.m_autoStatus.bIdentical == 1) {
+                qDebug() << "----------------------------- Project successfully loaded from the MS. Next Step - Hurrrrraaaaayyyyyyyy ----------------------------";
+                PrintConfigMsVersions(udpListener);
+                loadingCycle++;
+            }
+            else
+            {
+                qDebug() << "----------------------------- Project not loaded successfully. ----------------------------- ";
+                errorCount++;
+                if (errorCount > 10) {
+                    loadingCycle--;
+                }
+            }
+            break;
+
+        }
+        qDebug() << "errorCount= " << errorCount + ", cycle= " << loadingCycle;
+        QThread::msleep(1500);
+    }
     
-    CUDPListener udpListener = CUDPListener(nullptr,projectPath,configPath);
-    udpListener.start();
 
-    QString msg = QStringLiteral("C,%1,%2,%3").arg(msIP, user, pw);
-    msg = msg.replace(":", ".");
-    qDebug() << "Connecting to MS with:" << msIP << "," << user << "," << pw;
-
- connect:
-    config.sendCommand(QStringLiteral("127.0.0.1"), 7770, msg); // Connect with MS
-
-checkConnected:
-    qDebug() << "AutoStatus: " << udpListener.m_autoStatus.toString();
-    if (udpListener.m_autoStatus.nDocState == DS_ONLINE) {
-        qDebug() << "Miniservers are connected and running. Going to next step - Loading From MS";
-        PrintConfigMsVersions(udpListener);
-        errorCount = 0;
-    }
-    else
-    {
-        errorCount++;
-        qDebug() << "Connection not established or not all Miniservers are running.";
-        qDebug() << "DocState = " << udpListener.m_autoStatus.nDocState << " should be  =  " << DS_ONLINE;
-        qDebug() << "Sleep 1s";
-        QThread::sleep(1);
-        if (errorCount < 50) {
-            goto checkConnected;
-        }
-        else {
-            errorCount = 0;
-            goto connect;
-        }
-        
-    }
-    config.LoadFromMiniserver();
-    qDebug() << "ErrorCoung = " << errorCount;
-    QThread::sleep(1);
-    errorCount = 0;
-    qDebug() << "ErrorCoung = " << errorCount;
-
-loadProject:
-
-    if (udpListener.m_autoStatus.nDocState == DS_ONLINE && udpListener.m_autoStatus.m_nCurrentState == AUTO_CONNECTED && udpListener.m_autoStatus.bAllClientsRunning == 1
-        && udpListener.m_autoStatus.bIdentical == 1) {
-        qDebug() << "Project successfully loaded from the MS. Next Step - Hurrrrraaaaayyyyyyyy";
-        PrintConfigMsVersions(udpListener);
-    }
-    else
-    {
-
-        qDebug() << "Project not loaded successfully. Trying again after Sleep 1s";
-        qDebug() << "Error Coung = " << errorCount;
-        QThread::sleep(1);
-        errorCount++;
-        if (errorCount < 50) {
-            goto loadProject;
-        }
-        else {
-            goto checkConnected;
-            errorCount = 0;
-        }
-        
-    }
-
+    qDebug() << "Closing udp listener";
+    
     udpListener.requestInterruption();
     udpListener.wait();
+    
 }
 
 
@@ -159,7 +190,7 @@ int CConfigMSUpdate::getRunningConfigInstances()
 }
 
 
-int CConfigMSUpdate::performMiniserverUpdate() {
+int CConfigMSUpdate::performMiniserverUpdate(QThread* thread) {
 
     int updateCycleState = 0;
     int counterCyclesTime = 0; // After 17 Minutes, stop update Progress in this application and show MessageBox and DO NOT KILL CONFIG!
@@ -170,7 +201,7 @@ int CConfigMSUpdate::performMiniserverUpdate() {
     CUDPListener udpL = CUDPListener(nullptr, projectPath, configPath);
     udpL.start();
     
-    while (udpL.m_autoStatus.nDocState == 0) {
+    while (udpL.m_autoStatus.nDocState ) {
         QThread::msleep(500); //wait until first data is received
     }
 
@@ -182,7 +213,7 @@ int CConfigMSUpdate::performMiniserverUpdate() {
          OpenConfigLoadProject()   */
     }
 
-    while (updateCycleState < 6)
+    while (updateCycleState < 6 && !thread->isInterruptionRequested())
     {
         qDebug() << udpL.m_autoStatus.toString();
         switch (updateCycleState)

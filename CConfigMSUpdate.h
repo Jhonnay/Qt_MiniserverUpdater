@@ -86,11 +86,11 @@ public:
     
 
     
-    void OpenConfigLoadProject();
+    void OpenConfigLoadProject(QThread* thread);
 
     void PrintConfigMsVersions(CUDPListener& udpL);
 
-    int performMiniserverUpdate();
+    int performMiniserverUpdate(QThread* thread);
 
     static int getRunningConfigInstances();
 

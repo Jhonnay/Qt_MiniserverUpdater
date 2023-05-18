@@ -8,7 +8,7 @@ CUDPListener::CUDPListener(QObject *parent, const QString& projectPath, const QS
 {
     m_projectPath = projectPath;
     m_configPath = configPath;
-    m_socket = new QUdpSocket();
+    m_socket = new QUdpSocket(parent);
     
 
     m_autoStatus.nDocState = 0;
@@ -38,7 +38,7 @@ void CUDPListener::run()
         datagram.resize(m_socket->pendingDatagramSize());
         m_socket->readDatagram(datagram.data(), datagram.size(), &senderIp, &senderPort);
 
-        while (!m_socket->hasPendingDatagrams()) {
+        while (!m_socket->hasPendingDatagrams() && !this->isInterruptionRequested()) {
             QThread::msleep(1000);
         };
 
@@ -94,7 +94,7 @@ void CUDPListener::run()
         qDebug() << "Failed to close UDP socket";
     }
     else {
-        qDebug() << "Socket closed! :) JUhuuuuu";
+        qDebug() << "----------------------------- Socket closed! :) JUhuuuuu -----------------------------";
     }
     
 }
