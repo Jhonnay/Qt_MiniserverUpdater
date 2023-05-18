@@ -103,6 +103,9 @@
     <ClCompile Include="CConfigMSUpdate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CUpdateWorker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CApplicationSettings.h">
@@ -168,6 +171,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="CUDPListener.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="CUpdateWorker.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

@@ -169,6 +169,10 @@ int CConfigMSUpdate::performMiniserverUpdate() {
 
     CUDPListener udpL = CUDPListener(nullptr, projectPath, configPath);
     udpL.start();
+    
+    while (udpL.m_autoStatus.nDocState == 0) {
+        QThread::msleep(500); //wait until first data is received
+    }
 
     if (udpL.m_autoStatus.nDocState == DS_ONLINE &&
         udpL.m_autoStatus.m_nCurrentState == AUTO_CONNECTED &&
@@ -285,6 +289,7 @@ int CConfigMSUpdate::performMiniserverUpdate() {
 
         case UPDATE_CYCLE_CLOSE_CONFIG:
             config.closeConfig();
+            
             qDebug() << "\n\n" << "Update Process complete.";
             updateCycleState++;
             ret = 1;

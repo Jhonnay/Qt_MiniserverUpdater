@@ -83,8 +83,9 @@ void Qt_Bottom_Action_Buttons::onCheckBoxHandsfreeClicked()
 
 void Qt_Bottom_Action_Buttons::setDisabledAllExceptCancel(bool setting)
 {
-	this->setDisabled(setting);
-	if (setting) {
-		this->btnCancel->setDisabled(!setting);
-	}
+	this->btnAdd->setDisabled(setting);
+	this->btnRefresh->setDisabled(setting);
+	this->btnRemove->setDisabled(setting);
+	this->btnAdd->setDisabled(setting);
+	this->btnUpdate->setDisabled(setting);
 }
