@@ -127,6 +127,16 @@ bool CMiniserverTableModel::setData(const QModelIndex& index, const QVariant& va
     return false;
 }
 
+bool CMiniserverTableModel::insertRow(const CMiniserver& miniserver) {
+    int row = miniserverlist->size();
+    beginInsertRows(QModelIndex(), row, row);
+    miniserverlist->append(miniserver);
+    endInsertRows();
+    //emit dataChanged(index(row, 0), index(row, columnCount() - 1));
+    //emit layoutChanged();
+    return true;
+}
+
 void CMiniserverTableModel::printDebugDataChanged(const QModelIndex& index, CMiniserver& miniserver)
 {
     qDebug() << "Data Changed @ Row:  " << index.row() << " Column: " << index.column() << " - " << miniserver.toString();

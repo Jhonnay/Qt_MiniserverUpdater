@@ -5,10 +5,11 @@
 
 CMiniserver::CMiniserver()
 {
-    serialNumber = "empty";
+    serialNumber = "";
     adminUser = "a";
     adminPassword = "a";
     miniserverStatus="empty";
+    miniserverVersion = "TBD";
     updatelevel = "none";
     versionColor = "black";
     miniserverProject = "none";
@@ -38,6 +39,12 @@ CMiniserver::CMiniserver(const std::string& serialNumber, const std::string& adm
     this->localIP = localIP;
     this->configLanguage = configLanguage;
 
+}
+
+bool CMiniserver::isDummy()
+{
+
+    return serialNumber.empty();
 }
 
 
@@ -198,6 +205,21 @@ QString CMiniserver::unformatMiniserverVersionQString(const QString& version) {
     return convertedVersion;
 }
 
+int CMiniserver::unformatVersionToInteger() {
+    QString unformatedversion = unformatMiniserverVersionQString(QString::fromStdString(miniserverVersion));
+    return std::stoi(unformatedversion.toStdString());
+}
+
+std::string CMiniserver::calculateVersionColor(QString configVersion) {
+
+    if (miniserverVersion == "0.0.0.0") { return "red"; };
+    int miniserver = unformatVersionToInteger();
+    int config = std::stoi(configVersion.toStdString());
+    if (config > miniserver) { return "orange"; };
+    if (config == miniserver) { return "green"; };
+    if (config < miniserver) { return "black"; };
+
+}
 
 std::string CMiniserver::toString() const
 {

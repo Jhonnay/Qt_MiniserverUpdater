@@ -53,6 +53,7 @@ private:
     CConfig config;
     QString localhost = "127.0.0.1";
 
+
 public:
 
     CConfigMSUpdate() = default;
@@ -64,7 +65,7 @@ public:
         configLanguage(configLanguage)
     {
     }
-
+    QString miniserverVersionAfterUpdate;
     static int UpdateCycleState() { return updateCycleState; }
     static void SetUpdateCycleState(int value) { updateCycleState = value; }
     static bool Stop() { return stop; }

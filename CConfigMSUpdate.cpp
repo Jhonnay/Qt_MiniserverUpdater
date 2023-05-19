@@ -306,6 +306,7 @@ int CConfigMSUpdate::performMiniserverUpdate(QThread* thread) {
                 qDebug() << "Versions of Config and Miniservers match";
                 PrintConfigMsVersions(udpL);
                 updateCycleState++;
+                miniserverVersionAfterUpdate = udpL.m_versionsOfMiniservers[0];
                 ret = 1;
             }
             break;
@@ -336,6 +337,7 @@ int CConfigMSUpdate::performMiniserverUpdate(QThread* thread) {
         QThread::msleep(1000);
     }
 
+    
     udpL.requestInterruption();
     udpL.wait();
 

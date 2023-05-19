@@ -19,16 +19,20 @@ CRefreshWorker::~CRefreshWorker()
 void CRefreshWorker::run()
 {
     const QModelIndexList selectedIndexes = tableViewMiniserver->selectionModel()->selectedRows();
+    QString configVersionUnformated = CConfig::getConfigFileVersionUnformated(statusbar->getConfigExePath());
     int count = selectedIndexes.count();
     int progress = 1;
     int successfulRetreives = 0;
     QString progresstext = QStringLiteral("Refreshing %1 Miniserver information").arg(QString::number(count));
     emit updateStatusBarProgress(1, progresstext);
+    tableViewMiniserver->clearSelection();
 
     for (const QModelIndex& index : selectedIndexes)
     {
         CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
         miniserver.setMiniserverStatus(MyConstants::Strings::StartUp_Listview_MS_Version);
+        miniserver.setVersionColor("darkblue");
+        miniserver.setMiniserverVersion(MyConstants::Strings::StartUp_Listview_MS_Version);
         tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
         tableViewMiniserver->resizeColumnsToContents();
         tableViewMiniserver->setColumnWidth(6, 100);
@@ -44,7 +48,7 @@ void CRefreshWorker::run()
         CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
 
         progresstext = QStringLiteral("Retreiving of %1 (%2/%3)").arg(QString::fromStdString(miniserver.getSerialNumber())).arg(QString::number(progress)).arg(QString::number(count));
-        int progressInt = (progress * 100 )/ count -1;
+        int progressInt = (progress * 100 / 2)/ count;
         emit updateStatusBarProgress(progressInt, progresstext);
 
         //check if interrupted and set to "canceled" and skip FOR interation
@@ -64,7 +68,7 @@ void CRefreshWorker::run()
         
         miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information);
         miniserver.setMiniserverVersion(MyConstants::Strings::StartUp_Listview_MS_Version);
-        miniserver.setVersionColor("Black");
+        miniserver.setVersionColor("darkblue");
         tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
         tableViewMiniserver->resizeColumnsToContents();
         tableViewMiniserver->setColumnWidth(6, 100);
@@ -73,15 +77,18 @@ void CRefreshWorker::run()
 
         if (!miniserver.getLocalIP().empty()) {
             unformatedVersionString = CWebService::sendCommandRest_Version_Local_Gen1(miniserver, "dev/sys/version", "value");
-            updateLevel = CWebService::sendCommandRest_Version_Local_Gen1(miniserver, "/dev/cfg/updatelevel", "value");
-            cloxapp = CWebService::sendCommandRest_LoxAppJson_Local_Gen1(miniserver, "data/LoxAPP3.json");
+            if (unformatedVersionString != "error") { //speed up retreiving if not reachable
+                updateLevel = CWebService::sendCommandRest_Version_Local_Gen1(miniserver, "/dev/cfg/updatelevel", "value");
+                cloxapp = CWebService::sendCommandRest_LoxAppJson_Local_Gen1(miniserver, "data/LoxAPP3.json");
+            }
         }
         else {
             unformatedVersionString = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "dev/sys/version", "value");
-            updateLevel = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "/dev/cfg/updatelevel", "value");
-            cloxapp = CWebService::sendCommandRest_LoxAppJson_Remote_Cloud(miniserver, "data/LoxAPP3.json");
+            if (unformatedVersionString != "error") { //speed up retreiving if not reachable
+                updateLevel = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "/dev/cfg/updatelevel", "value");
+                cloxapp = CWebService::sendCommandRest_LoxAppJson_Remote_Cloud(miniserver, "data/LoxAPP3.json");
+            }
         }
-
         if (updateLevel.contains('"')) {
             updateLevel = updateLevel.left(updateLevel.indexOf('"'));
         }
@@ -89,6 +96,8 @@ void CRefreshWorker::run()
         miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information_successfull);
         miniserver.setUpdatelevel(updateLevel.toStdString());
         miniserver.setMiniserverProject(cloxapp.projectName + "/" + cloxapp.localUrl);
+        miniserver.setVersionColor(miniserver.calculateVersionColor(configVersionUnformated));
+
         if (miniserver.getMiniserverVersion() == "0.0.0.0") {
             miniserver.setMiniserverConfiguration(MyConstants::Strings::Listview_Refresh_MS_Configuration_Error);
             miniserver.setUpdatelevel(MyConstants::Strings::Listview_Refresh_MS_Configuration_Error);
@@ -106,6 +115,7 @@ void CRefreshWorker::run()
             successfulRetreives++;
         }
 
+        
         progress++;
 
         tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);

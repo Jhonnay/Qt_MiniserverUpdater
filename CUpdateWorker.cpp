@@ -1,6 +1,7 @@
 #include "CUpdateWorker.h"
 #include "MyConstants.h"
 #include "CConfigMSUpdate.h"
+#include "CRefreshWorker.h"
 
 CUpdateWorker::CUpdateWorker(QObject *parent)
 	: QThread(parent)
@@ -26,7 +27,7 @@ void CUpdateWorker::run()
     int successfulUpdates = 0;
     QString progresstext = QStringLiteral("Updating %1 Miniserver(s)").arg(QString::number(count));
     emit updateStatusBarProgress(1, progresstext);
-
+    tableViewMiniserver->clearSelection();
 
     //Update Listview for selected miniservers --> to be updated. 
     for (const QModelIndex& index : selectedIndexes)
@@ -44,7 +45,7 @@ void CUpdateWorker::run()
         CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
 
         progresstext = QStringLiteral("Updating %1 (%2/%3)").arg(QString::fromStdString(miniserver.getSerialNumber())).arg(QString::number(progress)).arg(QString::number(count));
-        int progressInt = (progress * 100) / count -1;
+        int progressInt = (progress * 100 / 2) / count;
         emit updateStatusBarProgress(progressInt, progresstext);
 
         //check if interrupted and set to "canceled" and skip FOR interation
@@ -83,6 +84,8 @@ void CUpdateWorker::run()
         //Update Status to Updated
         if (updateSuccessful == 1) {
             miniserver.setMiniserverStatus(MyConstants::Strings::Listview_Updated_MS_Status);
+            miniserver.setMiniserverVersion(CMiniserver::formatMiniserverVersionQString(config.miniserverVersionAfterUpdate).toStdString());
+            miniserver.setVersionColor(miniserver.calculateVersionColor(config.miniserverVersionAfterUpdate));
             successfulUpdates++; //if the update was successful but canceled afterwards it should count as updated. 
         }
         else if(!isInterruptionRequested() && updateSuccessful == 0){
@@ -93,6 +96,8 @@ void CUpdateWorker::run()
         }
         
         progress++;
+
+        
 
         //TODO Refresh Minisever Information
         tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);

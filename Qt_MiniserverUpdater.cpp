@@ -6,6 +6,7 @@
 #include <QtConcurrent>
 #include "CUpdateWorker.h"
 #include "CRefreshWorker.h"
+#include "Qt_CreateEditMiniserver.h"
 
 Qt_MiniserverUpdater::Qt_MiniserverUpdater(QWidget* parent )
     : QMainWindow(parent)
@@ -55,6 +56,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(refreshWorker, &CRefreshWorker::updateStatusBarProgress, statusbar, &Qt_Statusbar::updateProgress);
     connect(updateWorker, &CUpdateWorker::updateStatusBarProgress, statusbar, &Qt_Statusbar::updateProgress);
 
+    connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonAddClicked, this, &Qt_MiniserverUpdater::onAddMiniserverPressed);
 
     this->setCentralWidget(centralWidget);
 
@@ -91,6 +93,35 @@ void Qt_MiniserverUpdater::onCancelConnectConfigClicked() {
 void Qt_MiniserverUpdater::onUpdateStatusbarProgress(int progress, QString progresstext)
 {
     emit updateStatusbarProgress(progress, progresstext);
+}
+
+void Qt_MiniserverUpdater::onAddMiniserverPressed()
+{
+    CMiniserver miniserver = Qt_CreateEditMiniserver::createDialog("Add Miniserver");
+    if (!miniserver.isDummy()) {
+
+        CMiniserverTableModel* model = tableViewMiniserver->getMiniserverModel();
+       
+        //int row = model->rowCount();
+        tableViewMiniserver->getMiniserverModel()->insertRow(miniserver);
+
+        // Notify the view about the changes
+        //QModelIndex topLeft = model->index(row, 0);
+        //QModelIndex bottomRight = model->index(row, model->columnCount() - 1);
+        //emit model->dataChanged(topLeft, bottomRight);
+        //model->layoutChanged();
+        // Resize columns and update the view
+        //tableViewMiniserver->resizeColumnsToContents();
+        //tableViewMiniserver->reset();
+
+        //
+        //tableViewMiniserver->repaint();
+
+
+
+        qDebug() << "--------------------- Miniserver ADDED -------------\n" << miniserver.toString();
+    }
+
 }
 
 void Qt_MiniserverUpdater::onConnectConfigFinished() {

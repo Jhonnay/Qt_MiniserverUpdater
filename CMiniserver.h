@@ -28,6 +28,7 @@ public:
         const std::string& miniserverConfiguration, const std::string& localIP,
         const std::string& configLanguage);
 
+    bool isDummy();
 
     // Getter and Setter for serialNumber
     std::string getSerialNumber() const;
@@ -76,6 +77,10 @@ public:
     static QString formatMiniserverVersionQString(QString unformatedQString);
 
     static QString unformatMiniserverVersionQString(const QString& version);
+
+    int unformatVersionToInteger();
+
+    std::string calculateVersionColor(QString configVersion);
 
     //toString Function
     std::string toString() const;

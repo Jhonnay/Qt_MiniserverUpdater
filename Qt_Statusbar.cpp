@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Qt_Statusbar.h"
-#include <QFileDialog>
+#include <QFile>
 #include <iostream>
 
 #include "Windows.h"

@@ -104,6 +104,7 @@
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
     <ClCompile Include="Qt_ComboBoxItem.cpp" />
+    <ClCompile Include="Qt_CreateEditMiniserver.cpp" />
     <ClCompile Include="Qt_Menubar.cpp" />
     <ClCompile Include="Qt_MiniserverTableView.cpp" />
     <ClCompile Include="Qt_Miniserver_Listview.cpp" />
@@ -112,6 +113,7 @@
     <QtRcc Include="Qt_MiniserverUpdater.qrc" />
     <QtUic Include="Qt_Bottom_Action_Buttons.ui" />
     <QtUic Include="Qt_ComboBoxItem.ui" />
+    <QtUic Include="Qt_CreateEditMiniserver.ui" />
     <QtUic Include="Qt_Menubar.ui" />
     <QtUic Include="Qt_MiniserverTableView.ui" />
     <QtUic Include="Qt_MiniserverUpdater.ui" />
@@ -152,6 +154,7 @@
     <QtMoc Include="Qt_Statusbar.h" />
     <QtMoc Include="Qt_ComboBoxItem.h" />
     <QtMoc Include="Qt_MiniserverTableView.h" />
+    <QtMoc Include="Qt_CreateEditMiniserver.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
