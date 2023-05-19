@@ -3,6 +3,7 @@
 #include "CConfigMSUpdate.h"
 #include "CLoxAppJson.h"
 #include "CWebService.h"
+#include <QStringLiteral>
 
 CRefreshWorker::CRefreshWorker(QObject* parent, Qt_MiniserverTableView* tableview, Qt_Bottom_Action_Buttons* actionButtons, Qt_Statusbar* bottomStatus)
 	: QThread(parent)
@@ -18,6 +19,11 @@ CRefreshWorker::~CRefreshWorker()
 void CRefreshWorker::run()
 {
     const QModelIndexList selectedIndexes = tableViewMiniserver->selectionModel()->selectedRows();
+    int count = selectedIndexes.count();
+    int progress = 1;
+    int successfulRetreives = 0;
+    QString progresstext = QStringLiteral("Refreshing %1 Miniserver information").arg(QString::number(count));
+    emit updateStatusBarProgress(1, progresstext);
 
     for (const QModelIndex& index : selectedIndexes)
     {
@@ -29,12 +35,17 @@ void CRefreshWorker::run()
     }
     for (const QModelIndex& index : selectedIndexes)
     {
+        
         // Get the row number of the selected index
         int row = index.row();
         QString unformatedVersionString;
         QString updateLevel;
         CLoxAppJson cloxapp;
         CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
+
+        progresstext = QStringLiteral("Retreiving of %1 (%2/%3)").arg(QString::fromStdString(miniserver.getSerialNumber())).arg(QString::number(progress)).arg(QString::number(count));
+        int progressInt = (progress * 100 )/ count -1;
+        emit updateStatusBarProgress(progressInt, progresstext);
 
         //check if interrupted and set to "canceled" and skip FOR interation
         if (isInterruptionRequested()) {
@@ -44,6 +55,7 @@ void CRefreshWorker::run()
             tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
             tableViewMiniserver->resizeColumnsToContents();
             tableViewMiniserver->setColumnWidth(6, 100);
+            progress++;
             continue;
         }
 
@@ -81,31 +93,37 @@ void CRefreshWorker::run()
             miniserver.setMiniserverConfiguration(MyConstants::Strings::Listview_Refresh_MS_Configuration_Error);
             miniserver.setUpdatelevel(MyConstants::Strings::Listview_Refresh_MS_Configuration_Error);
             miniserver.setVersionColor("RED");
+            miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information_timeout);
         }
         else if (cloxapp.gatewayType == 0)
         {
             miniserver.setMiniserverConfiguration(MyConstants::Strings::Listview_Refresh_MS_Configuration_Standalone);
+            successfulRetreives++;
         }
         else
         {
             miniserver.setMiniserverConfiguration(MyConstants::Strings::Listview_Refresh_MS_Configuration_ClientGateway);
-
+            successfulRetreives++;
         }
 
+        progress++;
 
         tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
         tableViewMiniserver->resizeColumnsToContents();
         tableViewMiniserver->setColumnWidth(6, 100);
         
     }
-
+    progresstext = QStringLiteral("Successfully retreived (%1 of %2)").arg(QString::number(successfulRetreives)).arg(QString::number(count));
     if (isInterruptionRequested()) {
         emit refreshCanceled();
-
+        progresstext = "Canceled! - " + progresstext;
+        emit updateStatusBarProgress(100, progresstext);
         return;
     }
-
+    
+    emit updateStatusBarProgress(100, progresstext);
     emit refreshCompleted();
+    
 
     
 

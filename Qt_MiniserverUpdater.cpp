@@ -52,6 +52,10 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(connectConfigWorker, &CConnectConfigWorker::connectingCanceled, this, &Qt_MiniserverUpdater::onCancelConnectConfigClicked);
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonCancelClicked, this, &Qt_MiniserverUpdater::onCancelConnectConfigClicked);
 
+    connect(refreshWorker, &CRefreshWorker::updateStatusBarProgress, statusbar, &Qt_Statusbar::updateProgress);
+    connect(updateWorker, &CUpdateWorker::updateStatusBarProgress, statusbar, &Qt_Statusbar::updateProgress);
+
+
     this->setCentralWidget(centralWidget);
 
     //ui.setupUi(this);
@@ -82,6 +86,11 @@ void Qt_MiniserverUpdater::setConfigEXEPath(QString path)
 void Qt_MiniserverUpdater::onCancelConnectConfigClicked() {
     this->connectConfigWorker->requestInterruption();
     connect(connectConfigWorker, &CConnectConfigWorker::finished, this, &Qt_MiniserverUpdater::onConnectConfigFinished);
+}
+
+void Qt_MiniserverUpdater::onUpdateStatusbarProgress(int progress, QString progresstext)
+{
+    emit updateStatusbarProgress(progress, progresstext);
 }
 
 void Qt_MiniserverUpdater::onConnectConfigFinished() {

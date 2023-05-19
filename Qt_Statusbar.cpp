@@ -12,6 +12,7 @@
 #include "CConfig.h"
 #include <qthread.h>
 #include <QtConcurrent/QtConcurrent>
+#include "Qt_MiniserverUpdater.h"
 
 
 
@@ -106,6 +107,9 @@ Qt_Statusbar::Qt_Statusbar(QWidget* parent)
 
     // Set initial state
     updateProgress(100, "Downloading file");
+
+
+
 }
 
 QString Qt_Statusbar::getSelectedFilePath()
@@ -137,10 +141,10 @@ void Qt_Statusbar::mouseDoubleClickEvent(QMouseEvent* event)
     }
 }
 
-void Qt_Statusbar::updateProgress(int progress, std::string progresstext)
+void Qt_Statusbar::updateProgress(int progress, QString progresstext)
 {
     progressBar->setValue(progress);
-    progressLabel->setText(QString::fromStdString(progresstext));
+    progressLabel->setText(progresstext);
     QSize size = progressLabel->sizeHint();
     progressLabel->setFixedSize(size);
 

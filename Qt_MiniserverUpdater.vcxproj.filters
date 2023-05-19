@@ -186,7 +186,7 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="CConnectConfigWorker.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

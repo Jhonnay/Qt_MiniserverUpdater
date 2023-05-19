@@ -24,14 +24,14 @@ public slots:
 
 private slots:
     void selectFile();
-    void updateProgress(int progress, std::string progresstext);
     bool checkConfigEXE(QString configFilePath);
     void startConfig(QString configPath);
     void startConfig_Language(QString configPath, QString Language);
     void killAllConfigs();
 
 
-
+public slots:
+    void updateProgress(int progress, QString progresstext);
 
     //QString getVersionString(QString fName);
 

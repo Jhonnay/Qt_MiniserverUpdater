@@ -306,6 +306,7 @@ int CConfigMSUpdate::performMiniserverUpdate(QThread* thread) {
                 qDebug() << "Versions of Config and Miniservers match";
                 PrintConfigMsVersions(udpL);
                 updateCycleState++;
+                ret = 1;
             }
             break;
 
@@ -323,7 +324,7 @@ int CConfigMSUpdate::performMiniserverUpdate(QThread* thread) {
             
             qDebug() << "\n\n" << "Update Process complete.";
             updateCycleState++;
-            ret = 1;
+            
             break;
         }
         qDebug() << "Waiting 1000ms ...";

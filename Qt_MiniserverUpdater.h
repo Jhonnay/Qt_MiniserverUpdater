@@ -38,8 +38,11 @@ public slots:
     void onRefreshMiniserversFinished();
     void onConnectConfigFinished();
     void onCancelConnectConfigClicked();
+    void onUpdateStatusbarProgress(int progress, QString progresstext);
 
 
+signals:
+    void updateStatusbarProgress(int progress, QString progresstext);
 private:
     QList<CMiniserver>* miniservers;
     ApplicationSettings* applicationSettings;

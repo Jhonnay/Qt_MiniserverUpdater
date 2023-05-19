@@ -29,5 +29,6 @@ protected:
 signals:
 	void updatingCompleted();
 	void updatingCanceled();
+	void updateStatusBarProgress(int progress, QString progresstext);
 
 };
