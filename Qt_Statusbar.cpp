@@ -120,13 +120,14 @@ QString Qt_Statusbar::getSelectedFilePath()
 void Qt_Statusbar::selectFile()
 {
     QString initialDir = "C:\\Program Files (x86)\\Loxone";
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), initialDir, tr("Executable Files (*.exe)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Loxone Config"), initialDir, tr("Executable Files (LoxoneConfig.exe)"));
     QCoreApplication::processEvents();
     if (!fileName.isEmpty()) {
         checkConfigEXE(fileName);
 
         exefilePath = fileName;
         fileLabel->setText(exefilePath);
+        emit exefilepathChanged();
     }
 
 }

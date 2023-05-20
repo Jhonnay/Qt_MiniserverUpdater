@@ -1,10 +1,6 @@
 #include "stdafx.h"
 #include "Qt_Menubar.h"
 
-
-
-#include "Qt_Menubar.h"
-
 Qt_Menubar::Qt_Menubar(QWidget* parent)
     : QWidget(parent)
 {
@@ -26,6 +22,11 @@ Qt_Menubar::Qt_Menubar(QWidget* parent)
 Qt_Menubar::~Qt_Menubar()
 {
     delete menuBar;
+}
+
+void Qt_Menubar::onapplicationSettingsClicked()
+{
+    emit applicationSettingsClicked();
 }
 
 void Qt_Menubar::createFileMenu()
@@ -53,9 +54,9 @@ void Qt_Menubar::createSettingsMenu()
 {
     settingsMenu = menuBar->addMenu(tr("&Settings"));
 
-    //settingsAct = new QAction(tr("&Program Settings"), this);
-    //settingsMenu->addAction(settingsAct);
-
+    settingsAct = new QAction(tr("&Startup Settings"), this);
+    settingsMenu->addAction(settingsAct);
+    connect(settingsMenu, &QMenu::triggered, this, &Qt_Menubar::onapplicationSettingsClicked);
 
 }
 

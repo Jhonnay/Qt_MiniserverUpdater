@@ -115,6 +115,9 @@
     <ClCompile Include="Qt_CreateEditMiniserver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Qt_ApplicationSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CApplicationSettings.h">
@@ -194,6 +197,9 @@
     <QtMoc Include="Qt_CreateEditMiniserver.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="Qt_ApplicationSettings.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="Qt_Bottom_Action_Buttons.ui">
@@ -215,6 +221,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="Qt_CreateEditMiniserver.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Qt_ApplicationSettings.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

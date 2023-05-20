@@ -6,9 +6,9 @@
 ApplicationSettings::ApplicationSettings()
 {
     this->bUseDefaultConfiguration = false;
-    this->strDefaultConfigurationPath = "";
+    this->strDefaultConfigurationPath = "not set";
     this->bUseDefaultConfig = false;
-    this->strDefaultConfigPath = "";
+    this->strDefaultConfigPath = "not set";
 }
 
 ApplicationSettings::ApplicationSettings(bool bUseDefaultConfiguration, std::string strDefaultConfigurationPath, bool bUseDefaultConfig, std::string strDefaultConfigPath)
@@ -57,4 +57,18 @@ std::string ApplicationSettings::getStrDefaultConfigPath() const
 void ApplicationSettings::setStrDefaultConfigPath(const std::string& strDefaultConfigPath)
 {
     this->strDefaultConfigPath = strDefaultConfigPath;
+}
+
+
+bool ApplicationSettings::isDummyApplicationSettings() {
+    if (
+        this->bUseDefaultConfiguration == false &&
+        this->strDefaultConfigurationPath == "not set" &&
+        this->bUseDefaultConfig == false &&
+        this->strDefaultConfigPath == "not set"
+        ) {
+        return true;
+    }
+
+    return false;
 }

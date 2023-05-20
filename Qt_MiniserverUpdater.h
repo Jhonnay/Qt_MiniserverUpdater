@@ -23,6 +23,7 @@ public:
     
     void setMiniserverList(QList<CMiniserver>* list);
     void setConfigEXEPath(QString path);
+    void setApplicationsettings(ApplicationSettings* settings);
     
     
 
@@ -41,6 +42,8 @@ public slots:
     void onUpdateStatusbarProgress(int progress, QString progresstext);
     void onAddMiniserverPressed();
     void onRemoveMiniserverPressed();
+    void onApplicationSettingsClicked();
+    void onConfigFilePathChanged();
 
 
 signals:

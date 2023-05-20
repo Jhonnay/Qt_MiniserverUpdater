@@ -7,6 +7,7 @@
 #include "CUpdateWorker.h"
 #include "CRefreshWorker.h"
 #include "Qt_CreateEditMiniserver.h"
+#include "Qt_ApplicationSettings.h"
 
 Qt_MiniserverUpdater::Qt_MiniserverUpdater(QWidget* parent )
     : QMainWindow(parent)
@@ -58,6 +59,8 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
 
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonAddClicked, this, &Qt_MiniserverUpdater::onAddMiniserverPressed);
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonRemoveClicked, this, &Qt_MiniserverUpdater::onRemoveMiniserverPressed);
+    connect(menubar, &Qt_Menubar::applicationSettingsClicked, this, &Qt_MiniserverUpdater::onApplicationSettingsClicked);
+    connect(statusbar, &Qt_Statusbar::exefilepathChanged, this, &Qt_MiniserverUpdater::onConfigFilePathChanged);
 
     this->setCentralWidget(centralWidget);
 
@@ -86,6 +89,68 @@ void Qt_MiniserverUpdater::setConfigEXEPath(QString path)
     statusbar->setConfigExePath(path);
 }
 
+void Qt_MiniserverUpdater::setApplicationsettings(ApplicationSettings* settings)
+{
+    this->applicationSettings = settings;
+}
+
+void Qt_MiniserverUpdater::onApplicationSettingsClicked() {
+    QString roamingPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString filePath = roamingPath + "/ApplicationSettings.json";
+    qDebug() << "Application  Settings Menu clicked!";
+    ApplicationSettings* settingsbefore = this->applicationSettings;
+
+    ApplicationSettings settings = Qt_ApplicationSettings::createDialog("Application Settings", settingsbefore, nullptr);
+    if (!settings.isDummyApplicationSettings()) {
+        QJsonObject jsonObj;
+
+        // Set values in the JSON object from the ApplicationSettings object
+        jsonObj["BUseDefaultConfiguration"] = settings.getBUseDefaultConfiguration();
+        jsonObj["StrDefaultConfigurationPath"] = QString::fromStdString(settings.getStrDefaultConfigurationPath());
+        jsonObj["BUseDefaultConfig"] = settings.getBUseDefaultConfig();
+        jsonObj["StrDefaultConfigPath"] = QString::fromStdString(settings.getStrDefaultConfigPath());
+
+        QJsonDocument jsonDoc(jsonObj);
+
+        QFile file(filePath);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            // Handle error opening file
+            return;
+        }
+
+        file.write(jsonDoc.toJson());
+        file.close();
+        this->applicationSettings->setBUseDefaultConfig(settings.getBUseDefaultConfig());
+        this->applicationSettings->setBUseDefaultConfiguration(settings.getBUseDefaultConfiguration());
+        this->applicationSettings->setStrDefaultConfigPath(settings.getStrDefaultConfigPath());
+        this->applicationSettings->setStrDefaultConfigurationPath(settings.getStrDefaultConfigurationPath());
+        statusbar->setConfigExePath(QString::fromStdString(applicationSettings->getStrDefaultConfigPath()));
+
+        for (int i = 0; i < miniservers->count(); i++) {
+            QModelIndex index = tableViewMiniserver->getMiniserverModel()->index(i, 0);
+            CMiniserver miniserver = miniservers->at(i);
+            miniserver.setVersionColor(miniserver.calculateVersionColor(CConfig::getConfigFileVersionUnformated(QString::fromStdString(applicationSettings->getStrDefaultConfigPath()))));
+            tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
+            tableViewMiniserver->resizeColumnsToContents();
+            tableViewMiniserver->setColumnWidth(6, 100);
+        }
+        
+    }
+    
+}
+
+void Qt_MiniserverUpdater::onConfigFilePathChanged() {
+    for (int i = 0; i < miniservers->count(); i++) {
+        QModelIndex index = tableViewMiniserver->getMiniserverModel()->index(i, 0);
+        CMiniserver miniserver = miniservers->at(i);
+        miniserver.setVersionColor(miniserver.calculateVersionColor(CConfig::getConfigFileVersionUnformated(statusbar->getConfigExePath())));
+        tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
+        tableViewMiniserver->resizeColumnsToContents();
+        tableViewMiniserver->setColumnWidth(6, 100);
+    }
+
+}
 
 void Qt_MiniserverUpdater::onCancelConnectConfigClicked() {
     this->connectConfigWorker->requestInterruption();

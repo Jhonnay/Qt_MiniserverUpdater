@@ -24,6 +24,8 @@ public:
     std::string getStrDefaultConfigPath() const;
     void setStrDefaultConfigPath(const std::string& strDefaultConfigPath);
 
+    bool isDummyApplicationSettings();
+
 private:
     bool bUseDefaultConfiguration;
     bool bUseDefaultConfig;

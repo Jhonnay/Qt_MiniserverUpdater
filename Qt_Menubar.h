@@ -13,7 +13,21 @@ public:
     explicit Qt_Menubar(QWidget* parent = nullptr);
     ~Qt_Menubar();
 
+    void onapplicationSettingsClicked();
+
 signals:
+    void saveClicked();
+    void openClicked();
+    void newClicked();
+    void exitClicked();
+    void applicationSettingsClicked();
+    void startAppClicked();
+    void debugAppClicked();
+    void killAppClicked();
+    void versionClicked();
+    void checkUpdateClicked();
+    void helpClicked();
+    void changelogClicked();
 
 private:
     void createFileMenu();

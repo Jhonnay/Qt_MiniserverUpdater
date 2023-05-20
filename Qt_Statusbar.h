@@ -37,6 +37,7 @@ public slots:
 
 signals:
     void doubleClicked();
+    void exefilepathChanged();
 protected:
     void mouseDoubleClickEvent(QMouseEvent* event) override;
 

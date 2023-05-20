@@ -97,6 +97,7 @@
     <ClCompile Include="CurrentUser.cpp" />
     <ClCompile Include="CWebService.cpp" />
     <ClCompile Include="MyConstants.cpp" />
+    <ClCompile Include="Qt_ApplicationSettings.cpp" />
     <ClCompile Include="Qt_Bottom_Action_Buttons.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
@@ -111,6 +112,7 @@
     <ClCompile Include="Qt_Statusbar.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <QtRcc Include="Qt_MiniserverUpdater.qrc" />
+    <QtUic Include="Qt_ApplicationSettings.ui" />
     <QtUic Include="Qt_Bottom_Action_Buttons.ui" />
     <QtUic Include="Qt_ComboBoxItem.ui" />
     <QtUic Include="Qt_CreateEditMiniserver.ui" />
@@ -155,6 +157,7 @@
     <QtMoc Include="Qt_ComboBoxItem.h" />
     <QtMoc Include="Qt_MiniserverTableView.h" />
     <QtMoc Include="Qt_CreateEditMiniserver.h" />
+    <QtMoc Include="Qt_ApplicationSettings.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

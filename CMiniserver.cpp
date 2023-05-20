@@ -1,6 +1,7 @@
 
 #include "stdafx.h"
 #include "CMiniserver.h"
+#include "MyConstants.h"
 
 
 CMiniserver::CMiniserver()
@@ -213,6 +214,7 @@ int CMiniserver::unformatVersionToInteger() {
 std::string CMiniserver::calculateVersionColor(QString configVersion) {
 
     if (miniserverVersion == "0.0.0.0") { return "red"; };
+    if (miniserverVersion == MyConstants::Strings::StartUp_Listview_MS_Version) { return "darkblue"; };
     int miniserver = unformatVersionToInteger();
     int config = std::stoi(configVersion.toStdString());
     if (config > miniserver) { return "orange"; };

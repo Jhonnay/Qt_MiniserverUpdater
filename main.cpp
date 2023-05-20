@@ -31,11 +31,11 @@ int main(int argc, char* argv[])
     QList<CMiniserver> miniservers;
     //MainWindow
     Qt_MiniserverUpdater* mainwindow = new Qt_MiniserverUpdater(&miniservers, nullptr);
-    
-
     QString applicationSettingsPath = checkIfApplicationSettingsExist("ApplicationSettings.json");
+    ApplicationSettings applicationSettings;
     if (!applicationSettingsPath.isEmpty()) {
-        ApplicationSettings applicationSettings = parseApplicationSettingsJsonFile(applicationSettingsPath);
+        applicationSettings = parseApplicationSettingsJsonFile(applicationSettingsPath);
+        mainwindow->setApplicationsettings(&applicationSettings);
         if (applicationSettings.getBUseDefaultConfig()) {
             mainwindow->setConfigEXEPath(QString::fromStdString(applicationSettings.getStrDefaultConfigPath()));
         }
