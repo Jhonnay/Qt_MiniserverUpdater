@@ -12,7 +12,7 @@ public:
 	Qt_CreateEditMiniserver(const QString& title = QString(), QWidget* parent = nullptr);
 	~Qt_CreateEditMiniserver();
 
-	static CMiniserver createDialog(const QString& title = QString(), CMiniserver* miniserver = nullptr);
+	static CMiniserver createDialog(const QString& title = QString(), CMiniserver* miniserver = nullptr, QList<CMiniserver>* list =nullptr);
 
 private:
 	//Ui::Qt_CreateEditMiniserverClass ui;

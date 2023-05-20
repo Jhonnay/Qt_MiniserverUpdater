@@ -101,6 +101,7 @@ const std::string MyConstants::Strings::MessageBox_AutoUpdate_selected_ERROR_not
 const std::string MyConstants::Strings::MessageBox_AutoUpdate_selected_Error_which_could_not_update = "These Miniserver could not start AutoUpdate: ";
 const std::string MyConstants::Strings::MessageBox_CheckUpdate_no_Internet = "Check your internet connection!";
 const std::string MyConstants::Strings::MessageBox_CheckUpdate_no_Update_available = "No new updates available. 😕";
+const std::string MyConstants::Strings::MessageBox_SerialNumber_duplicate = "Serial Number is already in list!";
 
 //WebServices
 const std::string MyConstants::Strings::WebService_Success_Code = "200";

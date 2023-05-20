@@ -68,5 +68,7 @@ void Qt_MiniserverTableView::handleConnectConfigClicked(const QModelIndex& index
     emit  ConnectConfigClicked(index, miniserver);
 }
 
-
-
+void Qt_MiniserverTableView::insertRow(const CMiniserver& miniserver)
+{
+    m_model->insertRow(miniserver);
+}

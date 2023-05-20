@@ -40,6 +40,7 @@ public slots:
     void onCancelConnectConfigClicked();
     void onUpdateStatusbarProgress(int progress, QString progresstext);
     void onAddMiniserverPressed();
+    void onRemoveMiniserverPressed();
 
 
 signals:

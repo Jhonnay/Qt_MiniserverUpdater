@@ -57,6 +57,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(updateWorker, &CUpdateWorker::updateStatusBarProgress, statusbar, &Qt_Statusbar::updateProgress);
 
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonAddClicked, this, &Qt_MiniserverUpdater::onAddMiniserverPressed);
+    connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonRemoveClicked, this, &Qt_MiniserverUpdater::onRemoveMiniserverPressed);
 
     this->setCentralWidget(centralWidget);
 
@@ -72,6 +73,7 @@ void Qt_MiniserverUpdater::setMiniserverList(QList<CMiniserver>* list)
         (*list)[i].setMiniserverStatus(MyConstants::Strings::StartUp_Listview_MS_Status);
         (*list)[i].setMiniserverVersion(MyConstants::Strings::StartUp_Listview_MS_Version);
         (*list)[i].setVersionColor("darkblue");
+        qDebug() << "Row: " << i << " - " << list->at(i).toString();
     }
     this->miniservers = list;
     tableViewMiniserver->setModel(new CMiniserverTableModel(list,this));
@@ -97,31 +99,38 @@ void Qt_MiniserverUpdater::onUpdateStatusbarProgress(int progress, QString progr
 
 void Qt_MiniserverUpdater::onAddMiniserverPressed()
 {
-    CMiniserver miniserver = Qt_CreateEditMiniserver::createDialog("Add Miniserver");
+    CMiniserver miniserver = Qt_CreateEditMiniserver::createDialog("Add Miniserver",nullptr,miniservers);
     if (!miniserver.isDummy()) {
 
-        CMiniserverTableModel* model = tableViewMiniserver->getMiniserverModel();
-       
-        //int row = model->rowCount();
-        tableViewMiniserver->getMiniserverModel()->insertRow(miniserver);
-
-        // Notify the view about the changes
+        ////CMiniserverTableModel* model = tableViewMiniserver->getMiniserverModel();
+        //
+        ////int row = model->rowCount();
+        ////tableViewMiniserver->getMiniserverModel()->insertRow(miniserver);
+        //
+        //CMiniserverTableModel* model = tableViewMiniserver->getMiniserverModel();
+        //model->insertRow(miniserver);
+        //
+        //// Notify the view about the changes
+        //int row = model->rowCount() - 1; // Index of the newly inserted row
         //QModelIndex topLeft = model->index(row, 0);
         //QModelIndex bottomRight = model->index(row, model->columnCount() - 1);
         //emit model->dataChanged(topLeft, bottomRight);
-        //model->layoutChanged();
-        // Resize columns and update the view
-        //tableViewMiniserver->resizeColumnsToContents();
-        //tableViewMiniserver->reset();
 
-        //
-        //tableViewMiniserver->repaint();
-
-
-
+        //tableViewMiniserver->insertRow(miniserver);
+        miniservers->append(miniserver);
+        setMiniserverList(miniservers);
         qDebug() << "--------------------- Miniserver ADDED -------------\n" << miniserver.toString();
     }
 
+}
+
+void Qt_MiniserverUpdater::onRemoveMiniserverPressed()
+{
+    const QModelIndexList selectedIndexes = tableViewMiniserver->selectionModel()->selectedRows();
+    for (const QModelIndex& index : selectedIndexes) {
+        miniservers->removeAt(index.row());
+        setMiniserverList(miniservers);
+    }
 }
 
 void Qt_MiniserverUpdater::onConnectConfigFinished() {

@@ -129,11 +129,18 @@ bool CMiniserverTableModel::setData(const QModelIndex& index, const QVariant& va
 
 bool CMiniserverTableModel::insertRow(const CMiniserver& miniserver) {
     int row = miniserverlist->size();
+    beginResetModel();
     beginInsertRows(QModelIndex(), row, row);
+    
+    
     miniserverlist->append(miniserver);
     endInsertRows();
-    //emit dataChanged(index(row, 0), index(row, columnCount() - 1));
-    //emit layoutChanged();
+    QModelIndex topLeft = index(0, 0);
+    QModelIndex bottomRight = index(rowCount() - 1, columnCount() - 1);
+    emit dataChanged(topLeft, bottomRight);
+    layoutChanged();
+    endResetModel();
+    setData(this->index(row,0), QVariant::fromValue(miniserver), Qt::EditRole);
     return true;
 }
 

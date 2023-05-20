@@ -47,7 +47,7 @@ Qt_CreateEditMiniserver::~Qt_CreateEditMiniserver()
     delete labelHint;
 }
 
-CMiniserver Qt_CreateEditMiniserver::createDialog(const QString& title, CMiniserver* miniserver)
+CMiniserver Qt_CreateEditMiniserver::createDialog(const QString& title, CMiniserver* miniserver, QList<CMiniserver>* list)
 {
     Qt_CreateEditMiniserver dialog(title);
     if (miniserver) {
@@ -75,6 +75,17 @@ CMiniserver Qt_CreateEditMiniserver::createDialog(const QString& title, CMiniser
 
         }
         
+        bool serialNumberalreadyInList = false;
+        for (int i = 0; i < list->count(); i++) {
+            if ((*list)[i].getSerialNumber() == serial.toStdString()) {
+                serialNumberalreadyInList = true;
+            }
+        }
+        if (serialNumberalreadyInList) {
+            QMessageBox::information(nullptr, "Serial Number duplicate", QString::fromStdString(MyConstants::Strings::MessageBox_SerialNumber_duplicate));
+            return CMiniserver(); // Return an empty CMiniserver object if username or password not provided
+        }
+
         CMiniserver result = dialog.getMiniserver();
         return result;
     }

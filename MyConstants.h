@@ -112,6 +112,7 @@ public:
         static const std::string MessageBox_AutoUpdate_selected_Error_which_could_not_update;
         static const std::string MessageBox_CheckUpdate_no_Internet;
         static const std::string MessageBox_CheckUpdate_no_Update_available;
+        static const std::string MessageBox_SerialNumber_duplicate;
         /* WebServices */
         static const std::string WebService_Success_Code;
     };

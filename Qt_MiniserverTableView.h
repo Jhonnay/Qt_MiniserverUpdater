@@ -20,6 +20,7 @@ public:
 public slots:
 	void update() { QTableView::update(); }
 	void repaint() { QTableView::repaint(); }
+	void insertRow(const CMiniserver& miniserver);
 
 private slots: 
 	void handleConnectConfigClicked(const QModelIndex& index);
