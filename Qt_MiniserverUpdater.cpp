@@ -8,6 +8,8 @@
 #include "CRefreshWorker.h"
 #include "Qt_CreateEditMiniserver.h"
 #include "Qt_ApplicationSettings.h"
+#include <algorithm>
+#include <cstdlib>
 
 Qt_MiniserverUpdater::Qt_MiniserverUpdater(QWidget* parent )
     : QMainWindow(parent)
@@ -80,6 +82,22 @@ void Qt_MiniserverUpdater::setMiniserverList(QList<CMiniserver>* list)
     }
     this->miniservers = list;
     tableViewMiniserver->setModel(new CMiniserverTableModel(list,this));
+    tableViewMiniserver->resizeColumnsToContents();
+    tableViewMiniserver->setColumnWidth(6, 100);
+}
+
+void Qt_MiniserverUpdater::updateMiniserverList(QList<CMiniserver>* list)
+{
+    for (int i = 0; i < list->count(); i++) {
+        if ((*list)[i].getMiniserverVersion() == "") { //if it is a new Miniserver, change to TBD. Leave all others unchanged. 
+            (*list)[i].setMiniserverStatus(MyConstants::Strings::StartUp_Listview_MS_Status);
+            (*list)[i].setMiniserverVersion(MyConstants::Strings::StartUp_Listview_MS_Version);
+            (*list)[i].setVersionColor("darkblue");
+        }
+        qDebug() << "Row: " << i << " - " << list->at(i).toString();
+    }
+    this->miniservers = list;
+    tableViewMiniserver->setModel(new CMiniserverTableModel(list, this));
     tableViewMiniserver->resizeColumnsToContents();
     tableViewMiniserver->setColumnWidth(6, 100);
 }
@@ -183,7 +201,7 @@ void Qt_MiniserverUpdater::onAddMiniserverPressed()
 
         //tableViewMiniserver->insertRow(miniserver);
         miniservers->append(miniserver);
-        setMiniserverList(miniservers);
+        updateMiniserverList(miniservers);
         qDebug() << "--------------------- Miniserver ADDED -------------\n" << miniserver.toString();
     }
 
@@ -191,11 +209,16 @@ void Qt_MiniserverUpdater::onAddMiniserverPressed()
 
 void Qt_MiniserverUpdater::onRemoveMiniserverPressed()
 {
-    const QModelIndexList selectedIndexes = tableViewMiniserver->selectionModel()->selectedRows();
+    QModelIndexList selectedIndexes = tableViewMiniserver->selectionModel()->selectedRows();
+    
+    QModelIndexList indexlist = tableViewMiniserver->selectionModel()->selectedRows();
+    std::sort(selectedIndexes.begin(), selectedIndexes.end(), [](const QModelIndex& a, const QModelIndex& b) { return a.row() > b.row(); });
+
     for (const QModelIndex& index : selectedIndexes) {
-        miniservers->removeAt(index.row());
-        setMiniserverList(miniservers);
+        miniservers->removeAt(index.row());   
     }
+    updateMiniserverList(miniservers);
+    
 }
 
 void Qt_MiniserverUpdater::onConnectConfigFinished() {

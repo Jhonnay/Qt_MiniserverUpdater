@@ -98,7 +98,7 @@ CMiniserver Qt_CreateEditMiniserver::getMiniserver()
     return CMiniserver(serialNumberLineEdit->text().toStdString(), 
         adminUserLineEdit->text().toStdString(),
         adminPasswordLineEdit->text().toStdString()
-        , "TBD", "TBD", "TBD", "darkblue", "/", "TBD", localIPLineEdit->text().toStdString(), "5");
+        , "", "TBD", "TBD", "darkblue", "/", "TBD", localIPLineEdit->text().toStdString(), "5");
 
 ;
 }

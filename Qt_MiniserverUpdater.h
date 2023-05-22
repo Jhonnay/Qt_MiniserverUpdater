@@ -22,6 +22,7 @@ public:
     ~Qt_MiniserverUpdater();
     
     void setMiniserverList(QList<CMiniserver>* list);
+    void updateMiniserverList(QList<CMiniserver>* list); 
     void setConfigEXEPath(QString path);
     void setApplicationsettings(ApplicationSettings* settings);
     
