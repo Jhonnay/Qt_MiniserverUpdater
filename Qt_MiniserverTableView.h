@@ -17,6 +17,11 @@ public:
 	~Qt_MiniserverTableView();
 	CMiniserverTableModel* getMiniserverModel();
 	
+
+protected: 
+	void contextMenuEvent(QContextMenuEvent* event) override;
+	bool eventFilter(QObject* object, QEvent* event) override;
+
 public slots:
 	void update() { QTableView::update(); }
 	void repaint() { QTableView::repaint(); }
@@ -32,5 +37,6 @@ signals:
 
 private:
 	CMiniserverTableModel* m_model;
+	void setLinkCursor(bool enabled);
 
 };

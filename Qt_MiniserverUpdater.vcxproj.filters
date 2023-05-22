@@ -118,6 +118,9 @@
     <ClCompile Include="Qt_ApplicationSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CSerialNumberHyperlinkDelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CApplicationSettings.h">
@@ -199,6 +202,9 @@
     </QtMoc>
     <QtMoc Include="Qt_ApplicationSettings.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="CSerialNumberHyperlinkDelegate.h">
+      <Filter>Source Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

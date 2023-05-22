@@ -1,4 +1,5 @@
 #include "Qt_MiniserverTableView.h"
+#include "CSerialNumberHyperlinkDelegate.h"
 
 
 Qt_MiniserverTableView::Qt_MiniserverTableView(QWidget *parent)
@@ -18,6 +19,7 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
     verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     verticalHeader()->setMinimumWidth(35);
     setSortingEnabled(true);
+    setMouseTracking(true);
     //setUpdatesEnabled(true);
     setEditTriggers(QAbstractItemView::AllEditTriggers); //enable single click for edit mode
     //setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::EditKeyPressed);
@@ -31,7 +33,8 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
     //QString styleSheet = "QTableView::item:selected { selection-background-color: rgba(255, 255, 255, 10); }";
     //setStyleSheet(styleSheet);
     
-
+    CSerialNumberHyperlinkDelegate* hyperlinkDelegate = new CSerialNumberHyperlinkDelegate(this);
+    setItemDelegateForColumn(1, hyperlinkDelegate);
 
     // Set up the "Connect Config" push button delegate
     CConnectConfigButtonDelegate* buttonDelegate = new CConnectConfigButtonDelegate(this);
@@ -71,4 +74,132 @@ void Qt_MiniserverTableView::handleConnectConfigClicked(const QModelIndex& index
 void Qt_MiniserverTableView::insertRow(const CMiniserver& miniserver)
 {
     m_model->insertRow(miniserver);
+}
+
+
+void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
+{
+	QModelIndex clickedIndex = indexAt(event->pos());
+	if (clickedIndex.isValid())
+	{
+		if (clickedIndex.column() == 1)
+		{
+			QMenu contextMenu;
+			contextMenu.addAction("Edit Miniserver");
+			contextMenu.addAction("Copy Username");
+			contextMenu.addAction("Copy Password");
+			contextMenu.addAction("Extern WI");
+			contextMenu.addAction("Intern WI");
+			contextMenu.addAction("Deflog");
+			contextMenu.addAction("FTP");
+			contextMenu.addAction("LPH");
+			contextMenu.addAction("CrashLog Server");
+			contextMenu.addAction("Open in Loxone APP");
+			contextMenu.addAction("Download Prog Folder");
+
+			QAction* selectedItem = contextMenu.exec(event->globalPos());
+			if (selectedItem)
+			{
+				QString selectedItemText = selectedItem->text();
+                CMiniserver miniserver = m_model->miniserverlist->at(clickedIndex.row());
+				if (selectedItemText == "Edit Miniserver")
+				{
+
+				}
+				else if (selectedItemText == "Copy Username")
+				{
+                    QString username = QString::fromStdString(miniserver.getAdminUser());
+                    QClipboard* clipboard = QApplication::clipboard();
+                    clipboard->setText(username);
+				}
+				else if (selectedItemText == "Copy Password")
+				{
+                    QString username = QString::fromStdString(miniserver.getAdminPassword());
+                    QClipboard* clipboard = QApplication::clipboard();
+                    clipboard->setText(username);
+				}
+                else if (selectedItemText == "Extern WI") {
+                    QString link = QString("http://dns.loxonecloud.com/%1").arg(QString::fromStdString(miniserver.getSerialNumber()));
+                    QDesktopServices::openUrl(QUrl(link));
+                }
+                else if (selectedItemText == "Intern WI") {
+                    if (!miniserver.getLocalIP().empty()) {
+                        QString link = QString("http://%1/").arg(QString::fromStdString(miniserver.getLocalIP()));
+                    }
+                }
+                else if (selectedItemText == "Deflog") {
+                    QString serialNumber = QString::fromStdString(miniserver.getSerialNumber());
+                    QString localIP = QString::fromStdString(miniserver.getLocalIP());
+                    QString username = QString::fromStdString(miniserver.getAdminUser());
+                    QString password = QString::fromStdString(miniserver.getAdminPassword());
+                    QString link = CSerialNumberHyperlinkDelegate::generateLink(serialNumber, localIP);
+                    link += "/dev/fsget/log/def.log";
+
+                    //QUrl authenticatedUrl;
+                    //authenticatedUrl.setUrl(link);
+                    //authenticatedUrl.setUserName(username);
+                    //authenticatedUrl.setPassword(password);
+
+                    QDesktopServices::openUrl(QUrl(link));
+                }
+                else if (selectedItemText == "FTP") {
+
+                }
+                else if (selectedItemText == "LPH") {
+
+                }
+                else if (selectedItemText == "CrashLog Server") {
+
+                }
+                else if (selectedItemText == "Open in Loxone APP") {
+
+                }
+                else if (selectedItemText == "Download Prog Folder") {
+
+                }
+				
+			}
+		}
+		else
+		{
+			QTableView::contextMenuEvent(event);
+		}
+	}
+}
+
+bool Qt_MiniserverTableView::eventFilter(QObject* object, QEvent* event)
+{
+    if (object == viewport())
+    {
+        if (event->type() == QEvent::MouseMove)
+        {
+            QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+            QModelIndex index = indexAt(mouseEvent->pos());
+            if (index.isValid() && index.column() == 1) {
+                setLinkCursor(true);
+            }
+            else {
+                setLinkCursor(false);
+            }
+                
+        }
+        else if (event->type() == QEvent::Leave)
+        {
+            setLinkCursor(false);
+        }
+    }
+
+    return QTableView::eventFilter(object, event);
+}
+
+
+void Qt_MiniserverTableView::setLinkCursor(bool enabled)
+{
+    if (enabled) {
+        QApplication::setOverrideCursor(Qt::PointingHandCursor);
+    }
+    else {
+        QApplication::restoreOverrideCursor();
+    }
+       
 }
