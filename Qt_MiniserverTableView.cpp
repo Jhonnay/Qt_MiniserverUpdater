@@ -1,5 +1,8 @@
 #include "Qt_MiniserverTableView.h"
 #include "CSerialNumberHyperlinkDelegate.h"
+#include "CWebService.h"
+#include "MyConstants.h"
+#include "Qt_CreateEditMiniserver.h"
 
 
 Qt_MiniserverTableView::Qt_MiniserverTableView(QWidget *parent)
@@ -86,6 +89,7 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
 		{
 			QMenu contextMenu;
 			contextMenu.addAction("Edit Miniserver");
+            contextMenu.addAction("Copy SNR");
 			contextMenu.addAction("Copy Username");
 			contextMenu.addAction("Copy Password");
 			contextMenu.addAction("Extern WI");
@@ -94,8 +98,8 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
 			contextMenu.addAction("FTP");
 			contextMenu.addAction("LPH");
 			contextMenu.addAction("CrashLog Server");
-			contextMenu.addAction("Open in Loxone APP");
-			contextMenu.addAction("Download Prog Folder");
+			contextMenu.addAction("Open in Loxone APP (BETA)");
+			contextMenu.addAction("Download Prog Folder (BETA)");
 
 			QAction* selectedItem = contextMenu.exec(event->globalPos());
 			if (selectedItem)
@@ -104,8 +108,15 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                 CMiniserver miniserver = m_model->miniserverlist->at(clickedIndex.row());
 				if (selectedItemText == "Edit Miniserver")
 				{
-
+                    CMiniserver newMiniserver = Qt_CreateEditMiniserver::createDialog("Edit Miniserver", &miniserver, m_model->miniserverlist);
+                    m_model->miniserverlist->replace(clickedIndex.row(), newMiniserver);
 				}
+                else if (selectedItemText == "Copy SNR")
+                {
+                    QString username = QString::fromStdString(miniserver.getSerialNumber());
+                    QClipboard* clipboard = QApplication::clipboard();
+                    clipboard->setText(username);
+                }
 				else if (selectedItemText == "Copy Username")
 				{
                     QString username = QString::fromStdString(miniserver.getAdminUser());
@@ -134,28 +145,64 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                     QString password = QString::fromStdString(miniserver.getAdminPassword());
                     QString link = CSerialNumberHyperlinkDelegate::generateLink(serialNumber, localIP);
                     link += "/dev/fsget/log/def.log";
+                    QUrl url = QUrl(link);
 
-                    //QUrl authenticatedUrl;
-                    //authenticatedUrl.setUrl(link);
-                    //authenticatedUrl.setUserName(username);
-                    //authenticatedUrl.setPassword(password);
-
-                    QDesktopServices::openUrl(QUrl(link));
+                    if (!localIP.isEmpty()) {
+                        url.setUserName(username);
+                        url.setPassword(password);
+                       
+                    }
+                    else {
+                        QString cloudlink = CWebService::getCloudDNSLink(miniserver);
+                        cloudlink += "dev/fsget/log/def.log";
+                        url.setUrl(cloudlink);
+                        url.setUserName(username);
+                        url.setPassword(password);
+                    }
+                    
+                    QDesktopServices::openUrl(url);
+                    
                 }
                 else if (selectedItemText == "FTP") {
+                    
+                    QString serialNumber = QString::fromStdString(miniserver.getSerialNumber());
+                    QString localIP = QString::fromStdString(miniserver.getLocalIP());
+                    QString username = QString::fromStdString(miniserver.getAdminUser());
+                    QString password = QString::fromStdString(miniserver.getAdminPassword());
+                    if (!localIP.isEmpty()) {
+                        QUrl ftpUrl;
+                        ftpUrl.setScheme("ftp");
+                        ftpUrl.setUserName(username);
+                        ftpUrl.setPassword(password);
+                        ftpUrl.setHost(localIP);
 
+                        QStringList arguments;
+                        arguments << ftpUrl.toString();
+
+                        QProcess::startDetached("explorer", arguments);
+                        
+                    }
+                    else {
+                        QMessageBox::warning(nullptr, "Warning", QString::fromStdString(MyConstants::Strings::MessageBox_FTP_Local_IP_not_defined));
+                    }
+                    
+                    
                 }
                 else if (selectedItemText == "LPH") {
-
+                    QString serialNumber = QString::fromStdString(miniserver.getSerialNumber());
+                    QString link = QString::fromStdString(MyConstants::Strings::Link_LPH) + serialNumber;
+                    QDesktopServices::openUrl(QUrl(link));
                 }
                 else if (selectedItemText == "CrashLog Server") {
+                    QString serialNumber = QString::fromStdString(miniserver.getSerialNumber());
+                    QString link = QString::fromStdString(MyConstants::Strings::Link_CrashLog_Server) + serialNumber;
+                    QDesktopServices::openUrl(QUrl(link));
+                }
+                else if (selectedItemText == "Open in Loxone APP (BETA)") {
 
                 }
-                else if (selectedItemText == "Open in Loxone APP") {
-
-                }
-                else if (selectedItemText == "Download Prog Folder") {
-
+                else if (selectedItemText == "Download Prog Folder (BETA)") {
+                    CWebService::DownloadProgFolder(miniserver);
                 }
 				
 			}

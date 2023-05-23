@@ -60,7 +60,9 @@ CMiniserver Qt_CreateEditMiniserver::createDialog(const QString& title, CMiniser
         dialog.serialNumberLineEdit->setText(QString::fromStdString(MyConstants::Strings::MS_Default_partial_SN));
     }
 
-    if (dialog.exec() == QDialog::Accepted) {
+    int dialogResult = dialog.exec();
+
+    if (dialogResult == QDialog::Accepted) {
         QString serial = dialog.serialNumberLineEdit->text();
         serial = serial.remove(':');
         int lenght = serial.length();
@@ -81,13 +83,20 @@ CMiniserver Qt_CreateEditMiniserver::createDialog(const QString& title, CMiniser
                 serialNumberalreadyInList = true;
             }
         }
-        if (serialNumberalreadyInList) {
+        if (serialNumberalreadyInList && !title.contains("Edit")) {
             QMessageBox::information(nullptr, "Serial Number duplicate", QString::fromStdString(MyConstants::Strings::MessageBox_SerialNumber_duplicate));
             return CMiniserver(); // Return an empty CMiniserver object if username or password not provided
         }
 
         CMiniserver result = dialog.getMiniserver();
+        result.setSerialNumber(serial.toStdString());
         return result;
+    }
+
+    if (dialogResult == QDialog::Rejected) {
+        if (miniserver) {
+            return *miniserver;
+        }
     }
 
     return CMiniserver(); // Return an empty CMiniserver object if the dialog was canceled

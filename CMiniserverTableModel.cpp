@@ -166,6 +166,9 @@ void CMiniserverTableModel::onConnectConfigClicked()
     emit connectConfigClicked(miniserver);
 }
 
+
+
+
 //void CMiniserverTableModel::sort(int column, Qt::SortOrder order)
 //{
 //    // Sort the list of CMiniserver objects based on the selected column

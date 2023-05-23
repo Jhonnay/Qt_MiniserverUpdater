@@ -1,4 +1,7 @@
 #include "CSerialNumberHyperlinkDelegate.h"
+#include "CMiniserver.h"
+#include "CMiniserverTableModel.h"
+#include "CWebService.h"
 
 CSerialNumberHyperlinkDelegate::CSerialNumberHyperlinkDelegate(QObject *parent)
 	: QStyledItemDelegate(parent)
@@ -51,11 +54,34 @@ bool CSerialNumberHyperlinkDelegate::editorEvent(QEvent* event, QAbstractItemMod
     if (event->type() == QEvent::MouseButtonRelease && index.column() == 1) {
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
         if (mouseEvent->button() == Qt::LeftButton) {
-            QString serialNumber = index.data().toString();
-            QString localIP = model->index(index.row(), 7).data().toString(); // column 7 is "Local IP"
+            CMiniserverTableModel* miniserverModel = dynamic_cast<CMiniserverTableModel*>(model);
+            if (miniserverModel)
+            {
+                int row = index.row();
+                CMiniserver miniserver = miniserverModel->miniserverlist->at(index.row());
+                QString serialNumber = QString::fromStdString(miniserver.getSerialNumber());
+                QString localIP = QString::fromStdString(miniserver.getLocalIP());
+                QString username = QString::fromStdString(miniserver.getAdminUser());
+                QString password = QString::fromStdString(miniserver.getAdminPassword());
+                QString link = generateLink(serialNumber, localIP);
 
-            QString link = generateLink(serialNumber, localIP);
-            QDesktopServices::openUrl(QUrl(link));
+                //QUrl url(link);
+                //if (!localIP.isEmpty())
+                //{
+                //    url.setUserName(username);
+                //    url.setPassword(password);
+                //}
+                //else
+                //{
+                //    QString cloudlink = CWebService::getCloudDNSLink(miniserver);
+                //    //cloudlink += "dev/fsget/log/def.log";
+                //    url.setUrl(cloudlink);
+                //    url.setUserName(username);
+                //    url.setPassword(password);
+                //}
+                //QString urlString = url.toString();
+                QDesktopServices::openUrl(QUrl(link));
+            }
 
             return true;
         }
