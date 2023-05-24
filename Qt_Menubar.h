@@ -14,6 +14,9 @@ public:
     ~Qt_Menubar();
 
     void onapplicationSettingsClicked();
+    void onSaveClicked();
+    void onOpenClicked();
+    void onNewClicked(); 
 
 signals:
     void saveClicked();

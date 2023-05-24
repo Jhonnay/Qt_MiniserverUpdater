@@ -113,6 +113,7 @@ public:
         static const std::string MessageBox_CheckUpdate_no_Internet;
         static const std::string MessageBox_CheckUpdate_no_Update_available;
         static const std::string MessageBox_SerialNumber_duplicate;
+        static const std::string MessageBox_AskUser_On_New_File;
         /* WebServices */
         static const std::string WebService_Success_Code;
     };

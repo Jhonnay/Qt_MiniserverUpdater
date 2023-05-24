@@ -88,6 +88,7 @@
     <ClCompile Include="CConfigMSUpdate.cpp" />
     <ClCompile Include="CConnectConfigButtonDelegate.cpp" />
     <ClCompile Include="CConnectConfigWorker.cpp" />
+    <ClCompile Include="CFileParser.cpp" />
     <ClCompile Include="CLoxAppJson.cpp" />
     <ClCompile Include="CMiniserver.cpp" />
     <ClCompile Include="CMiniserverTableModel.cpp" />

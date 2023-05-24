@@ -29,22 +29,47 @@ void Qt_Menubar::onapplicationSettingsClicked()
     emit applicationSettingsClicked();
 }
 
+void Qt_Menubar::onSaveClicked() {
+    emit saveClicked();
+}
+
+void Qt_Menubar::onOpenClicked() {
+    emit openClicked();
+}
+
+void Qt_Menubar::onNewClicked()
+{
+
+
+    emit newClicked();
+}
+
+
+
+
 void Qt_Menubar::createFileMenu()
 {
     fileMenu = menuBar->addMenu(tr("&File"));
 
     saveAct = new QAction(tr("&Save"), this);
+    saveAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
     fileMenu->addAction(saveAct);
+    connect(saveAct, &QAction::triggered, this, &Qt_Menubar::onSaveClicked);
 
     openAct = new QAction(tr("&Open"), this);
+    openAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
     fileMenu->addAction(openAct);
+    connect(openAct, &QAction::triggered, this, &Qt_Menubar::onOpenClicked);
 
     newAct = new QAction(tr("&New"), this);
+    newAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
     fileMenu->addAction(newAct);
+    connect(newAct, &QAction::triggered, this, &Qt_Menubar::onNewClicked);
 
     fileMenu->addSeparator();
 
     exitAct = new QAction(tr("&Exit"), this);
+    exitAct->setShortcut(QKeySequence(Qt::ALT + Qt::Key_F4));
     fileMenu->addAction(exitAct);
 
     connect(exitAct, &QAction::triggered, qApp, QApplication::quit);

@@ -248,3 +248,18 @@ void CMiniserver::printAllMiniserversToDebug(QList<CMiniserver>* miniservers)
         qDebug() << message;
     }
 }
+
+QString CMiniserver::getLocalIPfromListviewProjectText(const QString& str)
+{
+    // find the index of the first "/" in the string
+    int index = str.indexOf("/");
+
+    // if there is no "/" or nothing after it, return an empty string
+    if (index == -1 || index == str.length() - 1) {
+        return "";
+    }
+
+    // otherwise, return the substring starting from the next character after "/"
+    return str.mid(index + 1);
+}
+

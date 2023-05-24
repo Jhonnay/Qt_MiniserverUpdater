@@ -10,6 +10,7 @@
 #include "Qt_ApplicationSettings.h"
 #include <algorithm>
 #include <cstdlib>
+#include "CFileParser.cpp"
 
 Qt_MiniserverUpdater::Qt_MiniserverUpdater(QWidget* parent )
     : QMainWindow(parent)
@@ -63,6 +64,10 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonRemoveClicked, this, &Qt_MiniserverUpdater::onRemoveMiniserverPressed);
     connect(menubar, &Qt_Menubar::applicationSettingsClicked, this, &Qt_MiniserverUpdater::onApplicationSettingsClicked);
     connect(statusbar, &Qt_Statusbar::exefilepathChanged, this, &Qt_MiniserverUpdater::onConfigFilePathChanged);
+
+    connect(menubar, &Qt_Menubar::saveClicked, this, &Qt_MiniserverUpdater::onSaveFileClicked);
+    connect(menubar, &Qt_Menubar::openClicked, this, &Qt_MiniserverUpdater::onOpenFileClicked);
+    connect(menubar, &Qt_Menubar::newClicked, this, &Qt_MiniserverUpdater::onNewFileClicked);
 
     this->setCentralWidget(centralWidget);
 
@@ -168,6 +173,50 @@ void Qt_MiniserverUpdater::onConfigFilePathChanged() {
         tableViewMiniserver->setColumnWidth(6, 100);
     }
 
+}
+
+void Qt_MiniserverUpdater::onSaveFileClicked()
+{
+    // Get the default save directory path
+    QString defaultDirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+
+    // Show a file dialog to select the save file path
+    QString filePath = QFileDialog::getSaveFileName(this, "Save Miniserver JSON", defaultDirPath, "JSON Files (*.json)");
+
+    // Check if the user selected a file
+    if (!filePath.isEmpty()) {
+        // Save the Miniservers to the selected JSON file
+        FileParser::saveMiniserverJsonFile(*miniservers, filePath);
+    }
+
+}
+
+void Qt_MiniserverUpdater::onOpenFileClicked()
+{
+    // Get the default save directory path
+    QString defaultDirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+
+    // Show a file dialog to select the save file path
+    QString filePath = QFileDialog::getOpenFileName(this, "Opne Miniserver JSON", defaultDirPath, "JSON Files (*.json)");
+
+    // Check if the user selected a file
+    if (!filePath.isEmpty()) {
+        // Save the Miniservers to the selected JSON file
+        *miniservers = FileParser::parseMiniserverJsonFile(filePath);
+        setMiniserverList(miniservers);
+    }
+
+}
+
+void Qt_MiniserverUpdater::onNewFileClicked()
+{
+    QMessageBox msgBox(QMessageBox::Question, "New Miniserver List", QString::fromUtf8(MyConstants::Strings::MessageBox_AskUser_On_New_File), QMessageBox::Yes | QMessageBox::No, this);
+
+    // if the user clicked yes, 
+    if (msgBox.exec() == QMessageBox::Yes) {
+        miniservers->clear();
+        setMiniserverList(miniservers);
+    }
 }
 
 void Qt_MiniserverUpdater::onCancelConnectConfigClicked() {

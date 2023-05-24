@@ -102,6 +102,7 @@ const std::string MyConstants::Strings::MessageBox_AutoUpdate_selected_Error_whi
 const std::string MyConstants::Strings::MessageBox_CheckUpdate_no_Internet = "Check your internet connection!";
 const std::string MyConstants::Strings::MessageBox_CheckUpdate_no_Update_available = "No new updates available. 😕";
 const std::string MyConstants::Strings::MessageBox_SerialNumber_duplicate = "Serial Number is already in list!";
+const std::string MyConstants::Strings::MessageBox_AskUser_On_New_File = "Are you sure that you want to create start a new file and remove all Minsierver from the list? Please save the JSON beforehand!";
 
 //WebServices
 const std::string MyConstants::Strings::WebService_Success_Code = "200";

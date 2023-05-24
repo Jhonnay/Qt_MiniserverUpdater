@@ -207,6 +207,36 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
 				
 			}
 		}
+        else if (clickedIndex.column() == 3) {
+            QMenu contextMenu;
+            contextMenu.addAction("Copy Local IP");
+            contextMenu.addAction("Get Local IP from Miniserver");
+            contextMenu.addAction("Use Local IP in column");
+            
+
+            QAction* selectedItem = contextMenu.exec(event->globalPos());
+            if (selectedItem)
+            {
+                QString selectedItemText = selectedItem->text();
+                CMiniserver miniserver = m_model->miniserverlist->at(clickedIndex.row());
+
+                if (selectedItemText == "Copy Local IP") {
+                    QString project = QString::fromStdString(miniserver.getMiniserverProject());
+                    QClipboard* clipboard = QApplication::clipboard();
+                    clipboard->setText(CMiniserver::getLocalIPfromListviewProjectText(project));
+                }
+                else if (selectedItemText == "Get Local IP from Miniserver") {
+
+                }
+                else if (selectedItemText == "Use Local IP in column") {
+                    QString project = QString::fromStdString(miniserver.getMiniserverProject());
+                    miniserver.setLocalIP(CMiniserver::getLocalIPfromListviewProjectText(project).toStdString());
+                    m_model->miniserverlist->replace(clickedIndex.row(), miniserver);
+
+                }
+            }
+        }
+
 		else
 		{
 			QTableView::contextMenuEvent(event);

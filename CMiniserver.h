@@ -85,4 +85,6 @@ public:
     //toString Function
     std::string toString() const;
     static void printAllMiniserversToDebug(QList<CMiniserver>* miniservers);
+
+    static QString getLocalIPfromListviewProjectText(const QString& str);
 };

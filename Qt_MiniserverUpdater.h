@@ -30,7 +30,6 @@ public:
 
 public slots:
     void onConnectConfigClicked(const QModelIndex& index, const CMiniserver& miniserver);
-   
     void onRefreshClicked();
     void onConnectConfig();
     void onUpdateMiniserverClicked();
@@ -45,6 +44,9 @@ public slots:
     void onRemoveMiniserverPressed();
     void onApplicationSettingsClicked();
     void onConfigFilePathChanged();
+    void onSaveFileClicked();
+    void onOpenFileClicked();
+    void onNewFileClicked();
 
 
 signals:
