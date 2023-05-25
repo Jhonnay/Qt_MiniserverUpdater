@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include "CFileParser.cpp"
+#include "CLoxoneApp.h"
 
 Qt_MiniserverUpdater::Qt_MiniserverUpdater(QWidget* parent )
     : QMainWindow(parent)
@@ -68,6 +69,11 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(menubar, &Qt_Menubar::saveClicked, this, &Qt_MiniserverUpdater::onSaveFileClicked);
     connect(menubar, &Qt_Menubar::openClicked, this, &Qt_MiniserverUpdater::onOpenFileClicked);
     connect(menubar, &Qt_Menubar::newClicked, this, &Qt_MiniserverUpdater::onNewFileClicked);
+    connect(menubar, &Qt_Menubar::startAppClicked, this, &Qt_MiniserverUpdater::onStartAppClicked);
+    connect(menubar, &Qt_Menubar::debugAppClicked, this, &Qt_MiniserverUpdater::onStartDebugAppClicked);
+    connect(menubar, &Qt_Menubar::killAppClicked, this, &Qt_MiniserverUpdater::onKillLoxoneAppClicked);
+    connect(menubar, &Qt_Menubar::versionClicked, this, &Qt_MiniserverUpdater::onVersionClicked);    
+    connect(menubar, &Qt_Menubar::changelogClicked, this, &Qt_MiniserverUpdater::onChangelogClicked);
 
     this->setCentralWidget(centralWidget);
 
@@ -115,6 +121,11 @@ void Qt_MiniserverUpdater::setConfigEXEPath(QString path)
 void Qt_MiniserverUpdater::setApplicationsettings(ApplicationSettings* settings)
 {
     this->applicationSettings = settings;
+}
+
+void Qt_MiniserverUpdater::setApplicationVersion(QString version)
+{
+    this->applicationVersion = version;
 }
 
 void Qt_MiniserverUpdater::onApplicationSettingsClicked() {
@@ -216,6 +227,71 @@ void Qt_MiniserverUpdater::onNewFileClicked()
     if (msgBox.exec() == QMessageBox::Yes) {
         miniservers->clear();
         setMiniserverList(miniservers);
+    }
+}
+
+void Qt_MiniserverUpdater::onStartAppClicked()
+{
+    int runningAppInstances = CLoxoneApp::getRunningLoxoneApps();
+    if (runningAppInstances > 0) {
+
+        QMessageBox::warning(nullptr, "App already open", QString::fromStdString(MyConstants::Strings::MessageBox_App_already_open));
+        
+        return;
+    }
+
+    QString exeFilePath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+    int index = exeFilePath.lastIndexOf('/');
+    if (index != -1) {
+        exeFilePath = exeFilePath.left(index);
+        exeFilePath += QString::fromStdString(MyConstants::Strings::Path_Folder_for_Loxone_App);
+        QProcess process = QProcess();
+        process.startDetached(exeFilePath);
+    }
+}
+
+void Qt_MiniserverUpdater::onStartDebugAppClicked()
+{
+    int runningAppInstances = CLoxoneApp::getRunningLoxoneApps();
+    if (runningAppInstances > 0) {
+
+        QMessageBox::warning(nullptr, "App already open", QString::fromStdString(MyConstants::Strings::MessageBox_App_already_open));
+
+        return;
+    }
+
+    QString exeFilePath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+    int index = exeFilePath.lastIndexOf('/');
+    if (index != -1) {
+        exeFilePath = exeFilePath.left(index);
+        exeFilePath += QString::fromStdString(MyConstants::Strings::Path_Folder_for_Loxone_App);
+        QProcess process = QProcess();
+        process.arguments() << " --debug"; 
+        process.startDetached(exeFilePath);
+    }
+}
+
+void Qt_MiniserverUpdater::onKillLoxoneAppClicked()
+{
+    CLoxoneApp::killAllRunningApps();
+}
+
+void Qt_MiniserverUpdater::onVersionClicked()
+{
+    QString message = "Current Version: " + applicationVersion;
+    QMessageBox::information(nullptr, "Version", message);
+}
+
+void Qt_MiniserverUpdater::onChangelogClicked()
+{
+    QString changelogFilePath = QDir::currentPath() + "/Changelog.txt";
+    if (QFile::exists(changelogFilePath))
+    {
+        QProcess::startDetached("notepad.exe", QStringList() << changelogFilePath);
+    }
+    else
+    {
+        QMessageBox::critical(nullptr, "Error", QString::fromStdString(MyConstants::Strings::MessageBox_Changelog_Cannot_be_opened));
     }
 }
 

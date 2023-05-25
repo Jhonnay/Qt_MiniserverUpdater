@@ -17,6 +17,11 @@ public:
     void onSaveClicked();
     void onOpenClicked();
     void onNewClicked(); 
+    void onStartAppClicked();
+    void onStartDebugAppClicked();
+    void onKillLoxoneAppClicked();
+    void onVersionClicked();
+    void onChangelogClicked();
 
 signals:
     void saveClicked();
@@ -31,6 +36,7 @@ signals:
     void checkUpdateClicked();
     void helpClicked();
     void changelogClicked();
+
 
 private:
     void createFileMenu();

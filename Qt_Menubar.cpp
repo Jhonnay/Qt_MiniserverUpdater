@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Qt_Menubar.h"
 
 Qt_Menubar::Qt_Menubar(QWidget* parent)
@@ -42,6 +42,31 @@ void Qt_Menubar::onNewClicked()
 
 
     emit newClicked();
+}
+
+void Qt_Menubar::onStartAppClicked()
+{
+    emit startAppClicked();
+}
+
+void Qt_Menubar::onStartDebugAppClicked()
+{
+    emit debugAppClicked();
+}
+
+void Qt_Menubar::onKillLoxoneAppClicked()
+{
+    emit killAppClicked();
+}
+
+void Qt_Menubar::onVersionClicked()
+{
+    emit versionClicked();
+}
+
+void Qt_Menubar::onChangelogClicked()
+{
+    emit changelogClicked();
 }
 
 
@@ -89,14 +114,17 @@ void Qt_Menubar::createLoxoneAppMenu()
 {
     loxoneAppMenu = menuBar->addMenu(tr("&Loxone App"));
 
-    startAppAct = new QAction(tr("&Start App"), this);
+    startAppAct = new QAction(tr("&✈ Start App"), this);
     loxoneAppMenu->addAction(startAppAct);
+    connect(startAppAct, &QAction::triggered, this, &Qt_Menubar::onStartAppClicked);
 
-    debugAppAct = new QAction(tr("&Debug"), this);
+    debugAppAct = new QAction(tr("&🖥 Debug"), this);
     loxoneAppMenu->addAction(debugAppAct);
+    connect(debugAppAct, &QAction::triggered, this, &Qt_Menubar::onStartDebugAppClicked);
 
-    killAppAct = new QAction(tr("&Kill App"), this);
+    killAppAct = new QAction(tr("&💣 Kill App"), this);
     loxoneAppMenu->addAction(killAppAct);
+    connect(killAppAct, &QAction::triggered, this, &Qt_Menubar::onKillLoxoneAppClicked);
 }
 
 void Qt_Menubar::createHelpMenu()
@@ -105,6 +133,7 @@ void Qt_Menubar::createHelpMenu()
 
     versionAct = new QAction(tr("&Version"), this);
     helpMenu->addAction(versionAct);
+    connect(versionAct, &QAction::triggered, this, &Qt_Menubar::onVersionClicked);
 
     checkUpdateAct = new QAction(tr("&Check Update"), this);
     helpMenu->addAction(checkUpdateAct);
@@ -114,4 +143,5 @@ void Qt_Menubar::createHelpMenu()
 
     changelogAct = new QAction(tr("&Changelog"), this);
     helpMenu->addAction(changelogAct);
+    connect(changelogAct, &QAction::triggered, this, &Qt_Menubar::onChangelogClicked);
 }

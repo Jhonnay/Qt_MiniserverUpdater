@@ -48,6 +48,8 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
     CComboBoxLanguageDelegate* comboBoxDelegate = new CComboBoxLanguageDelegate(this);
     setItemDelegateForColumn(8, comboBoxDelegate);
     resizeColumnsToContents();
+
+    
 }
 
 

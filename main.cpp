@@ -20,6 +20,9 @@
 
 #include "CFileParser.cpp"
 
+#define VERSION "0.1.0"
+
+
 int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
@@ -29,6 +32,7 @@ int main(int argc, char* argv[])
     QList<CMiniserver> miniservers;
     //MainWindow
     Qt_MiniserverUpdater* mainwindow = new Qt_MiniserverUpdater(&miniservers, nullptr);
+    mainwindow->setApplicationVersion(QString::fromStdString(VERSION));
     QString applicationSettingsPath = FileParser::checkIfApplicationSettingsExist("ApplicationSettings.json");
     ApplicationSettings applicationSettings;
     if (!applicationSettingsPath.isEmpty()) {
@@ -44,7 +48,7 @@ int main(int argc, char* argv[])
     }
 
     //mainWindow.setCentralWidget(centralWidget);
-    mainwindow->setWindowTitle("Miniserver Updater (c) Musat Version 0.1");
+    mainwindow->setWindowTitle("Miniserver Updater (c) Musat Version " + QString::fromStdString(VERSION));
     mainwindow->resize(1000, 600);
     mainwindow->show();
 

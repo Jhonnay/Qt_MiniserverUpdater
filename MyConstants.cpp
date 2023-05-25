@@ -6,7 +6,7 @@ const std::string MyConstants::Strings::Path_ApplicationSettings = "\\WPF_Minise
 const std::string MyConstants::Strings::Path_Loxone_Installation = "\\Loxone";
 const std::string MyConstants::Strings::Path_Changelog = "\\Changelog.txt";
 const std::string MyConstants::Strings::Path_Folder_for_ApplicationData = "\\WPF_MiniserverUpdater";
-const std::string MyConstants::Strings::Path_Folder_for_Loxone_App = "\\Programs\\kerberos\\Loxone.exe";
+const std::string MyConstants::Strings::Path_Folder_for_Loxone_App = "/Programs/kerberos/Loxone.exe";
 
 /* Links */
 const std::string MyConstants::Strings::Link_CloudDNS = "https://dns.loxonecloud.com/";

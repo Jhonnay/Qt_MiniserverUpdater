@@ -25,6 +25,7 @@ public:
     void updateMiniserverList(QList<CMiniserver>* list); 
     void setConfigEXEPath(QString path);
     void setApplicationsettings(ApplicationSettings* settings);
+    void setApplicationVersion(QString version);
     
     
 
@@ -47,6 +48,12 @@ public slots:
     void onSaveFileClicked();
     void onOpenFileClicked();
     void onNewFileClicked();
+    void onStartAppClicked();
+    void onStartDebugAppClicked();
+    void onKillLoxoneAppClicked();
+    void onVersionClicked();
+    void onChangelogClicked();
+
 
 
 signals:
@@ -64,6 +71,7 @@ private:
     CUpdateWorker* updateWorker;
     CRefreshWorker* refreshWorker;
     CConnectConfigWorker* connectConfigWorker;
+    QString applicationVersion;
 
     //CConfigMSUpdate* configMSUpdate;
     //Ui::Qt_MiniserverUpdaterClass ui;

@@ -90,6 +90,7 @@
     <ClCompile Include="CConnectConfigWorker.cpp" />
     <ClCompile Include="CFileParser.cpp" />
     <ClCompile Include="CLoxAppJson.cpp" />
+    <ClCompile Include="CLoxoneApp.cpp" />
     <ClCompile Include="CMiniserver.cpp" />
     <ClCompile Include="CMiniserverTableModel.cpp" />
     <ClCompile Include="CRefreshWorker.cpp" />
@@ -144,6 +145,7 @@
     <ClInclude Include="CConfigMSUpdate.h" />
     <QtMoc Include="CConnectConfigWorker.h" />
     <ClInclude Include="CLoxAppJson.h" />
+    <ClInclude Include="CLoxoneApp.h" />
     <ClInclude Include="CMiniserver.h" />
     <QtMoc Include="CMiniserverTableModel.h" />
     <QtMoc Include="CUDPListener.h" />
