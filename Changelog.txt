@@ -1,12 +1,23 @@
 
 Known Issues: 
-Pressing enter on Local IP "QLineEdit" does not leave TextEditMode
 Pressing up / down arrow key ín LocalIP field selects the next line
 known issues:
-* Update can be done only for one miniserver. 
 * Loading from Miniserver done twice when updating. 
+* Progress for Refesh/Updating not perfect. 
+* Handsfree Mode not implemented
+* opening not valid json file will crash the program
 
-V0.1
+
+V0.1.1
+*Added InnoSetup Installer
+*Added dialog on Application Start if the Applicationsfolder was not able to be created/found/...
+*Added check when setting the miniserverlist json and config exe --> checks if files exists
+*Added Applications Setting loaded/not loaded to statusbar on startup
+*Fixed crash when applicationsettings path was not valid when accepting the dialog
+*Fixed wrong default filename in filechoser for MiniserverList in ApplicationSettingsDialog.
+*Fixed application settings could not be changed if on startup the application settings were not available (object never initialized)
+
+V0.1.0
 *Fixed:
 	 Changing Language after List was sorted does not work. --> Index should be determined for QList*, when changing Data underneath. 
 	 

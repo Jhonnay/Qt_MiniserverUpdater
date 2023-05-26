@@ -120,6 +120,23 @@ void Qt_MiniserverUpdater::setConfigEXEPath(QString path)
 
 void Qt_MiniserverUpdater::setApplicationsettings(ApplicationSettings* settings)
 {
+    QString configpath = QString::fromStdString(settings->getStrDefaultConfigPath());
+    QString miniserverListpath = QString::fromStdString(settings->getStrDefaultConfigurationPath());
+
+    //TODO::all off this can be prevented, if I make the Aplication Settings Textboxes not editable. 
+    //TODO: Check function (also used in Application Settings Dialog)
+    bool miniserverlistValid = QFileInfo(miniserverListpath).exists();
+    bool configexeValid = QFileInfo(configpath).exists();
+    if (miniserverListpath == "not set") { miniserverlistValid = true; }
+    if (configpath == "not set") { configexeValid = true; };
+
+    if (!miniserverlistValid || !configexeValid) {
+        QMessageBox::warning(nullptr, "Warning", QString::fromStdString(MyConstants::Strings::MessageBox_ApplicationSettingsPaths_not_correct));
+        this->applicationSettings = new ApplicationSettings();
+        return; 
+
+    }
+
     this->applicationSettings = settings;
 }
 
@@ -127,6 +144,8 @@ void Qt_MiniserverUpdater::setApplicationVersion(QString version)
 {
     this->applicationVersion = version;
 }
+
+
 
 void Qt_MiniserverUpdater::onApplicationSettingsClicked() {
     QString roamingPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -307,6 +326,11 @@ void Qt_MiniserverUpdater::onCancelConnectConfigClicked() {
 void Qt_MiniserverUpdater::onUpdateStatusbarProgress(int progress, QString progresstext)
 {
     emit updateStatusbarProgress(progress, progresstext);
+}
+
+void Qt_MiniserverUpdater::setStatusbarProgress(int progress, QString progresstext)
+{
+    statusbar->updateProgress(progress, progresstext);
 }
 
 void Qt_MiniserverUpdater::onAddMiniserverPressed()

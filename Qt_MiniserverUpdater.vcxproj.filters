@@ -21,6 +21,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>qml;cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="InnoSetup">
+      <UniqueIdentifier>{4f997025-ef73-4ec6-9bb6-5c0c401f7b29}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="Qt_MiniserverUpdater.qrc">
@@ -162,6 +165,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
+    <None Include="InnoSetup\InnoSetupCreator.iss">
+      <Filter>InnoSetup</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Qt_Bottom_Action_Buttons.h">

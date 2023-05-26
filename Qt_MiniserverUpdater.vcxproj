@@ -61,7 +61,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PostBuildEvent>
-      <Command>xcopy /E /Y "$(SolutionDir)resources" "$(TargetDir)resources"</Command>
+      <Command>"xcopy /E /Y "$(SolutionDir)resources" "$(TargetDir)resources"
+ "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "$(SolutionDir)InnoSetup\InnoSetupCreator.iss"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -138,6 +139,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
     </CopyFileToFolders>
+    <None Include="InnoSetup\InnoSetupCreator.iss" />
     <None Include="Qt_MiniserverUpdater.ico" />
     <QtUic Include="Qt_Miniserver_Listview.ui" />
     <QtUic Include="Qt_Statusbar.ui" />

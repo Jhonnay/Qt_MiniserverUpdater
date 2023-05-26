@@ -106,7 +106,7 @@ Qt_Statusbar::Qt_Statusbar(QWidget* parent)
     this->setPalette(pal);
 
     // Set initial state
-    updateProgress(100, "Downloading file");
+    //updateProgress(100, "Downloading file");
 
 
 

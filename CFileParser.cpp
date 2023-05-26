@@ -84,9 +84,18 @@ public:
     static QString checkIfApplicationSettingsExist(QString applicationSettingsFileName) {
         QString roamingPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
+        //TODO: Make this to function (also usedn in Application Settings dialog) slighty different
         QDir dir(roamingPath);
         if (!dir.exists()) {
-            //dir.mkpath(".");
+            QMessageBox::warning(nullptr, "Application Settings", "Could not open path: " + roamingPath);
+            dir.mkpath(roamingPath);
+            if (!dir.exists()) {
+                QMessageBox::warning(nullptr, "Application Settings", "Could not create Path: " + roamingPath);
+            }
+            else {
+                QMessageBox::information(nullptr, "Application Settings", "Successfully created path: " + roamingPath);
+            }
+
             return "";
         }
 

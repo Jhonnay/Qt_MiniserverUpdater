@@ -26,6 +26,7 @@ public:
     void setConfigEXEPath(QString path);
     void setApplicationsettings(ApplicationSettings* settings);
     void setApplicationVersion(QString version);
+    void setStatusbarProgress(int progress, QString progresstext);
     
     
 
