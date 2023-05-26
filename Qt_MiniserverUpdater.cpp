@@ -266,7 +266,7 @@ void Qt_MiniserverUpdater::onStartDebugAppClicked()
         exeFilePath = exeFilePath.left(index);
         exeFilePath += QString::fromStdString(MyConstants::Strings::Path_Folder_for_Loxone_App);
         QProcess process = QProcess();
-        process.arguments() << " --debug"; 
+        process.arguments() << "--debug"; 
         process.startDetached(exeFilePath);
     }
 }

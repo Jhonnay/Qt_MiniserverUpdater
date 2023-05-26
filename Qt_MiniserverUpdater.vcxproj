@@ -59,6 +59,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PostBuildEvent>
+      <Command>xcopy /E /Y "$(SolutionDir)resources" "$(TargetDir)resources"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -128,10 +133,11 @@
     <ClCompile Include="Qt_MiniserverUpdater.cpp" />
     <ClCompile Include="main.cpp" />
     <None Include="cpp.hint" />
-    <None Include="EmptyProject.Loxone">
+    <CopyFileToFolders Include="EmptyProject.Loxone">
       <DeploymentContent>true</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </None>
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
     <None Include="Qt_MiniserverUpdater.ico" />
     <QtUic Include="Qt_Miniserver_Listview.ui" />
     <QtUic Include="Qt_Statusbar.ui" />
@@ -166,7 +172,9 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Changelog.txt" />
+    <CopyFileToFolders Include="Changelog.txt">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </CopyFileToFolders>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
