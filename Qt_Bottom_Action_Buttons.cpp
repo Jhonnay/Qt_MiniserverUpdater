@@ -12,7 +12,8 @@ Qt_Bottom_Action_Buttons::Qt_Bottom_Action_Buttons(QWidget* parent)
 	btnAdd = new QPushButton(QString::fromStdString("➕"), this);
 	btnCancel = new QPushButton(QString::fromStdString("Cancel"), this);
 	btnRemove = new QPushButton(QString::fromStdString("➖"), this);
-	checkbox_handsfreemode = new QCheckBox(QString::fromStdString("Handsfree Update Mode"), this);
+	//checkbox_handsfreemode = new QCheckBox(QString::fromStdString("Handsfree Update Mode"), this);
+	//checkbox_handsfreemode->setChecked(true);
 
 
 	hBox = new QHBoxLayout;
@@ -21,7 +22,7 @@ Qt_Bottom_Action_Buttons::Qt_Bottom_Action_Buttons(QWidget* parent)
 	hBox->addWidget(btnRemove);
 	hBox->addWidget(btnAdd);
 	hBox->addWidget(btnCancel);
-	hBox->addWidget(checkbox_handsfreemode);
+	//hBox->addWidget(checkbox_handsfreemode);
 	hBox->setContentsMargins(8, 8, 200, 8);
 
 	setLayout(hBox);
@@ -31,7 +32,7 @@ Qt_Bottom_Action_Buttons::Qt_Bottom_Action_Buttons(QWidget* parent)
 	connect(btnRemove, &QPushButton::clicked, this, &Qt_Bottom_Action_Buttons::onButtonRemoveClicked);
 	connect(btnAdd, &QPushButton::clicked, this, &Qt_Bottom_Action_Buttons::onButtonAddClicked);
 	connect(btnCancel, &QPushButton::clicked, this, &Qt_Bottom_Action_Buttons::onButtonCancelClicked);
-	connect(checkbox_handsfreemode, &QCheckBox::clicked, this, &Qt_Bottom_Action_Buttons::onCheckBoxHandsfreeClicked);
+	//connect(checkbox_handsfreemode, &QCheckBox::clicked, this, &Qt_Bottom_Action_Buttons::onCheckBoxHandsfreeClicked);
 }
 
 
@@ -45,7 +46,7 @@ Qt_Bottom_Action_Buttons::~Qt_Bottom_Action_Buttons()
 	delete btnRemove;
 	delete btnAdd;
 	delete btnCancel;
-	delete checkbox_handsfreemode;
+	//delete checkbox_handsfreemode;
 }
 
 void Qt_Bottom_Action_Buttons::onButtonUpdateClicked()
@@ -89,3 +90,8 @@ void Qt_Bottom_Action_Buttons::setDisabledAllExceptCancel(bool setting)
 	this->btnAdd->setDisabled(setting);
 	this->btnUpdate->setDisabled(setting);
 }
+
+//bool Qt_Bottom_Action_Buttons::isHandsfreeModeEnabled()
+//{
+//	return checkbox_handsfreemode->isChecked();
+//}

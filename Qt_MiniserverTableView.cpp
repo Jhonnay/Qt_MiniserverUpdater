@@ -238,6 +238,35 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                 }
             }
         }
+        else if (clickedIndex.column() == 5) {
+            QMenu contextMenu;
+            contextMenu.addAction("Set Release");
+            contextMenu.addAction("Set Alpha");
+            contextMenu.addAction("Set Beta");
+            contextMenu.addAction("AutoUpdate");
+            contextMenu.addAction("AutoUpdate all selected (BETA)");
+
+            QAction* selectedItem = contextMenu.exec(event->globalPos());
+            if (selectedItem) {
+                QString selectedItemText = selectedItem->text();
+                CMiniserver miniserver = m_model->miniserverlist->at(clickedIndex.row());
+
+                if (selectedItemText == "Set Release") {
+                }
+                else if (selectedItemText == "Set Alpha") {
+
+                }
+                else if (selectedItemText == "Set Beta") {
+
+                }
+                else if (selectedItemText == "AutoUpdate") {
+
+                }
+                else if (selectedItemText == "AutoUpdate all selected (BETA)") {
+
+                }
+            }
+        }
 
 		else
 		{

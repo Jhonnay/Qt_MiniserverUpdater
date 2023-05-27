@@ -27,6 +27,8 @@ public:
 
 	void setDisabledAllExceptCancel(bool setting);
 
+	//bool isHandsfreeModeEnabled();
+
 signals:
 	void buttonUpdateClicked();
 	void buttonRefreshClicked();
@@ -43,6 +45,6 @@ private:
 	QPushButton* btnRemove;
 	QPushButton* btnAdd;
 	QPushButton* btnCancel;
-	QCheckBox* checkbox_handsfreemode;
+	//QCheckBox* checkbox_handsfreemode;
 	Ui::Qt_Bottom_Action_ButtonsClass ui;
 };

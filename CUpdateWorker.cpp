@@ -87,6 +87,17 @@ void CUpdateWorker::run()
             miniserver.setMiniserverVersion(CMiniserver::formatMiniserverVersionQString(config.miniserverVersionAfterUpdate).toStdString());
             miniserver.setVersionColor(miniserver.calculateVersionColor(config.miniserverVersionAfterUpdate));
             successfulUpdates++; //if the update was successful but canceled afterwards it should count as updated. 
+            
+            //if (!bottom_buttons->isHandsfreeModeEnabled()) {
+            //    //block Update until User sees that the miniservers Updated.
+            //    QMetaObject::invokeMethod(qApp, [&]() {
+            //        // Create and show the dialog here
+            //        QString message = config.getMiniserverVersions();
+            //        QMessageBox::information(nullptr, "Update Information", "Miniserver(s) Versions: " + message);
+            //        });
+            //    
+            //}
+            
         }
         else if(!isInterruptionRequested() && updateSuccessful == 0){
             miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information_timeout);

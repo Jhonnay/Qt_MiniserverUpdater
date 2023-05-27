@@ -52,6 +52,7 @@ private:
     QString configLanguage;
     CConfig config;
     QString localhost = "127.0.0.1";
+    QString miniserverVersions;
 
 
 public:
@@ -84,6 +85,7 @@ public:
     void SetNewConfigInstallerPath(QString value) { newConfigInstallerPath = value; }
     QString ConfigLanguage() const { return configLanguage; }
     void SetConfigLanguage(QString value) { configLanguage = value; }
+    QString getMiniserverVersions() { return miniserverVersions; }
     
 
     
@@ -95,7 +97,7 @@ public:
 
     static int getRunningConfigInstances();
 
-    
+    void buildminiserversVersionString(CUDPListener& udpL);  
 
 };
 

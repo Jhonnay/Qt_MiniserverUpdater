@@ -1,12 +1,16 @@
 
 Known Issues: 
-Pressing up / down arrow key ín LocalIP field selects the next line
-known issues:
-* Loading from Miniserver done twice when updating. 
+* Pressing up / down arrow key ín LocalIP field selects the next line
 * Progress for Refesh/Updating not perfect. 
-* Handsfree Mode not implemented
-* opening not valid json file will crash the program
 
+TODO's:
+*implement AutoUpdate Context Menu. 
+
+
+V0.1.2
+*New: Implemented Handsfree Mode
+*Removed: Updatehandsfree Checkbox (does not make sense)
+*Fixed opening not valid json file will crash the program
 
 V0.1.1
 *Added InnoSetup Installer

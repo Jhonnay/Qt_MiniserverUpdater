@@ -1,4 +1,5 @@
 #include "CConfigMSUpdate.h"
+#include "CMiniserver.h"
 
 
 //#define AUTO_DISCONNECTED 0
@@ -34,6 +35,8 @@
 #define LOADING_CYCLE_CHECK_CONNECTED 3
 #define LOADING_CYCLE_SEND_LOAD_COMMAND 4
 #define LOADING_CYCLE_CHECK_PROGRAM_IDENTICAL 5 
+
+
 
 void CConfigMSUpdate::OpenConfigLoadProject(QThread* thread)
 {
@@ -148,6 +151,22 @@ void CConfigMSUpdate::PrintConfigMsVersions(CUDPListener& udpL)
         {
             qDebug() << vers << ", ";
         }
+    }
+    catch (const std::exception& ex)
+    {
+        qDebug() << "SocketException: " << ex.what();
+    }
+}
+
+void CConfigMSUpdate::buildminiserversVersionString(CUDPListener& udpL)
+{
+    try
+    {
+        for (const auto& vers : udpL.m_versionsOfMiniservers)
+        {
+            miniserverVersions+=  CMiniserver::formatMiniserverVersionQString(vers) +  ", ";
+        }
+        miniserverVersions = miniserverVersions.left(miniserverVersions.lastIndexOf(","));
     }
     catch (const std::exception& ex)
     {
@@ -307,6 +326,7 @@ int CConfigMSUpdate::performMiniserverUpdate(QThread* thread) {
                 PrintConfigMsVersions(udpL);
                 updateCycleState++;
                 miniserverVersionAfterUpdate = udpL.m_versionsOfMiniservers[0];
+                buildminiserversVersionString(udpL);
                 ret = 1;
             }
             break;

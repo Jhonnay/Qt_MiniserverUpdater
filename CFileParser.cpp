@@ -9,53 +9,69 @@
 #include <QDir>
 #include "CMiniserver.h"
 #include "CApplicationSettings.h"
+#include "MyConstants.h"
 
 class FileParser {
 public:
     static QList<CMiniserver> parseMiniserverJsonFile(const QString& fileName) {
         QList<CMiniserver> miniservers;
 
-        // Open the JSON file
-        QFile file(fileName);
-        if (!file.open(QIODevice::ReadOnly)) {
-            qWarning() << "Failed to open file:" << fileName;
-            return miniservers;
-        }
+        try {
+            // Open the JSON file
+            QFile file(fileName);
+            if (!file.open(QIODevice::ReadOnly)) {
+                qWarning() << "Failed to open file:" << fileName;
+                return miniservers;
+            }
 
-        // Read the JSON data from the file
-        QByteArray jsonData = file.readAll();
-        file.close();
+            // Read the JSON data from the file
+            QByteArray jsonData = file.readAll();
+            file.close();
 
-        // Parse the JSON data
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
-        if (jsonDoc.isNull()) {
-            qWarning() << "Failed to parse JSON data from file:" << fileName;
-            return miniservers;
-        }
+            // Parse the JSON data
+            QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
+            if (jsonDoc.isNull()) {
+                qWarning() << "Failed to parse JSON data from file:" << fileName;
+                QMessageBox::warning(nullptr, "Miniserver Json", QString::fromStdString(MyConstants::Strings::MessageBox_MiniserverList_could_not_parse));
+                return miniservers;
+            }
 
-        // Convert the JSON data to a list of CMiniserver objects
-        if (jsonDoc.isArray()) {
-            QJsonArray jsonArray = jsonDoc.array();
-            foreach(const QJsonValue & jsonValue, jsonArray) {
-                if (jsonValue.isObject()) {
-                    QJsonObject jsonObj = jsonValue.toObject();
-                    CMiniserver miniserver(
-                        jsonObj["serialNumer"].toString().toStdString(),
-                        jsonObj["adminUser"].toString().toStdString(),
-                        jsonObj["adminPassWord"].toString().toStdString(),
-                        jsonObj["MSVersion"].toString().toStdString(),
-                        jsonObj["MSStatus"].toString().toStdString(),
-                        jsonObj["UpdateLevel"].toString().toStdString(),
-                        jsonObj["VersionColor"].toString().toStdString(),
-                        jsonObj["MSProject"].toString().toStdString(),
-                        jsonObj["MSConfiguration"].toString().toStdString(),
-                        jsonObj["LocalIPAdress"].toString().toStdString(),
-                        jsonObj["ConfigLanguage"].toString().toStdString()
-                    );
-                    miniservers.append(miniserver);
+            // Convert the JSON data to a list of CMiniserver objects
+            if (jsonDoc.isArray()) {
+                QJsonArray jsonArray = jsonDoc.array();
+                foreach(const QJsonValue & jsonValue, jsonArray) {
+                    if (jsonValue.isObject()) {
+                        QJsonObject jsonObj = jsonValue.toObject();
+                        CMiniserver miniserver(
+                            jsonObj["serialNumer"].toString().toStdString(),
+                            jsonObj["adminUser"].toString().toStdString(),
+                            jsonObj["adminPassWord"].toString().toStdString(),
+                            jsonObj["MSVersion"].toString().toStdString(),
+                            jsonObj["MSStatus"].toString().toStdString(),
+                            jsonObj["UpdateLevel"].toString().toStdString(),
+                            jsonObj["VersionColor"].toString().toStdString(),
+                            jsonObj["MSProject"].toString().toStdString(),
+                            jsonObj["MSConfiguration"].toString().toStdString(),
+                            jsonObj["LocalIPAdress"].toString().toStdString(),
+                            jsonObj["ConfigLanguage"].toString().toStdString()
+                        );
+                        if (miniserver.getConfigLanguage().empty()) { miniserver.setConfigLanguage("5"); };
+                        miniservers.append(miniserver);
+                    }
+                    else {
+                        qWarning() << "Failed to parse JSON data from file:" << fileName;
+                        QMessageBox::warning(nullptr, "Miniserver Json", QString::fromStdString(MyConstants::Strings::MessageBox_MiniserverList_could_not_parse));
+                    }
                 }
             }
         }
+        catch (...) {
+            qWarning() << "An error occurred while parsing the JSON file:" << fileName;
+            QMessageBox::warning(nullptr, "Miniserver Json", QString::fromStdString(MyConstants::Strings::MessageBox_MiniserverList_could_not_parse));
+            miniservers.clear();
+            return miniservers;
+        }
+        
 
         return miniservers;
     }
@@ -69,14 +85,28 @@ public:
             return application;
         }
 
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(file.readAll());
-        QJsonObject jsonObj = jsonDoc.object();
+        try {
+            QJsonDocument jsonDoc = QJsonDocument::fromJson(file.readAll());
+            QJsonObject jsonObj = jsonDoc.object();
 
-        // Read values from JSON object and set them in the CApplication object
-        application.setBUseDefaultConfiguration(jsonObj.value("BUseDefaultConfiguration").toBool());
-        application.setStrDefaultConfigurationPath(jsonObj.value("StrDefaultConfigurationPath").toString().toStdString());
-        application.setBUseDefaultConfig(jsonObj.value("BUseDefaultConfig").toBool());
-        application.setStrDefaultConfigPath(jsonObj.value("StrDefaultConfigPath").toString().toStdString());
+            // Read values from JSON object and set them in the CApplication object
+            application.setBUseDefaultConfiguration(jsonObj.value("BUseDefaultConfiguration").toBool());
+            application.setStrDefaultConfigurationPath(jsonObj.value("StrDefaultConfigurationPath").toString().toStdString());
+            application.setBUseDefaultConfig(jsonObj.value("BUseDefaultConfig").toBool());
+            application.setStrDefaultConfigPath(jsonObj.value("StrDefaultConfigPath").toString().toStdString());
+        }
+        catch (const QJsonParseError& error) {
+            // Handle JSON parsing error
+            qDebug() << "Applcation Settings JSON parsing error:" << error.errorString();
+            QMessageBox::warning(nullptr, "Application Settings", QString::fromStdString(MyConstants::Strings::MessageBox_ApplicationSettings_could_not_parse));
+        }
+        catch (...) {
+            // Handle any other exception
+            qDebug() << "An error occurred while parsing the JSON file.";
+            QMessageBox::warning(nullptr, "Application Settings", QString::fromStdString(MyConstants::Strings::MessageBox_ApplicationSettings_could_not_parse));
+            application = ApplicationSettings();
+            return application;
+        }
 
         return application;
     }
