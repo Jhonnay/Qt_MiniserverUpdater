@@ -126,6 +126,10 @@ QString CWebService::sendCommandRest_Version_Remote_Cloud(CMiniserver miniserver
             
             receivedData = receivedData.mid(receivedData.indexOf(interestedValue) + interestedValue.length() + 2);
             receivedData = receivedData.left(8);
+            int index = receivedData.lastIndexOf('"');
+            if (index != -1) {
+                receivedData = receivedData.left(index);
+            }
         
         }
 
@@ -193,6 +197,11 @@ QString CWebService::sendCommandRest_Version_Local_Gen1(CMiniserver miniserver, 
 
         receivedData = receivedData.mid(receivedData.indexOf(interestedValue) + interestedValue.length() + 2);
         receivedData = receivedData.left(8);
+
+        int index = receivedData.lastIndexOf('"');
+        if (index != -1) {
+            receivedData = receivedData.left(index);
+        }
 
         delete manager;
     }

@@ -4,8 +4,10 @@ Known Issues:
 * Progress for Refesh/Updating not perfect. 
 
 TODO's:
-*implement AutoUpdate Context Menu. 
+* Check for new Update Version
 
+V0.1.3
+*New: implemented ContextMenu Actions for Column "UpdateLevel"
 
 V0.1.2
 *New: Implemented Handsfree Mode

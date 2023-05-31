@@ -250,21 +250,73 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
             if (selectedItem) {
                 QString selectedItemText = selectedItem->text();
                 CMiniserver miniserver = m_model->miniserverlist->at(clickedIndex.row());
+                bool bLocal = !miniserver.getLocalIP().empty();
+                QString webService, updateLevel;
+                QString interestedValue = "value";
 
                 if (selectedItemText == "Set Release") {
+                    webService = "dev/cfg/updatelevel/release";
+                    
                 }
                 else if (selectedItemText == "Set Alpha") {
-
+                    webService = "dev/cfg/updatelevel/alpha";
                 }
                 else if (selectedItemText == "Set Beta") {
-
+                    webService = "dev/cfg/updatelevel/beta";
                 }
                 else if (selectedItemText == "AutoUpdate") {
-
+                    webService = "/dev/sys/autoupdate";
+                    interestedValue = "Code";
+                    autoUpdateSingleMiniserver(bLocal, miniserver, webService, interestedValue, clickedIndex);
+                    return;
                 }
-                else if (selectedItemText == "AutoUpdate all selected (BETA)") {
 
+                if (bLocal && selectedItemText != "AutoUpdate" && selectedItemText != "AutoUpdate all selected (BETA)") {
+                    CWebService::sendCommandRest_Version_Local_Gen1(miniserver, webService, interestedValue);
+                    updateLevel = CWebService::sendCommandRest_Version_Local_Gen1(miniserver, "dev/cfg/updatelevel", "value");
+                    if (updateLevel != "error") {
+                        miniserver.setUpdatelevel(updateLevel.toStdString());
+                    }
+                    else {
+                        miniserver.setUpdatelevel(updateLevel.toStdString());
+                        miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information_timeout);
+                    }
+                    
+                    m_model->miniserverlist->replace(clickedIndex.row(), miniserver);
+                    return;
                 }
+                else if (!bLocal && selectedItemText != "AutoUpdate" && selectedItemText != "AutoUpdate all selected (BETA)") {
+                    CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, webService, interestedValue);
+                    updateLevel = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "dev/cfg/updatelevel", "value");
+                    if (updateLevel != "error") {
+                        miniserver.setUpdatelevel(updateLevel.toStdString());
+                    }
+                    else {
+                        miniserver.setUpdatelevel(updateLevel.toStdString());
+                        miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information_timeout);
+                    }
+                    m_model->miniserverlist->replace(clickedIndex.row(), miniserver);
+                    return;
+                }
+
+
+                
+                if (selectedItemText == "AutoUpdate all selected (BETA)") {
+                    QModelIndexList selectedIndexes = selectionModel()->selectedRows();
+                    std::sort(selectedIndexes.begin(), selectedIndexes.end(), [](const QModelIndex& a, const QModelIndex& b) { return a.row() > b.row(); });
+                    webService = "/dev/sys/autoupdate";
+                    interestedValue = "Code";
+                    qDebug() << selectedIndexes;
+
+                    for (QModelIndex index : selectedIndexes) {
+                        miniserver = getMiniserverModel()->miniserverlist->operator[](index.row());
+                        autoUpdateSingleMiniserver(bLocal, miniserver, webService, interestedValue, index);
+                    }
+                }
+
+                //error if failed
+                
+                
             }
         }
 
@@ -273,6 +325,26 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
 			QTableView::contextMenuEvent(event);
 		}
 	}
+}
+
+void Qt_MiniserverTableView::autoUpdateSingleMiniserver(bool bLocal, CMiniserver& miniserver, QString& webService, QString& interestedValue, QModelIndex& clickedIndex)
+{
+    QString ret;
+    if (bLocal) {
+        ret = CWebService::sendCommandRest_Version_Local_Gen1(miniserver, webService, interestedValue);
+
+    }
+    else {
+        ret = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, webService, interestedValue);
+    }
+    if (ret == QString::fromStdString(MyConstants::Strings::WebService_Success_Code)) {
+        miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_AutoUpdate);
+        m_model->miniserverlist->replace(clickedIndex.row(), miniserver);
+    }
+    else {
+        miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information_timeout);
+        m_model->miniserverlist->replace(clickedIndex.row(), miniserver);
+    }
 }
 
 bool Qt_MiniserverTableView::eventFilter(QObject* object, QEvent* event)
