@@ -29,6 +29,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     updateWorker = new CUpdateWorker(this, tableViewMiniserver, bottom_buttons, statusbar);
     refreshWorker = new CRefreshWorker(this, tableViewMiniserver, bottom_buttons, statusbar);
     connectConfigWorker = new CConnectConfigWorker(this, tableViewMiniserver, bottom_buttons, statusbar);
+    downloadProgFolderWorker = new CDownloadProgFolderWorker(this);
     applicationSettings = NULL;
     
 
@@ -59,7 +60,15 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonCancelClicked, this, &Qt_MiniserverUpdater::onCancelConnectConfigClicked);
 
     connect(refreshWorker, &CRefreshWorker::updateStatusBarProgress, statusbar, &Qt_Statusbar::updateProgress);
+    connect(refreshWorker, &CRefreshWorker::setEnableTableview, tableViewMiniserver, &Qt_MiniserverTableView::setEnabledTableView);
     connect(updateWorker, &CUpdateWorker::updateStatusBarProgress, statusbar, &Qt_Statusbar::updateProgress);
+    connect(updateWorker, &CUpdateWorker::setEnableTableview, tableViewMiniserver, &Qt_MiniserverTableView::setEnabledTableView);
+
+
+    connect(tableViewMiniserver, &Qt_MiniserverTableView::enabledStateChanged, menubar, &Qt_Menubar::updateFileMenuState);
+    connect(tableViewMiniserver, &Qt_MiniserverTableView::downloadProgFolderPressed, this, &Qt_MiniserverUpdater::onDownloadProgFolder);
+    connect(downloadProgFolderWorker, &CDownloadProgFolderWorker::updateStatusBarProgress, statusbar, &Qt_Statusbar::updateProgress);
+
 
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonAddClicked, this, &Qt_MiniserverUpdater::onAddMiniserverPressed);
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonRemoveClicked, this, &Qt_MiniserverUpdater::onRemoveMiniserverPressed);
@@ -316,6 +325,12 @@ void Qt_MiniserverUpdater::onChangelogClicked()
     {
         QMessageBox::critical(nullptr, "Error", QString::fromStdString(MyConstants::Strings::MessageBox_Changelog_Cannot_be_opened));
     }
+}
+
+void Qt_MiniserverUpdater::onDownloadProgFolder(CMiniserver ms)
+{
+    this->downloadProgFolderWorker->setMiniserver(ms);
+    this->downloadProgFolderWorker->start();
 }
 
 void Qt_MiniserverUpdater::onCancelConnectConfigClicked() {

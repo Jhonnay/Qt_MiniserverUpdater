@@ -14,7 +14,6 @@ Qt_ApplicationSettings::Qt_ApplicationSettings(const QString& title, Application
 
 	connect(browseButton1, &QPushButton::clicked, [this]() {
 		QString roamingPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-
 		QString filePath = QFileDialog::getOpenFileName(this, tr("Open Miniserver List"), roamingPath, tr("JSON files (*.json)"));
 		if (!filePath.isEmpty()) {
 			//TODO: Check if valid Miniserverlist Json

@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
 #include "Qt_Menubar.h"
 
+
+
 Qt_Menubar::Qt_Menubar(QWidget* parent)
     : QWidget(parent)
 {
@@ -67,6 +69,11 @@ void Qt_Menubar::onVersionClicked()
 void Qt_Menubar::onChangelogClicked()
 {
     emit changelogClicked();
+}
+
+void Qt_Menubar::setMiniserverTableView(Qt_MiniserverTableView* tv)
+{
+    this->tableview = tv;
 }
 
 
@@ -144,4 +151,11 @@ void Qt_Menubar::createHelpMenu()
     changelogAct = new QAction(tr("&Changelog"), this);
     helpMenu->addAction(changelogAct);
     connect(changelogAct, &QAction::triggered, this, &Qt_Menubar::onChangelogClicked);
+}
+
+void Qt_Menubar::updateFileMenuState(bool state) {
+    saveAct->setEnabled(state);
+    openAct->setEnabled(state);
+    newAct->setEnabled(state);
+    menuBar->repaint();
 }

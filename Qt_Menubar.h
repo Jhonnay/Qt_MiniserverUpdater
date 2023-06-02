@@ -4,6 +4,9 @@
 #include <QMenuBar>
 #include <QMenu>
 #include <QAction>
+#include "Qt_MiniserverTableView.h"
+
+
 
 class Qt_Menubar : public QWidget
 {
@@ -22,7 +25,11 @@ public:
     void onKillLoxoneAppClicked();
     void onVersionClicked();
     void onChangelogClicked();
+    void setMiniserverTableView(Qt_MiniserverTableView* tv);
 
+
+public slots:
+    void updateFileMenuState(bool state);
 signals:
     void saveClicked();
     void openClicked();
@@ -65,4 +72,6 @@ private:
     QAction* checkUpdateAct;
     QAction* helpAct;
     QAction* changelogAct;
+
+    Qt_MiniserverTableView* tableview;
 };

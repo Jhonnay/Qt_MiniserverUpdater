@@ -21,6 +21,7 @@ CUpdateWorker::~CUpdateWorker()
 void CUpdateWorker::run()
 {
     const QModelIndexList selectedIndexes = tableViewMiniserver->selectionModel()->selectedRows();
+    emit setEnableTableview(false);
     QString configPath = statusbar->getConfigExePath();
     int count = selectedIndexes.count();
     int progress = 1;
@@ -124,9 +125,11 @@ void CUpdateWorker::run()
         emit updatingCanceled();
         progresstext = "Canceled! - " + progresstext;
         emit updateStatusBarProgress(100, progresstext);
+        emit setEnableTableview(true);
         return;
     }
     emit updateStatusBarProgress(100, progresstext);
     emit updatingCompleted();
+    emit setEnableTableview(true);
 
 }

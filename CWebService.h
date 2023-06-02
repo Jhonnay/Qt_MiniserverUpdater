@@ -16,7 +16,7 @@ public:
 	static CLoxAppJson sendCommandRest_LoxAppJson_Local_Gen1(CMiniserver miniserver, QString command);
 
 	static int DownloadProgFolder(CMiniserver miniserver);
-private:
+
 	static QList<QString> GetFileNamesOfProgList(QString& progList);
 	static QString ExtractFileName(QString& inputString);
 };

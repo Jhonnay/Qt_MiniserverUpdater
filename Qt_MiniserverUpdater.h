@@ -11,6 +11,7 @@
 #include "CUpdateWorker.h"
 #include "CRefreshWorker.h"
 #include "CConnectConfigWorker.h"
+#include "CDownloadProgFolderWorker.h"
 
 class Qt_MiniserverUpdater : public QMainWindow
 {
@@ -54,6 +55,7 @@ public slots:
     void onKillLoxoneAppClicked();
     void onVersionClicked();
     void onChangelogClicked();
+    void onDownloadProgFolder(CMiniserver ms);
 
 
 
@@ -72,6 +74,7 @@ private:
     CUpdateWorker* updateWorker;
     CRefreshWorker* refreshWorker;
     CConnectConfigWorker* connectConfigWorker;
+    CDownloadProgFolderWorker* downloadProgFolderWorker;
     QString applicationVersion;
 
     //CConfigMSUpdate* configMSUpdate;

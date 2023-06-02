@@ -94,6 +94,7 @@
     <ClCompile Include="CConfigMSUpdate.cpp" />
     <ClCompile Include="CConnectConfigButtonDelegate.cpp" />
     <ClCompile Include="CConnectConfigWorker.cpp" />
+    <ClCompile Include="CDownloadProgFolderWorker.cpp" />
     <ClCompile Include="CFileParser.cpp" />
     <ClCompile Include="CLoxAppJson.cpp" />
     <ClCompile Include="CLoxoneApp.cpp" />
@@ -152,6 +153,7 @@
     <QtMoc Include="CConnectConfigButtonDelegate.h" />
     <ClInclude Include="CConfigMSUpdate.h" />
     <QtMoc Include="CConnectConfigWorker.h" />
+    <QtMoc Include="CDownloadProgFolderWorker.h" />
     <ClInclude Include="CLoxAppJson.h" />
     <ClInclude Include="CLoxoneApp.h" />
     <ClInclude Include="CMiniserver.h" />

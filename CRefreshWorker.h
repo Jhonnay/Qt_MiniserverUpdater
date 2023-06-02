@@ -28,5 +28,6 @@ signals:
 	void refreshCompleted();
 	void refreshCanceled();
 	void updateStatusBarProgress(int progress, QString progresstext);
+	void setEnableTableview(bool state);
 
 };

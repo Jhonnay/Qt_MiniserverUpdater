@@ -18,7 +18,9 @@ CRefreshWorker::~CRefreshWorker()
 
 void CRefreshWorker::run()
 {
+    
     const QModelIndexList selectedIndexes = tableViewMiniserver->selectionModel()->selectedRows();
+    emit setEnableTableview(false);
     QString configVersionUnformated = CConfig::getConfigFileVersionUnformated(statusbar->getConfigExePath());
     int count = selectedIndexes.count();
     int progress = 1;
@@ -128,13 +130,11 @@ void CRefreshWorker::run()
         emit refreshCanceled();
         progresstext = "Canceled! - " + progresstext;
         emit updateStatusBarProgress(100, progresstext);
+        emit setEnableTableview(true);
         return;
     }
     
     emit updateStatusBarProgress(100, progresstext);
     emit refreshCompleted();
-    
-
-    
-
+    emit setEnableTableview(true);
 }

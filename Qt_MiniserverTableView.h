@@ -27,6 +27,7 @@ public slots:
 	void update() { QTableView::update(); }
 	void repaint() { QTableView::repaint(); }
 	void insertRow(const CMiniserver& miniserver);
+	void setEnabledTableView(bool state);
 
 private slots: 
 	void handleConnectConfigClicked(const QModelIndex& index);
@@ -35,6 +36,8 @@ private slots:
 	
 signals:
 	void ConnectConfigClicked(const QModelIndex& index, const CMiniserver& miniserver);
+	void enabledStateChanged(bool state);
+	void downloadProgFolderPressed(CMiniserver miniserver);
 
 private:
 	CMiniserverTableModel* m_model;

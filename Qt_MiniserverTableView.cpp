@@ -204,7 +204,8 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
 
                 }
                 else if (selectedItemText == "Download Prog Folder (BETA)") {
-                    CWebService::DownloadProgFolder(miniserver);
+                    emit downloadProgFolderPressed(miniserver);
+                    //CWebService::DownloadProgFolder(miniserver);
                 }
 				
 			}
@@ -382,4 +383,10 @@ void Qt_MiniserverTableView::setLinkCursor(bool enabled)
         QApplication::restoreOverrideCursor();
     }
        
+}
+
+void Qt_MiniserverTableView::setEnabledTableView(bool state)
+{
+    setEnabled(state);
+    emit enabledStateChanged(state);
 }
