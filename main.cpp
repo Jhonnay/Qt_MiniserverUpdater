@@ -19,8 +19,9 @@
 #include "CLoxAppJson.h"
 
 #include "CFileParser.cpp"
+#include <QtConcurrent>
 
-#define VERSION "0.1.4"
+#define VERSION "0.1.5"
 
 
 int main(int argc, char* argv[])
@@ -53,6 +54,8 @@ int main(int argc, char* argv[])
         mainwindow->setStatusbarProgress(100, "Applications Settings NOT loaded");
     }
 
+    
+    mainwindow->checkVersionOnStartup();
     //mainWindow.setCentralWidget(centralWidget);
     mainwindow->setWindowTitle("Miniserver Updater (c) Musat Version " + QString::fromStdString(VERSION));
     mainwindow->resize(1000, 600);

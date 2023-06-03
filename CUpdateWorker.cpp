@@ -1,4 +1,4 @@
-#include "CUpdateWorker.h"
+﻿#include "CUpdateWorker.h"
 #include "MyConstants.h"
 #include "CConfigMSUpdate.h"
 #include "CRefreshWorker.h"
@@ -20,13 +20,14 @@ CUpdateWorker::~CUpdateWorker()
 
 void CUpdateWorker::run()
 {
-    const QModelIndexList selectedIndexes = tableViewMiniserver->selectionModel()->selectedRows();
+    QModelIndexList selectedIndexes = tableViewMiniserver->selectionModel()->selectedRows();
+    std::sort(selectedIndexes.begin(), selectedIndexes.end(), [](const QModelIndex& a, const QModelIndex& b) { return a.row() < b.row(); });
     emit setEnableTableview(false);
     QString configPath = statusbar->getConfigExePath();
     int count = selectedIndexes.count();
     int progress = 1;
     int successfulUpdates = 0;
-    QString progresstext = QStringLiteral("Updating %1 Miniserver(s)").arg(QString::number(count));
+    QString progresstext = QStringLiteral("⏳ Updating %1 Miniserver(s)").arg(QString::number(count));
     emit updateStatusBarProgress(1, progresstext);
     tableViewMiniserver->clearSelection();
 
@@ -39,14 +40,13 @@ void CUpdateWorker::run()
         tableViewMiniserver->resizeColumnsToContents();
         tableViewMiniserver->setColumnWidth(6, 100);
     }
-
+    int progressInt= (progress * 100 / 2) / count;
     for (const QModelIndex& index : selectedIndexes)
     {
         int row = index.row();
         CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
 
-        progresstext = QStringLiteral("Updating %1 (%2/%3)").arg(QString::fromStdString(miniserver.getSerialNumber())).arg(QString::number(progress)).arg(QString::number(count));
-        int progressInt = (progress * 100 / 2) / count;
+        progresstext = QStringLiteral("⏳ Updating %1 (%2/%3)").arg(QString::fromStdString(miniserver.getSerialNumber())).arg(QString::number(progress)).arg(QString::number(count));
         emit updateStatusBarProgress(progressInt, progresstext);
 
         //check if interrupted and set to "canceled" and skip FOR interation
@@ -55,6 +55,7 @@ void CUpdateWorker::run()
             tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
             tableViewMiniserver->resizeColumnsToContents();
             tableViewMiniserver->setColumnWidth(6, 100);
+            progressInt = (progress * 100) / count;
             progress++;
             continue;
         }
@@ -106,7 +107,8 @@ void CUpdateWorker::run()
         else {
             miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Refresh_canceled);
         }
-        
+
+        progressInt = (progress * 100) / count;
         progress++;
 
         
@@ -123,7 +125,7 @@ void CUpdateWorker::run()
 
     if (isInterruptionRequested()) {
         emit updatingCanceled();
-        progresstext = "Canceled! - " + progresstext;
+        progresstext = "Canceled! ⛔ " + progresstext;
         emit updateStatusBarProgress(100, progresstext);
         emit setEnableTableview(true);
         return;

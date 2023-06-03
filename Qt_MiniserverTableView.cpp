@@ -27,6 +27,10 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
     setEditTriggers(QAbstractItemView::AllEditTriggers); //enable single click for edit mode
     //setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::EditKeyPressed);
     horizontalHeader()->setSectionsMovable(true);     //set Header moveable
+    QFont font = horizontalHeader()->font();
+    font.setBold(true);
+    horizontalHeader()->setFont(font);
+
     //connect(horizontalHeader(), &QHeaderView::sectionClicked, m_model, &CMiniserverTableModel::sort);
     //https://stackoverflow.com/questions/18831242/qt-start-editing-of-cell-after-one-click
     //Test
@@ -287,8 +291,9 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                     return;
                 }
                 else if (!bLocal && selectedItemText != "AutoUpdate" && selectedItemText != "AutoUpdate all selected (BETA)") {
-                    CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, webService, interestedValue);
-                    updateLevel = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "dev/cfg/updatelevel", "value");
+                    QString url = CWebService::getCloudDNSLink(miniserver);
+                    CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, webService, interestedValue,url);
+                    updateLevel = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "dev/cfg/updatelevel", "value", url);
                     if (updateLevel != "error") {
                         miniserver.setUpdatelevel(updateLevel.toStdString());
                     }
@@ -336,7 +341,7 @@ void Qt_MiniserverTableView::autoUpdateSingleMiniserver(bool bLocal, CMiniserver
 
     }
     else {
-        ret = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, webService, interestedValue);
+        ret = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, webService, interestedValue,"");
     }
     if (ret == QString::fromStdString(MyConstants::Strings::WebService_Success_Code)) {
         miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_AutoUpdate);

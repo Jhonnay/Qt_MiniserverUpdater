@@ -31,7 +31,16 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connectConfigWorker = new CConnectConfigWorker(this, tableViewMiniserver, bottom_buttons, statusbar);
     downloadProgFolderWorker = new CDownloadProgFolderWorker(this);
     applicationSettings = NULL;
+    actionDeselectAll = new QAction("Deselect All", this);
+    actionRemoveMiniserverWithDelete = new QAction("Remove selected", this);
+    checkUpdater = new CUpdateChecker(this);
     
+    actionDeselectAll->setShortcut(QKeySequence("Ctrl+D"));
+    actionRemoveMiniserverWithDelete->setShortcut(QKeySequence::Delete);
+    addAction(actionRemoveMiniserverWithDelete);
+    addAction(actionDeselectAll);
+
+
 
     vBox->addWidget(menubar);
     vBox->addWidget(tableViewMiniserver);
@@ -83,6 +92,10 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(menubar, &Qt_Menubar::killAppClicked, this, &Qt_MiniserverUpdater::onKillLoxoneAppClicked);
     connect(menubar, &Qt_Menubar::versionClicked, this, &Qt_MiniserverUpdater::onVersionClicked);    
     connect(menubar, &Qt_Menubar::changelogClicked, this, &Qt_MiniserverUpdater::onChangelogClicked);
+    connect(menubar, &Qt_Menubar::checkVersionClicked, this, &Qt_MiniserverUpdater::onCheckNewVersionClicked);
+
+    connect(actionDeselectAll, &QAction::triggered, this, &Qt_MiniserverUpdater::onDeselectAll);
+    connect(actionRemoveMiniserverWithDelete, &QAction::triggered, this, &Qt_MiniserverUpdater::onRemoveMiniserverPressed);
 
     this->setCentralWidget(centralWidget);
 
@@ -152,6 +165,7 @@ void Qt_MiniserverUpdater::setApplicationsettings(ApplicationSettings* settings)
 void Qt_MiniserverUpdater::setApplicationVersion(QString version)
 {
     this->applicationVersion = version;
+    this->checkUpdater->setApplicationVersion(version);
 }
 
 
@@ -333,6 +347,16 @@ void Qt_MiniserverUpdater::onDownloadProgFolder(CMiniserver ms)
     this->downloadProgFolderWorker->start();
 }
 
+void Qt_MiniserverUpdater::onDeselectAll()
+{
+    tableViewMiniserver->clearSelection();
+}
+
+void Qt_MiniserverUpdater::onCheckNewVersionClicked()
+{
+    checkUpdater->CheckUpdate_and_install_if_user_wants(true);
+}
+
 void Qt_MiniserverUpdater::onCancelConnectConfigClicked() {
     this->connectConfigWorker->requestInterruption();
     connect(connectConfigWorker, &CConnectConfigWorker::finished, this, &Qt_MiniserverUpdater::onConnectConfigFinished);
@@ -346,6 +370,11 @@ void Qt_MiniserverUpdater::onUpdateStatusbarProgress(int progress, QString progr
 void Qt_MiniserverUpdater::setStatusbarProgress(int progress, QString progresstext)
 {
     statusbar->updateProgress(progress, progresstext);
+}
+
+void Qt_MiniserverUpdater::checkVersionOnStartup()
+{
+    checkUpdater->CheckUpdate_and_install_if_user_wants(false);
 }
 
 void Qt_MiniserverUpdater::onAddMiniserverPressed()

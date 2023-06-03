@@ -1,4 +1,4 @@
-#include "CRefreshWorker.h"
+﻿#include "CRefreshWorker.h"
 #include "MyConstants.h"
 #include "CConfigMSUpdate.h"
 #include "CLoxAppJson.h"
@@ -18,8 +18,9 @@ CRefreshWorker::~CRefreshWorker()
 
 void CRefreshWorker::run()
 {
-    
-    const QModelIndexList selectedIndexes = tableViewMiniserver->selectionModel()->selectedRows();
+    QModelIndexList selectedIndexes = tableViewMiniserver->selectionModel()->selectedRows();
+    std::sort(selectedIndexes.begin(), selectedIndexes.end(), [](const QModelIndex& a, const QModelIndex& b) { return a.row() < b.row(); });
+
     emit setEnableTableview(false);
     QString configVersionUnformated = CConfig::getConfigFileVersionUnformated(statusbar->getConfigExePath());
     int count = selectedIndexes.count();
@@ -39,6 +40,8 @@ void CRefreshWorker::run()
         tableViewMiniserver->resizeColumnsToContents();
         tableViewMiniserver->setColumnWidth(6, 100);
     }
+
+    int progressInt = (progress * 100 / 2) / count;
     for (const QModelIndex& index : selectedIndexes)
     {
         
@@ -49,8 +52,7 @@ void CRefreshWorker::run()
         CLoxAppJson cloxapp;
         CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
 
-        progresstext = QStringLiteral("Retreiving of %1 (%2/%3)").arg(QString::fromStdString(miniserver.getSerialNumber())).arg(QString::number(progress)).arg(QString::number(count));
-        int progressInt = (progress * 100 / 2)/ count;
+        progresstext = QStringLiteral("⏳ Retreiving of %1 (%2/%3)").arg(QString::fromStdString(miniserver.getSerialNumber())).arg(QString::number(progress)).arg(QString::number(count));
         emit updateStatusBarProgress(progressInt, progresstext);
 
         //check if interrupted and set to "canceled" and skip FOR interation
@@ -61,6 +63,7 @@ void CRefreshWorker::run()
             tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
             tableViewMiniserver->resizeColumnsToContents();
             tableViewMiniserver->setColumnWidth(6, 100);
+            progressInt = (progress * 100) / count;
             progress++;
             continue;
         }
@@ -85,10 +88,11 @@ void CRefreshWorker::run()
             }
         }
         else {
-            unformatedVersionString = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "dev/sys/version", "value");
+            QString url = CWebService::getCloudDNSLink(miniserver);
+            unformatedVersionString = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "dev/sys/version", "value",url);
             if (unformatedVersionString != "error") { //speed up retreiving if not reachable
-                updateLevel = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "/dev/cfg/updatelevel", "value");
-                cloxapp = CWebService::sendCommandRest_LoxAppJson_Remote_Cloud(miniserver, "data/LoxAPP3.json");
+                updateLevel = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "/dev/cfg/updatelevel", "value",url);
+                cloxapp = CWebService::sendCommandRest_LoxAppJson_Remote_Cloud(miniserver, "data/LoxAPP3.json", url);
             }
         }
         if (updateLevel.contains('"')) {
@@ -117,7 +121,7 @@ void CRefreshWorker::run()
             successfulRetreives++;
         }
 
-        
+        progressInt = (progress * 100) / count;
         progress++;
 
         tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
@@ -128,7 +132,7 @@ void CRefreshWorker::run()
     progresstext = QStringLiteral("Successfully retreived (%1 of %2)").arg(QString::number(successfulRetreives)).arg(QString::number(count));
     if (isInterruptionRequested()) {
         emit refreshCanceled();
-        progresstext = "Canceled! - " + progresstext;
+        progresstext = "Canceled! ⛔ " + progresstext;
         emit updateStatusBarProgress(100, progresstext);
         emit setEnableTableview(true);
         return;

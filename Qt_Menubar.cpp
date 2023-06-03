@@ -71,6 +71,11 @@ void Qt_Menubar::onChangelogClicked()
     emit changelogClicked();
 }
 
+void Qt_Menubar::onCheckNewVersionClicked()
+{
+    emit checkVersionClicked();
+}
+
 void Qt_Menubar::setMiniserverTableView(Qt_MiniserverTableView* tv)
 {
     this->tableview = tv;
@@ -144,6 +149,7 @@ void Qt_Menubar::createHelpMenu()
 
     checkUpdateAct = new QAction(tr("&Check Update"), this);
     helpMenu->addAction(checkUpdateAct);
+    connect(checkUpdateAct, &QAction::triggered, this, &Qt_Menubar::onCheckNewVersionClicked);
 
     helpAct = new QAction(tr("&Help"), this);
     helpMenu->addAction(helpAct);

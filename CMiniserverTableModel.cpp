@@ -47,6 +47,9 @@ QVariant CMiniserverTableModel::data(const QModelIndex& index, int role) const
         QFont font;
         font.setBold(true);
         return font;
+    }else if (role == Qt::TextAlignmentRole && (index.column() == 2 || index.column() == 4 || index.column() == 5)) {
+        // center the text for column 1 and 3
+        return Qt::AlignCenter;
     }
 
     return QVariant();
@@ -62,14 +65,14 @@ QVariant CMiniserverTableModel::headerData(int section, Qt::Orientation orientat
         switch (section)
         {
         case 0: return "Status";
-        case 1: return "Serial Number";
+        case 1: return "Miniserver";
         case 2: return "Version";
         case 3: return "Project";
         case 4: return "Configuration";
         case 5: return "Update Level";
         case 6: return "Action";
         case 7: return "Local IP";
-        case 8: return "Config Language";
+        case 8: return "Language";
         default: return QVariant();
         }
     }

@@ -1,17 +1,30 @@
 Feature Wish:
-
+* Multiedit Row 
 
 Known Issues: 
 * Pressing up / down arrow key ín LocalIP field selects the next line
-* Progress for Refesh/Updating not perfect. 
-* Make File Menu Text grey when disabled
+* File Menu Text not grey when disabled
 
 TODO's:
 * Check for new Update Version
-
 * CSS Tableview Selection
 * CSS Tableview greyed out when disabled
 * Open in Loxone App 
+
+
+V0.1.5
+*Added UpdateChecker
+*Added Indexes are sorted before refresh
+*Added Indexes are sorted before update
+*Added center align certain columns
+*Added action STRG+D to unselect all rows
+*Added action Delete to remove selectecd miniservers
+*Adjusted Tableview Header text
+*Adjusted Tableview Header Text to be always bold.
+*VS Build Process: open Target folder after building the EXE
+*Fixed Download Prog - If the Miniserver is not reachable (Downloaded 0/0)
+*Fixed Remote WebServices ask for the CloudDNS link on every request
+*Fixed Progressbar going to 50% and jumping to 100% on finish 
 
 V0.1.4
 *Added Download ProgFolder Thread
@@ -37,14 +50,10 @@ V0.1.1
 *Fixed application settings could not be changed if on startup the application settings were not available (object never initialized)
 
 V0.1.0
-*Fixed:
-	 Changing Language after List was sorted does not work. --> Index should be determined for QList*, when changing Data underneath. 
-	 
-*Added/Changed:
-	added changelog file to repo
-	added setMiniserversInitial() & setMiniserversInitial() functions.
-	added formatMiniserverVersionQString()
-	added QlineEdit for LocalIP
-	added coloring of versionnumber when using setMiniserversInitial() & setMiniserversInitial()
-	set languagebox to fixed size
-	other improvements
+*Fixed: Changing Language after List was sorted does not work. --> Index should be determined for QList*, when changing Data underneath. 
+*Added changelog file to repo
+*Added setMiniserversInitial() & setMiniserversInitial() functions.
+*Added formatMiniserverVersionQString()
+*Added QlineEdit for LocalIP
+*Added coloring of versionnumber when using setMiniserversInitial() & setMiniserversInitial()
+*Changed set languagebox to fixed size

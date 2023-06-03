@@ -12,6 +12,7 @@
 #include "CRefreshWorker.h"
 #include "CConnectConfigWorker.h"
 #include "CDownloadProgFolderWorker.h"
+#include "CUpdateChecker.h"
 
 class Qt_MiniserverUpdater : public QMainWindow
 {
@@ -28,6 +29,7 @@ public:
     void setApplicationsettings(ApplicationSettings* settings);
     void setApplicationVersion(QString version);
     void setStatusbarProgress(int progress, QString progresstext);
+    void checkVersionOnStartup();
     
     
 
@@ -56,6 +58,8 @@ public slots:
     void onVersionClicked();
     void onChangelogClicked();
     void onDownloadProgFolder(CMiniserver ms);
+    void onDeselectAll();
+    void onCheckNewVersionClicked();
 
 
 
@@ -76,6 +80,9 @@ private:
     CConnectConfigWorker* connectConfigWorker;
     CDownloadProgFolderWorker* downloadProgFolderWorker;
     QString applicationVersion;
+    QAction* actionDeselectAll;
+    QAction* actionRemoveMiniserverWithDelete;
+    CUpdateChecker* checkUpdater;
 
     //CConfigMSUpdate* configMSUpdate;
     //Ui::Qt_MiniserverUpdaterClass ui;

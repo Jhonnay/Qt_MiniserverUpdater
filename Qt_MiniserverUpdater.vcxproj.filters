@@ -133,6 +133,9 @@
     <ClCompile Include="CDownloadProgFolderWorker.cpp">
       <Filter>Resource Files\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CUpdateChecker.cpp">
+      <Filter>Resource Files\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CApplicationSettings.h">
@@ -222,6 +225,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="CDownloadProgFolderWorker.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="CUpdateChecker.h">
       <Filter>Resource Files\Source Files</Filter>
     </QtMoc>
   </ItemGroup>

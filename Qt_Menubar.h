@@ -25,6 +25,7 @@ public:
     void onKillLoxoneAppClicked();
     void onVersionClicked();
     void onChangelogClicked();
+    void onCheckNewVersionClicked();
     void setMiniserverTableView(Qt_MiniserverTableView* tv);
 
 
@@ -43,6 +44,7 @@ signals:
     void checkUpdateClicked();
     void helpClicked();
     void changelogClicked();
+    void checkVersionClicked();
 
 
 private:

@@ -72,11 +72,14 @@ QString CWebService::getCloudDNSLink(CMiniserver miniserver)
 }
 
 
-
-QString CWebService::sendCommandRest_Version_Remote_Cloud(CMiniserver miniserver, QString command, QString interestedValue)
+QString CWebService::sendCommandRest_Version_Remote_Cloud(CMiniserver miniserver, QString command, QString interestedValue, QString cloudDNSLink)
 {
     QString receivedData = "error";
-    QString url = CWebService::getCloudDNSLink(miniserver);
+    QString url = cloudDNSLink;
+    if (cloudDNSLink.isEmpty()) {
+        url = CWebService::getCloudDNSLink(miniserver);
+    }
+
     qDebug() << "Url: " << url;
     if (!url.isEmpty()) {
         url = url + command;
@@ -210,10 +213,13 @@ QString CWebService::sendCommandRest_Version_Local_Gen1(CMiniserver miniserver, 
 }
 
 
-CLoxAppJson CWebService::sendCommandRest_LoxAppJson_Remote_Cloud(CMiniserver miniserver, QString command)
+CLoxAppJson CWebService::sendCommandRest_LoxAppJson_Remote_Cloud(CMiniserver miniserver, QString command, QString cloudDNSLink)
 {
     QString receivedData = "error";
-    QString url = CWebService::getCloudDNSLink(miniserver);
+    QString url = cloudDNSLink;
+    if (cloudDNSLink.isEmpty()) {
+        url = CWebService::getCloudDNSLink(miniserver);
+    }
     CLoxAppJson cLoxAppJson;
 
     if (!url.isEmpty()) {
@@ -450,7 +456,7 @@ int CWebService::DownloadProgFolder(CMiniserver miniserver)
         link = CSerialNumberHyperlinkDelegate::generateLink(QString::fromStdString(miniserver.getSerialNumber()), QString::fromStdString(miniserver.getLocalIP()));
     }
     else { //remote
-        proglistRAW = sendCommandRest_Version_Remote_Cloud(miniserver, "dev/fslist/prog", "");
+        proglistRAW = sendCommandRest_Version_Remote_Cloud(miniserver, "dev/fslist/prog", "","");
         link = getCloudDNSLink(miniserver);
     }
 
