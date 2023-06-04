@@ -32,7 +32,7 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>6.5.0_msvc2019_64</QtInstall>
-    <QtModules>charts;concurrent;core;gui;help;network;networkauth;uitools;webenginecore;websockets;widgets</QtModules>
+    <QtModules>core;gui;network;widgets;concurrent;help;webenginecore;websockets;charts;networkauth;uitools</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
     <QtToolsDesignTime>false</QtToolsDesignTime>
   </PropertyGroup>

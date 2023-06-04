@@ -60,6 +60,7 @@ public slots:
     void onDownloadProgFolder(CMiniserver ms);
     void onDeselectAll();
     void onCheckNewVersionClicked();
+    void onHelp();
 
 
 

@@ -4,6 +4,7 @@ Feature Wish:
 Known Issues: 
 * Pressing up / down arrow key ín LocalIP field selects the next line
 * File Menu Text not grey when disabled
+* Updatelevel not refreshed in UI when changing
 
 TODO's:
 * Check for new Update Version
@@ -11,6 +12,8 @@ TODO's:
 * CSS Tableview greyed out when disabled
 * Open in Loxone App 
 
+V0.1.6
+* added Help Documentations (opens HTML in Browser because webenginewidgets uses to much memory)
 
 V0.1.5
 *Added UpdateChecker

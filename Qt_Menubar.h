@@ -27,6 +27,7 @@ public:
     void onChangelogClicked();
     void onCheckNewVersionClicked();
     void setMiniserverTableView(Qt_MiniserverTableView* tv);
+    void onHelp();
 
 
 public slots:
@@ -45,6 +46,7 @@ signals:
     void helpClicked();
     void changelogClicked();
     void checkVersionClicked();
+    void help();
 
 
 private:

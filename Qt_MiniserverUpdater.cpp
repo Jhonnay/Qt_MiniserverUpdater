@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include "CFileParser.cpp"
 #include "CLoxoneApp.h"
+//#include <QWebEngineView>
 
 Qt_MiniserverUpdater::Qt_MiniserverUpdater(QWidget* parent )
     : QMainWindow(parent)
@@ -93,6 +94,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(menubar, &Qt_Menubar::versionClicked, this, &Qt_MiniserverUpdater::onVersionClicked);    
     connect(menubar, &Qt_Menubar::changelogClicked, this, &Qt_MiniserverUpdater::onChangelogClicked);
     connect(menubar, &Qt_Menubar::checkVersionClicked, this, &Qt_MiniserverUpdater::onCheckNewVersionClicked);
+    connect(menubar, &Qt_Menubar::help, this, &Qt_MiniserverUpdater::onHelp);
 
     connect(actionDeselectAll, &QAction::triggered, this, &Qt_MiniserverUpdater::onDeselectAll);
     connect(actionRemoveMiniserverWithDelete, &QAction::triggered, this, &Qt_MiniserverUpdater::onRemoveMiniserverPressed);
@@ -355,6 +357,29 @@ void Qt_MiniserverUpdater::onDeselectAll()
 void Qt_MiniserverUpdater::onCheckNewVersionClicked()
 {
     checkUpdater->CheckUpdate_and_install_if_user_wants(true);
+}
+
+void Qt_MiniserverUpdater::onHelp()
+{
+    //QDialog* dialog = new QDialog();
+    //QVBoxLayout* layout = new QVBoxLayout(dialog);
+    //QWebEngineView* webView = new QWebEngineView(dialog);
+    //layout->addWidget(webView);
+    //dialog->setWindowTitle("Documentation");
+    //
+    //// Load the local HTML file
+    //QString filePath = "/resources/Documentation.html";
+    //QUrl url = QUrl::fromLocalFile(QDir::currentPath() + filePath);
+    //qDebug() << url.path();
+    //webView->load(url);
+    //dialog->exec();
+    //
+    //delete dialog;
+    
+    QString filePath = "resources/Documentation.html";
+    QUrl url = QUrl::fromLocalFile(filePath);
+    QDesktopServices::openUrl(QUrl(url));
+
 }
 
 void Qt_MiniserverUpdater::onCancelConnectConfigClicked() {

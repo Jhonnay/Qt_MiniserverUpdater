@@ -81,6 +81,11 @@ void Qt_Menubar::setMiniserverTableView(Qt_MiniserverTableView* tv)
     this->tableview = tv;
 }
 
+void Qt_Menubar::onHelp()
+{
+    emit help();
+}
+
 
 
 
@@ -153,6 +158,8 @@ void Qt_Menubar::createHelpMenu()
 
     helpAct = new QAction(tr("&Help"), this);
     helpMenu->addAction(helpAct);
+    helpAct->setShortcut(QKeySequence(Qt::Key_F1));
+    connect(helpAct, &QAction::triggered, this, &Qt_Menubar::onHelp);
 
     changelogAct = new QAction(tr("&Changelog"), this);
     helpMenu->addAction(changelogAct);
