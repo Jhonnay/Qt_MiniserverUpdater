@@ -31,7 +31,7 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
     font.setBold(true);
     horizontalHeader()->setFont(font);
 
-    //connect(horizontalHeader(), &QHeaderView::sectionClicked, m_model, &CMiniserverTableModel::sort);
+    connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, m_model, &CMiniserverTableModel::sort);
     //https://stackoverflow.com/questions/18831242/qt-start-editing-of-cell-after-one-click
     //Test
     //QPalette palette;

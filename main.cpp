@@ -21,7 +21,7 @@
 #include "CFileParser.cpp"
 #include <QtConcurrent>
 
-#define VERSION "0.1.6"
+#define VERSION "0.1.7"
 
 
 int main(int argc, char* argv[])

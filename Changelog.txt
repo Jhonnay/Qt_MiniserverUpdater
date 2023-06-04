@@ -5,6 +5,7 @@ Known Issues:
 * Pressing up / down arrow key ín LocalIP field selects the next line
 * File Menu Text not grey when disabled
 * Updatelevel not refreshed in UI when changing
+*Changing local IP or other data will not sort the list
 
 TODO's:
 * Check for new Update Version
@@ -12,8 +13,11 @@ TODO's:
 * CSS Tableview greyed out when disabled
 * Open in Loxone App 
 
+V0.1.7
+*Added sorting for columns (WIP)
+
 V0.1.6
-* added Help Documentations (opens HTML in Browser because webenginewidgets uses to much memory)
+*Added Help Documentations (opens HTML in Browser because webenginewidgets uses to much memory)
 
 V0.1.5
 *Added UpdateChecker

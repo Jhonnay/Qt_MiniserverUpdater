@@ -228,7 +228,7 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="CUpdateChecker.h">
-      <Filter>Resource Files\Source Files</Filter>
+      <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

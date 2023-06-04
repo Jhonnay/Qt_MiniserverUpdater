@@ -30,7 +30,7 @@ signals:
 
 public slots:
     void onConnectConfigClicked();
-    //void sort(int column, Qt::SortOrder order);
+    void sort(int column, Qt::SortOrder order);
 
     
 };
