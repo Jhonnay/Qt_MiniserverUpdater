@@ -32,6 +32,7 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
     horizontalHeader()->setFont(font);
 
     connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, m_model, &CMiniserverTableModel::sort);
+    connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, &Qt_MiniserverTableView::handleSelectionChanged);
     //https://stackoverflow.com/questions/18831242/qt-start-editing-of-cell-after-one-click
     //Test
     //QPalette palette;
@@ -394,4 +395,9 @@ void Qt_MiniserverTableView::setEnabledTableView(bool state)
 {
     setEnabled(state);
     emit enabledStateChanged(state);
+}
+
+void Qt_MiniserverTableView::handleSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+{
+    emit mySelectionChanged(selected, deselected);
 }

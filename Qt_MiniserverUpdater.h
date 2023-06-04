@@ -61,6 +61,7 @@ public slots:
     void onDeselectAll();
     void onCheckNewVersionClicked();
     void onHelp();
+    void onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
 
 

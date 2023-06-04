@@ -31,13 +31,14 @@ public slots:
 
 private slots: 
 	void handleConnectConfigClicked(const QModelIndex& index);
-	
+	void handleSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
 	
 signals:
 	void ConnectConfigClicked(const QModelIndex& index, const CMiniserver& miniserver);
 	void enabledStateChanged(bool state);
 	void downloadProgFolderPressed(CMiniserver miniserver);
+	void mySelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
 private:
 	CMiniserverTableModel* m_model;

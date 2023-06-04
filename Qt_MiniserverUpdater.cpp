@@ -77,6 +77,8 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
 
     connect(tableViewMiniserver, &Qt_MiniserverTableView::enabledStateChanged, menubar, &Qt_Menubar::updateFileMenuState);
     connect(tableViewMiniserver, &Qt_MiniserverTableView::downloadProgFolderPressed, this, &Qt_MiniserverUpdater::onDownloadProgFolder);
+    //QItemSelectionModel* tableSelectionModel = tableViewMiniserver->selectionModel();
+    connect(tableViewMiniserver, &Qt_MiniserverTableView::mySelectionChanged, this, &Qt_MiniserverUpdater::onSelectionChanged);
     connect(downloadProgFolderWorker, &CDownloadProgFolderWorker::updateStatusBarProgress, statusbar, &Qt_Statusbar::updateProgress);
 
 
@@ -119,6 +121,7 @@ void Qt_MiniserverUpdater::setMiniserverList(QList<CMiniserver>* list)
     tableViewMiniserver->setModel(new CMiniserverTableModel(list,this));
     tableViewMiniserver->resizeColumnsToContents();
     tableViewMiniserver->setColumnWidth(6, 100);
+
 }
 
 void Qt_MiniserverUpdater::updateMiniserverList(QList<CMiniserver>* list)
@@ -382,6 +385,11 @@ void Qt_MiniserverUpdater::onHelp()
 
 }
 
+void Qt_MiniserverUpdater::onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+{
+    qDebug() << "selection changed: " + tableViewMiniserver->selectionModel()->selectedRows().count();
+}
+
 void Qt_MiniserverUpdater::onCancelConnectConfigClicked() {
     this->connectConfigWorker->requestInterruption();
     connect(connectConfigWorker, &CConnectConfigWorker::finished, this, &Qt_MiniserverUpdater::onConnectConfigFinished);
@@ -461,6 +469,10 @@ void Qt_MiniserverUpdater::onRefreshMiniserversFinished() {
 
 void Qt_MiniserverUpdater::onRefreshClicked()
 {
+    if (tableViewMiniserver->selectionModel()->selectedRows().count() == 0) {
+        qDebug() << "No Miniserver are selected for Refreshing!";
+        return;
+    }
     bottom_buttons->setDisabledAllExceptCancel(true);
     refreshWorker->start();
     
@@ -477,7 +489,13 @@ void Qt_MiniserverUpdater::onConnectConfig()
 
 void Qt_MiniserverUpdater::onUpdateMiniserverClicked()
 {
-    
+    //prevent crashing
+    if (tableViewMiniserver->selectionModel()->selectedRows().count() == 0) {
+        qDebug() << "No Miniserver are selected for Update!";
+        return;
+    }
+
+
     int configCount = CConfigMSUpdate::getRunningConfigInstances();
     QString configPath = statusbar->getConfigExePath();
 

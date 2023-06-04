@@ -5,13 +5,17 @@ Known Issues:
 * Pressing up / down arrow key ín LocalIP field selects the next line
 * File Menu Text not grey when disabled
 * Updatelevel not refreshed in UI when changing
-*Changing local IP or other data will not sort the list
+* Changing local IP or other data will not sort the list
+* onselectionchanged does not work in Qt_MiniserverUpdater neither in Qt_MiniserverTableview
 
 TODO's:
 * Check for new Update Version
 * CSS Tableview Selection
 * CSS Tableview greyed out when disabled
 * Open in Loxone App 
+
+V0.1.8
+*Fixed Crash: Clicking on Refresh/Update when no Miniserver is selected 
 
 V0.1.7
 *Added sorting for columns (WIP)
