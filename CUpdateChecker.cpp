@@ -42,7 +42,7 @@ void CUpdateChecker::CheckUpdate_and_install_if_user_wants(bool bShow_No_Update_
     bool updatesAvailable = check_Update_needed();
     if (updatesAvailable)
     {
-        QString message = "There is a newer version available! Do you want to download and install?\nCurrent Version: " + stringApplicationVersion + "\nAvailable Version: " + UpdateVersion;
+        QString message = "There is a newer version available! \n\n Current Version: " + stringApplicationVersion + "\n Available Version: " + UpdateVersion + "\n\nDo you want to download and install?";
         QMessageBox::StandardButton result = QMessageBox::question(nullptr,"Install Update?", message, QMessageBox::Yes | QMessageBox::No);
         if (result == QMessageBox::Yes)
         {

@@ -62,6 +62,7 @@ public slots:
     void onCheckNewVersionClicked();
     void onHelp();
     void onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+    void onRefreshSelected();
 
 
 
@@ -83,6 +84,7 @@ private:
     CDownloadProgFolderWorker* downloadProgFolderWorker;
     QString applicationVersion;
     QAction* actionDeselectAll;
+    QAction* actionRefreshSelected;
     QAction* actionRemoveMiniserverWithDelete;
     CUpdateChecker* checkUpdater;
 

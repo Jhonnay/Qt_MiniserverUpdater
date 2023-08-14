@@ -20,13 +20,14 @@
 
 #include "CFileParser.cpp"
 #include <QtConcurrent>
+#include "MyApplication.h"
 
-#define VERSION "0.1.8"
+#define VERSION "0.1.9"
 
 
 int main(int argc, char* argv[])
 {
-    QApplication a(argc, argv);
+    MyApplication app(argc, argv);
 
     std::cout << "Hello, World!" << std::endl;
 
@@ -61,7 +62,7 @@ int main(int argc, char* argv[])
     mainwindow->resize(1000, 600);
     mainwindow->show();
 
-    return a.exec();
+    return app.exec();
 }
 
 

@@ -33,14 +33,16 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     downloadProgFolderWorker = new CDownloadProgFolderWorker(this);
     applicationSettings = NULL;
     actionDeselectAll = new QAction("Deselect All", this);
+    actionRefreshSelected = new QAction("Refresh Selected", this);
     actionRemoveMiniserverWithDelete = new QAction("Remove selected", this);
     checkUpdater = new CUpdateChecker(this);
     
     actionDeselectAll->setShortcut(QKeySequence("Ctrl+D"));
+    actionRefreshSelected->setShortcut(QKeySequence("Ctrl+R"));
     actionRemoveMiniserverWithDelete->setShortcut(QKeySequence::Delete);
     addAction(actionRemoveMiniserverWithDelete);
     addAction(actionDeselectAll);
-
+    addAction(actionRefreshSelected);
 
 
     vBox->addWidget(menubar);
@@ -99,6 +101,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(menubar, &Qt_Menubar::help, this, &Qt_MiniserverUpdater::onHelp);
 
     connect(actionDeselectAll, &QAction::triggered, this, &Qt_MiniserverUpdater::onDeselectAll);
+    connect(actionRefreshSelected, &QAction::triggered, this, &Qt_MiniserverUpdater::onRefreshSelected);
     connect(actionRemoveMiniserverWithDelete, &QAction::triggered, this, &Qt_MiniserverUpdater::onRemoveMiniserverPressed);
 
     this->setCentralWidget(centralWidget);
@@ -390,6 +393,11 @@ void Qt_MiniserverUpdater::onSelectionChanged(const QItemSelection& selected, co
     qDebug() << "selection changed: " + tableViewMiniserver->selectionModel()->selectedRows().count();
 }
 
+void Qt_MiniserverUpdater::onRefreshSelected()
+{
+    onRefreshClicked();
+}
+
 void Qt_MiniserverUpdater::onCancelConnectConfigClicked() {
     this->connectConfigWorker->requestInterruption();
     connect(connectConfigWorker, &CConnectConfigWorker::finished, this, &Qt_MiniserverUpdater::onConnectConfigFinished);
@@ -439,6 +447,7 @@ void Qt_MiniserverUpdater::onAddMiniserverPressed()
 
 void Qt_MiniserverUpdater::onRemoveMiniserverPressed()
 {
+    
     QModelIndexList selectedIndexes = tableViewMiniserver->selectionModel()->selectedRows();
     
     QModelIndexList indexlist = tableViewMiniserver->selectionModel()->selectedRows();

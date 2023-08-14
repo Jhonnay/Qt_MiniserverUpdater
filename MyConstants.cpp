@@ -100,7 +100,7 @@ std::string MyConstants::Strings::MessageBox_AutoUpdate_selected_Already_running
 std::string MyConstants::Strings::MessageBox_AutoUpdate_selected_ERROR_nothing_selected = "Please select Miniservers";
 std::string MyConstants::Strings::MessageBox_AutoUpdate_selected_Error_which_could_not_update = "These Miniserver could not start AutoUpdate: ";
 std::string MyConstants::Strings::MessageBox_CheckUpdate_no_Internet = "Check your internet connection!";
-std::string MyConstants::Strings::MessageBox_CheckUpdate_no_Update_available = "No new updates available. 😕";
+std::string MyConstants::Strings::MessageBox_CheckUpdate_no_Update_available = "You are already on the bleeding Egde. 💪 👌";
 std::string MyConstants::Strings::MessageBox_SerialNumber_duplicate = "Serial Number is already in list!";
 std::string MyConstants::Strings::MessageBox_AskUser_On_New_File = "Are you sure that you want to create start a new file and remove all Minsierver from the list? Please save the JSON beforehand!";
 std::string MyConstants::Strings::MessageBox_ApplicationSettingsPaths_not_correct = "Please check the file Paths of your ApplicationSettings again!";

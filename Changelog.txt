@@ -1,18 +1,25 @@
 Feature Wish:
 * Multiedit Row 
+* Search Bar
 
 Known Issues: 
-* Pressing up / down arrow key ín LocalIP field selects the next line
 * File Menu Text not grey when disabled
-* Updatelevel not refreshed in UI when changing
+* Updatelevel not refreshed in UI when changing Updatelevel
 * Changing local IP or other data will not sort the list
 * onselectionchanged does not work in Qt_MiniserverUpdater neither in Qt_MiniserverTableview
+* sometimes the program crashes while refreshing the data. 
 
 TODO's:
-* Check for new Update Version
-* CSS Tableview Selection
-* CSS Tableview greyed out when disabled
+* CSS Tableview Selection: make it light blue similar to Config
+* CSS Tableview grey out when disabled
 * Open in Loxone App 
+* Get Local Ip from Context Menu
+* Update, remove, Refresh Buttons have to be disabled if nothing is selected
+
+V0.1.9
+*Adjusted Strings
+*Added Shortcut STRG+R - refresh all selected miniserver
+*Added Crash Handling + MiniDump integration
 
 V0.1.8
 *Fixed Crash: Clicking on Refresh/Update when no Miniserver is selected 
