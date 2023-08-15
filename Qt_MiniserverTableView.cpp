@@ -8,7 +8,7 @@
 Qt_MiniserverTableView::Qt_MiniserverTableView(QWidget *parent)
 	: QTableView(parent)
 {
-    Qt_MiniserverTableView(NULL, this); //does not work
+    //Qt_MiniserverTableView(NULL, this); //does not work
 }
 
 
@@ -401,3 +401,4 @@ void Qt_MiniserverTableView::handleSelectionChanged(const QItemSelection& select
 {
     emit mySelectionChanged(selected, deselected);
 }
+

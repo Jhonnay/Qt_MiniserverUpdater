@@ -9,7 +9,17 @@ CMiniserverTableModel::CMiniserverTableModel(QList<CMiniserver>* miniservers, QO
 int CMiniserverTableModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent)
+    if (m_searchText.isEmpty())
         return miniserverlist->size();
+    else {
+        int count = 0;
+        for (const CMiniserver& miniserver : *miniserverlist) {
+            if (miniserver.matchesSearchFilter(m_searchText)) {
+                count++;
+            } 
+        }
+        return count;
+    }
 }
 
 int CMiniserverTableModel::columnCount(const QModelIndex& parent) const
@@ -24,32 +34,36 @@ QVariant CMiniserverTableModel::data(const QModelIndex& index, int role) const
         return QVariant();
 
     const CMiniserver& miniserver = miniserverlist->at(index.row());
+    qDebug() << "SearchText used in data function: " << m_searchText;
 
-    if (role == Qt::DisplayRole || role == Qt::EditRole)
-    {
-        switch (index.column())
+    if (m_searchText.isEmpty() ||  miniserver.matchesSearchFilter(m_searchText)) {
+        if (role == Qt::DisplayRole || role == Qt::EditRole)
         {
-        case 0: return QString::fromStdString(miniserver.getMiniserverStatus());
-        case 1: return QString::fromStdString(miniserver.getSerialNumber());
-        case 2: return QString::fromStdString(miniserver.getMiniserverVersion());
-        case 3: return QString::fromStdString(miniserver.getMiniserverProject());
-        case 4: return QString::fromStdString(miniserver.getMiniserverConfiguration());
-        case 5: return QString::fromStdString(miniserver.getUpdatelevel());
-        case 7: return QString::fromStdString(miniserver.getLocalIP());
-        case 8: return CConfig::LanguageList.at(stoi(miniserver.getConfigLanguage()));
+            switch (index.column())
+            {
+            case 0: return QString::fromStdString(miniserver.getMiniserverStatus());
+            case 1: return QString::fromStdString(miniserver.getSerialNumber());
+            case 2: return QString::fromStdString(miniserver.getMiniserverVersion());
+            case 3: return QString::fromStdString(miniserver.getMiniserverProject());
+            case 4: return QString::fromStdString(miniserver.getMiniserverConfiguration());
+            case 5: return QString::fromStdString(miniserver.getUpdatelevel());
+            case 7: return QString::fromStdString(miniserver.getLocalIP());
+            case 8: return CConfig::LanguageList.at(stoi(miniserver.getConfigLanguage()));
+            }
         }
-    }
-    else if (role == Qt::ForegroundRole && index.column() == 2)
-    {
-        return QColor(QString::fromStdString(miniserver.getVersionColor()));
-    }
-    else if (role == Qt::FontRole && index.column() == 2) {
-        QFont font;
-        font.setBold(true);
-        return font;
-    }else if (role == Qt::TextAlignmentRole && (index.column() == 2 || index.column() == 4 || index.column() == 5)) {
-        // center the text for column 1 and 3
-        return Qt::AlignCenter;
+        else if (role == Qt::ForegroundRole && index.column() == 2)
+        {
+            return QColor(QString::fromStdString(miniserver.getVersionColor()));
+        }
+        else if (role == Qt::FontRole && index.column() == 2) {
+            QFont font;
+            font.setBold(true);
+            return font;
+        }
+        else if (role == Qt::TextAlignmentRole && (index.column() == 2 || index.column() == 4 || index.column() == 5)) {
+            // center the text for column 2 and 4 and 5
+            return Qt::AlignCenter;
+        }
     }
 
     return QVariant();
@@ -104,7 +118,7 @@ bool CMiniserverTableModel::setData(const QModelIndex& index, const QVariant& va
         {
             CMiniserver miniserver = variant.value<CMiniserver>();
             miniserverlist->replace(index.row(), miniserver);
-            emit dataChanged(this->index(index.row(), 0), this->index(index.row(), 8));
+            emit dataChanged(this->index(index.row(), 0), this->index(index.row(), 8), { Qt::DisplayRole, Qt::EditRole });
             
             printDebugDataChanged(index, miniserver);
             return true;
@@ -121,7 +135,7 @@ bool CMiniserverTableModel::setData(const QModelIndex& index, const QVariant& va
             printDebugDataChanged(index, miniserver);
 
             //emit dataChanged(index, index);
-            emit dataChanged(this->index(index.row(), 0), this->index(index.row(), 8));
+            emit dataChanged(this->index(index.row(), 0), this->index(index.row(), 8), { Qt::DisplayRole, Qt::EditRole });
 
             return true;
         }
@@ -140,7 +154,7 @@ bool CMiniserverTableModel::insertRow(const CMiniserver& miniserver) {
     endInsertRows();
     QModelIndex topLeft = index(0, 0);
     QModelIndex bottomRight = index(rowCount() - 1, columnCount() - 1);
-    emit dataChanged(topLeft, bottomRight);
+    emit dataChanged(topLeft, bottomRight, { Qt::DisplayRole, Qt::EditRole });
     layoutChanged();
     endResetModel();
     setData(this->index(row,0), QVariant::fromValue(miniserver), Qt::EditRole);
@@ -198,4 +212,19 @@ void CMiniserverTableModel::sort(int column, Qt::SortOrder order)
 
     // Emit the layoutChanged signal to notify the view that the data has been sorted
     emit layoutChanged();
+}
+
+void CMiniserverTableModel::setSearchText(const QString& searchText)
+{
+    if (m_searchText != searchText) {
+        beginResetModel();
+        m_searchText = searchText;
+        qDebug() << "SearchText changed: " << m_searchText;
+        QModelIndex topLeft = index(0, 0);
+        QModelIndex bottomRight = index(rowCount() - 1, columnCount() - 1);
+        emit dataChanged(topLeft, bottomRight, { Qt::DisplayRole, Qt::EditRole });
+        emit layoutChanged();
+        
+        endResetModel();
+    }
 }

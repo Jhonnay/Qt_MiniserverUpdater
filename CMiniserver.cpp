@@ -48,6 +48,29 @@ bool CMiniserver::isDummy()
     return serialNumber.empty();
 }
 
+bool CMiniserver::matchesSearchFilter(QString filter) const
+{
+    qDebug() << "SearchText in matches function: " << filter;
+    QString lowerFilter = filter.toLower(); // Convert the filter to lowercase
+
+    if (QString::fromStdString(this->serialNumber).toLower().contains(lowerFilter) ||
+        QString::fromStdString(this->miniserverVersion).toLower().contains(lowerFilter) ||
+        QString::fromStdString(this->miniserverStatus).toLower().contains(lowerFilter) ||
+        QString::fromStdString(this->updatelevel).toLower().contains(lowerFilter) ||
+        QString::fromStdString(this->versionColor).toLower().contains(lowerFilter) ||
+        QString::fromStdString(this->miniserverProject).toLower().contains(lowerFilter) ||
+        QString::fromStdString(this->miniserverConfiguration).toLower().contains(lowerFilter) ||
+        QString::fromStdString(this->localIP).toLower().contains(lowerFilter) ||
+        QString::fromStdString(this->configLanguage).toLower().contains(lowerFilter))
+    {
+        qDebug() << "SearchText: " << filter << " matches with:  " << toString();
+        return true;
+    }
+
+
+    return false;
+}
+
 
 // Getter and Setter for serialNumber
 std::string CMiniserver::getSerialNumber() const

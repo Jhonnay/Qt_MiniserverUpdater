@@ -36,6 +36,10 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     actionRefreshSelected = new QAction("Refresh Selected", this);
     actionRemoveMiniserverWithDelete = new QAction("Remove selected", this);
     checkUpdater = new CUpdateChecker(this);
+    searchField = new QLineEdit(this);
+    searchField->setPlaceholderText("Search...");
+    searchField->setVisible(false);  // Initially invisible
+    searchField->setContentsMargins(10, 0, 10, 10);
     
     actionDeselectAll->setShortcut(QKeySequence("Ctrl+D"));
     actionRefreshSelected->setShortcut(QKeySequence("Ctrl+R"));
@@ -48,6 +52,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     vBox->addWidget(menubar);
     vBox->addWidget(tableViewMiniserver);
     vBox->addWidget(bottom_buttons);
+    vBox->addWidget(searchField);
     vBox->addWidget(statusbar);
     vBox->setSpacing(0);
     vBox->setContentsMargins(0, 0, 0, 0);
@@ -79,7 +84,8 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
 
     connect(tableViewMiniserver, &Qt_MiniserverTableView::enabledStateChanged, menubar, &Qt_Menubar::updateFileMenuState);
     connect(tableViewMiniserver, &Qt_MiniserverTableView::downloadProgFolderPressed, this, &Qt_MiniserverUpdater::onDownloadProgFolder);
-    //QItemSelectionModel* tableSelectionModel = tableViewMiniserver->selectionModel();
+    //QItemSelectionModel* tableSelectionModel = tableViewMiniserver->selectionModel(); //not working
+    //connect(tableViewMiniserver->selectionModel(), &QItemSelectionModel::selectionChanged, this, &Qt_MiniserverUpdater::onSelectionChanged);
     connect(tableViewMiniserver, &Qt_MiniserverTableView::mySelectionChanged, this, &Qt_MiniserverUpdater::onSelectionChanged);
     connect(downloadProgFolderWorker, &CDownloadProgFolderWorker::updateStatusBarProgress, statusbar, &Qt_Statusbar::updateProgress);
 
@@ -103,6 +109,8 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(actionDeselectAll, &QAction::triggered, this, &Qt_MiniserverUpdater::onDeselectAll);
     connect(actionRefreshSelected, &QAction::triggered, this, &Qt_MiniserverUpdater::onRefreshSelected);
     connect(actionRemoveMiniserverWithDelete, &QAction::triggered, this, &Qt_MiniserverUpdater::onRemoveMiniserverPressed);
+
+    connect(searchField, &QLineEdit::textChanged, this, &Qt_MiniserverUpdater::handleSearchTextChanged);
 
     this->setCentralWidget(centralWidget);
 
@@ -556,3 +564,40 @@ void Qt_MiniserverUpdater::onConnectConfigClicked(const QModelIndex& index, cons
 }
 
 
+void Qt_MiniserverUpdater::handleSearchTextChanged(const QString& searchText)
+{
+    tableViewMiniserver->getMiniserverModel()->setSearchText(searchText);
+}
+
+// Handle Ctrl+F key press event to show/hide the search field
+void Qt_MiniserverUpdater::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_F && (event->modifiers() & Qt::ControlModifier)) {
+        searchField->setHidden(searchField->isVisible());
+        if (searchField->isVisible()) {
+            searchField->setFocus();
+        }
+        else
+        {
+            searchField->clear();
+            searchField->clearFocus();
+            handleSearchTextChanged(""); // Reset the filter when search field is hidden
+        }
+    }
+    else {
+        QWidget::keyPressEvent(event);
+    }
+}
+
+// Handle Ctrl+F key release event to hide the search field
+void Qt_MiniserverUpdater::keyReleaseEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_F && (event->modifiers() & Qt::ControlModifier)) {
+        searchField->clear();
+        searchField->setHidden(true);
+        handleSearchTextChanged(""); // Reset the filter when search field is hidden
+    }
+    else {
+        QWidget::keyReleaseEvent(event);
+    }
+}

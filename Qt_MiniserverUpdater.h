@@ -23,6 +23,7 @@ public:
     Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, QWidget* parent = nullptr);
     ~Qt_MiniserverUpdater();
     
+    QLineEdit* searchField;
     void setMiniserverList(QList<CMiniserver>* list);
     void updateMiniserverList(QList<CMiniserver>* list); 
     void setConfigEXEPath(QString path);
@@ -40,6 +41,9 @@ public slots:
     void onUpdateMiniserverClicked();
     void onCancelUpdateClicked();
     void onUpdateMiniserversFinished();
+    void handleSearchTextChanged(const QString& searchText);
+    void keyPressEvent(QKeyEvent* event);
+    void keyReleaseEvent(QKeyEvent* event);
     void onRefreshCancelClicked();
     void onRefreshMiniserversFinished();
     void onConnectConfigFinished();
@@ -87,6 +91,7 @@ private:
     QAction* actionRefreshSelected;
     QAction* actionRemoveMiniserverWithDelete;
     CUpdateChecker* checkUpdater;
+    
 
     //CConfigMSUpdate* configMSUpdate;
     //Ui::Qt_MiniserverUpdaterClass ui;

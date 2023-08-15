@@ -30,6 +30,8 @@ public:
 
     bool isDummy();
 
+    bool matchesSearchFilter(QString filter) const;
+
     // Getter and Setter for serialNumber
     std::string getSerialNumber() const;
     void setSerialNumber(const std::string& serialNumber);

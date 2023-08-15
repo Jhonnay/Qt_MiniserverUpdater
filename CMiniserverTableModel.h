@@ -22,8 +22,9 @@ public:
     void printDebugDataChanged(const QModelIndex& index, CMiniserver& miniserver);
     
     QList<CMiniserver>* miniserverlist;
+    QString m_searchText;
     
-
+   
 
 signals:
     void connectConfigClicked(const CMiniserver& miniserver);
@@ -31,6 +32,8 @@ signals:
 public slots:
     void onConnectConfigClicked();
     void sort(int column, Qt::SortOrder order);
+
+    void setSearchText(const QString& searchText);
 
     
 };

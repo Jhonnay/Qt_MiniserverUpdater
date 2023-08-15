@@ -16,6 +16,9 @@ TODO's:
 * Get Local Ip from Context Menu
 * Update, remove, Refresh Buttons have to be disabled if nothing is selected
 
+V0.2.0
+*Added Search Functionality with STRG+F
+
 V0.1.9
 *Adjusted Strings
 *Added Shortcut STRG+R - refresh all selected miniserver
