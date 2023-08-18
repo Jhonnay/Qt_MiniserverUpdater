@@ -43,7 +43,7 @@ public slots:
     void onUpdateMiniserversFinished();
     void handleSearchTextChanged(const QString& searchText);
     void keyPressEvent(QKeyEvent* event);
-    void keyReleaseEvent(QKeyEvent* event);
+    //void keyReleaseEvent(QKeyEvent* event);
     void onRefreshCancelClicked();
     void onRefreshMiniserversFinished();
     void onConnectConfigFinished();
@@ -91,6 +91,7 @@ private:
     QAction* actionRefreshSelected;
     QAction* actionRemoveMiniserverWithDelete;
     CUpdateChecker* checkUpdater;
+    CMiniserverTableModel* miniserverModel;
     
 
     //CConfigMSUpdate* configMSUpdate;

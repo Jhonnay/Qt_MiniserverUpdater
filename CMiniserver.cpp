@@ -50,8 +50,11 @@ bool CMiniserver::isDummy()
 
 bool CMiniserver::matchesSearchFilter(QString filter) const
 {
-    qDebug() << "SearchText in matches function: " << filter;
     QString lowerFilter = filter.toLower(); // Convert the filter to lowercase
+
+    if (filter.isEmpty()) {
+        return false;
+    }
 
     if (QString::fromStdString(this->serialNumber).toLower().contains(lowerFilter) ||
         QString::fromStdString(this->miniserverVersion).toLower().contains(lowerFilter) ||
@@ -63,7 +66,7 @@ bool CMiniserver::matchesSearchFilter(QString filter) const
         QString::fromStdString(this->localIP).toLower().contains(lowerFilter) ||
         QString::fromStdString(this->configLanguage).toLower().contains(lowerFilter))
     {
-        qDebug() << "SearchText: " << filter << " matches with:  " << toString();
+        //qDebug() << "SearchText: " << filter << " matches with:  " << toString();
         return true;
     }
 
@@ -285,4 +288,5 @@ QString CMiniserver::getLocalIPfromListviewProjectText(const QString& str)
     // otherwise, return the substring starting from the next character after "/"
     return str.mid(index + 1);
 }
+
 

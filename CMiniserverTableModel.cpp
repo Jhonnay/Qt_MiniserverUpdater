@@ -4,6 +4,7 @@
 CMiniserverTableModel::CMiniserverTableModel(QList<CMiniserver>* miniservers, QObject* parent)
     : QAbstractTableModel(parent), miniserverlist(miniservers)
 {
+    filteredMiniservers = new QList<CMiniserver>;
 }
 
 int CMiniserverTableModel::rowCount(const QModelIndex& parent) const
@@ -12,13 +13,7 @@ int CMiniserverTableModel::rowCount(const QModelIndex& parent) const
     if (m_searchText.isEmpty())
         return miniserverlist->size();
     else {
-        int count = 0;
-        for (const CMiniserver& miniserver : *miniserverlist) {
-            if (miniserver.matchesSearchFilter(m_searchText)) {
-                count++;
-            } 
-        }
-        return count;
+        return filteredMiniservers->size();
     }
 }
 
@@ -30,11 +25,13 @@ int CMiniserverTableModel::columnCount(const QModelIndex& parent) const
 
 QVariant CMiniserverTableModel::data(const QModelIndex& index, int role) const
 {
+    
     if (!index.isValid() || index.row() >= miniserverlist->size())
         return QVariant();
 
-    const CMiniserver& miniserver = miniserverlist->at(index.row());
-    qDebug() << "SearchText used in data function: " << m_searchText;
+    const CMiniserver& miniserver = m_searchText.isEmpty() ? miniserverlist->at(index.row()) : filteredMiniservers->at(index.row());
+    
+    qDebug() << "SearchText used in data function: " << this->m_searchText << " " << miniserver.getMiniserverProject() << " Search Text empty: " << m_searchText.isEmpty() << " matches filter: " << miniserver.matchesSearchFilter(m_searchText);
 
     if (m_searchText.isEmpty() ||  miniserver.matchesSearchFilter(m_searchText)) {
         if (role == Qt::DisplayRole || role == Qt::EditRole)
@@ -116,6 +113,7 @@ bool CMiniserverTableModel::setData(const QModelIndex& index, const QVariant& va
         QVariant variant = value;
         if (variant.canConvert<CMiniserver>())
         {
+            //refreshing miniservers. 
             CMiniserver miniserver = variant.value<CMiniserver>();
             miniserverlist->replace(index.row(), miniserver);
             emit dataChanged(this->index(index.row(), 0), this->index(index.row(), 8), { Qt::DisplayRole, Qt::EditRole });
@@ -124,7 +122,9 @@ bool CMiniserverTableModel::setData(const QModelIndex& index, const QVariant& va
             return true;
         }
         else {
-            CMiniserver& miniserver = miniserverlist->operator[](index.row());
+            CMiniserver& miniserver = m_searchText.isEmpty() ? miniserverlist->operator[](index.row()) : filteredMiniservers->operator[](index.row());
+            int trueIndex = miniserverlist->indexOf(miniserver);
+            miniserver = miniserverlist->operator[](trueIndex);
 
             switch (index.column())
             {
@@ -132,7 +132,8 @@ bool CMiniserverTableModel::setData(const QModelIndex& index, const QVariant& va
             case 8: miniserver.setConfigLanguage(value.toString().toStdString()); break;
             default: return false;
             }
-            printDebugDataChanged(index, miniserver);
+            QModelIndex ind = this->index(trueIndex, index.column());
+            printDebugDataChanged(this->index(trueIndex,index.column()), miniserver);
 
             //emit dataChanged(index, index);
             emit dataChanged(this->index(index.row(), 0), this->index(index.row(), 8), { Qt::DisplayRole, Qt::EditRole });
@@ -217,14 +218,23 @@ void CMiniserverTableModel::sort(int column, Qt::SortOrder order)
 void CMiniserverTableModel::setSearchText(const QString& searchText)
 {
     if (m_searchText != searchText) {
-        beginResetModel();
         m_searchText = searchText;
+        beginResetModel();
         qDebug() << "SearchText changed: " << m_searchText;
+
+        filteredMiniservers->clear();
+        for (const CMiniserver& miniserver : *miniserverlist) {
+            if (miniserver.matchesSearchFilter(m_searchText)) {
+                filteredMiniservers->append(miniserver);
+            }
+        }
+
         QModelIndex topLeft = index(0, 0);
         QModelIndex bottomRight = index(rowCount() - 1, columnCount() - 1);
         emit dataChanged(topLeft, bottomRight, { Qt::DisplayRole, Qt::EditRole });
         emit layoutChanged();
         
         endResetModel();
+        
     }
 }

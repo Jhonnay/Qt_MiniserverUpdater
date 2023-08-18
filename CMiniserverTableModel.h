@@ -22,7 +22,8 @@ public:
     void printDebugDataChanged(const QModelIndex& index, CMiniserver& miniserver);
     
     QList<CMiniserver>* miniserverlist;
-    QString m_searchText;
+    QList<CMiniserver>* filteredMiniservers;
+    QString m_searchText = "";
     
    
 

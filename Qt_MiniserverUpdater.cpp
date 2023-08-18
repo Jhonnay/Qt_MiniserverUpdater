@@ -133,6 +133,9 @@ void Qt_MiniserverUpdater::setMiniserverList(QList<CMiniserver>* list)
     tableViewMiniserver->resizeColumnsToContents();
     tableViewMiniserver->setColumnWidth(6, 100);
 
+    CMiniserverTableModel* model = tableViewMiniserver->getMiniserverModel();
+    qDebug() << "Address of Model after setting Miniservers: " << model;
+
 }
 
 void Qt_MiniserverUpdater::updateMiniserverList(QList<CMiniserver>* list)
@@ -566,7 +569,20 @@ void Qt_MiniserverUpdater::onConnectConfigClicked(const QModelIndex& index, cons
 
 void Qt_MiniserverUpdater::handleSearchTextChanged(const QString& searchText)
 {
-    tableViewMiniserver->getMiniserverModel()->setSearchText(searchText);
+    //qDebug() << "Search Text changed: " << searchText;
+    //CMiniserverTableModel* model = tableViewMiniserver->getMiniserverModel();
+    //qDebug() << "Address of Model when searching: " << model;
+    ////tableViewMiniserver->getMiniserverModel()->setSearchText(searchText);
+    //qDebug() << "Address of simpleModel when searching: " << tableViewMiniserver->model();
+
+    CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(tableViewMiniserver->model());
+    if (model) {
+        // Access functions of the model
+        model->setSearchText(searchText);
+        // Call other functions as needed
+    }
+
+    tableViewMiniserver->viewport()->repaint();
 }
 
 // Handle Ctrl+F key press event to show/hide the search field
@@ -579,9 +595,12 @@ void Qt_MiniserverUpdater::keyPressEvent(QKeyEvent* event)
         }
         else
         {
+            qDebug() << "Filter deactivated with STRG+F: ";
             searchField->clear();
             searchField->clearFocus();
             handleSearchTextChanged(""); // Reset the filter when search field is hidden
+            tableViewMiniserver->resizeColumnsToContents();
+            tableViewMiniserver->setColumnWidth(6, 100);
         }
     }
     else {
@@ -590,14 +609,15 @@ void Qt_MiniserverUpdater::keyPressEvent(QKeyEvent* event)
 }
 
 // Handle Ctrl+F key release event to hide the search field
-void Qt_MiniserverUpdater::keyReleaseEvent(QKeyEvent* event)
-{
-    if (event->key() == Qt::Key_F && (event->modifiers() & Qt::ControlModifier)) {
-        searchField->clear();
-        searchField->setHidden(true);
-        handleSearchTextChanged(""); // Reset the filter when search field is hidden
-    }
-    else {
-        QWidget::keyReleaseEvent(event);
-    }
-}
+//void Qt_MiniserverUpdater::keyReleaseEvent(QKeyEvent* event)
+//{
+//    if (event->key() == Qt::Key_F && (event->modifiers() & Qt::ControlModifier)) {
+//        qDebug() << "Key Release Search Function: " ;
+//        searchField->clear();
+//        searchField->setHidden(true);
+//        handleSearchTextChanged(""); // Reset the filter when search field is hidden
+//    }
+//    else {
+//        QWidget::keyReleaseEvent(event);
+//    }
+//}

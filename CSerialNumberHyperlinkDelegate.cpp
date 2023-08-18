@@ -5,7 +5,9 @@
 
 CSerialNumberHyperlinkDelegate::CSerialNumberHyperlinkDelegate(QObject *parent)
 	: QStyledItemDelegate(parent)
-{}
+{
+
+}
 
 CSerialNumberHyperlinkDelegate::~CSerialNumberHyperlinkDelegate()
 {}
@@ -34,16 +36,12 @@ QSize CSerialNumberHyperlinkDelegate::sizeHint(const QStyleOptionViewItem& optio
     if (index.column() == 1) {
         QString serialNumber = index.data().toString();
         QString displayText = QString(serialNumber);
-
-        // Calculate the size hint based on the rich text link
         // Calculate the size hint based on the rich text link
         QSize hint = QStyledItemDelegate::sizeHint(option, index);
         QFontMetrics fontMetrics(option.font);
         QSize textSize = fontMetrics.size(Qt::TextSingleLine, displayText);
-
         // Adjust the width to ensure the text fits completely
         hint.setWidth(qMax(hint.width(), textSize.width()));
-
         return hint;
     }
 
@@ -57,8 +55,8 @@ bool CSerialNumberHyperlinkDelegate::editorEvent(QEvent* event, QAbstractItemMod
             CMiniserverTableModel* miniserverModel = dynamic_cast<CMiniserverTableModel*>(model);
             if (miniserverModel)
             {
-                int row = index.row();
-                CMiniserver miniserver = miniserverModel->miniserverlist->at(index.row());
+                                             
+                CMiniserver miniserver = miniserverModel->m_searchText.isEmpty() ? miniserverModel->miniserverlist->at(index.row()) : miniserverModel->filteredMiniservers->at(index.row());
                 QString serialNumber = QString::fromStdString(miniserver.getSerialNumber());
                 QString localIP = QString::fromStdString(miniserver.getLocalIP());
                 QString username = QString::fromStdString(miniserver.getAdminUser());

@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include <QStyledItemDelegate>
+#include "CMiniserverTableModel.h"
 
 class CSerialNumberHyperlinkDelegate  : public QStyledItemDelegate
 {
@@ -14,4 +15,6 @@ public:
 	bool editorEvent(QEvent* event, QAbstractItemModel* model, const QStyleOptionViewItem& option, const QModelIndex& index) override;
 	static QString generateLink(const QString& serialNumber, const QString& localIP);
 	void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+
+
 };

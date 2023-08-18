@@ -17,7 +17,15 @@ TODO's:
 * Update, remove, Refresh Buttons have to be disabled if nothing is selected
 
 V0.2.0
-*Added Search Functionality with STRG+F
+*Added Search Functionality with STRG+F (WIP)
+ - delete with correct indexes
+ - STRG + R refresh with correct indexes
+ - edit miniserver does not update UI
+ - changing IP with correct indexes
+ - changing language with correct indexes
+ - Clicking on WI - done
+ - connect config with correct indexes -done
+
 
 V0.1.9
 *Adjusted Strings

@@ -32,6 +32,19 @@ public:
 
     bool matchesSearchFilter(QString filter) const;
 
+    bool operator==(const CMiniserver& other) const {
+        // Compare relevant attributes to determine equality
+        return this->serialNumber == other.serialNumber/* && 
+            this->adminUser == other.adminUser &&
+            this->adminPassword == other.adminPassword &&
+            this->miniserverVersion == other.miniserverVersion &&
+            this->versionColor == other.versionColor &&
+            this->miniserverProject == other.miniserverProject &&
+            this->miniserverConfiguration == other.miniserverConfiguration &&
+            this->localIP == other.localIP &&
+            this->configLanguage == other.configLanguage*/;
+    }
+
     // Getter and Setter for serialNumber
     std::string getSerialNumber() const;
     void setSerialNumber(const std::string& serialNumber);

@@ -68,16 +68,22 @@ CMiniserverTableModel* Qt_MiniserverTableView::getMiniserverModel()
 
 
 void Qt_MiniserverTableView::handleConnectConfigClicked(const QModelIndex& index) {
-    int row = index.row();
+        
     CConnectConfigButtonDelegate* button = qobject_cast<CConnectConfigButtonDelegate*>(sender());
     if (!button)
         return;
 
-    //QModelIndex _index = indexAt(button);
     if (!index.isValid())
         return;
 
-    const CMiniserver& miniserver = m_model->miniserverlist->at(index.row());
+    CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(this->model());
+    if (!model) {
+        return;
+    }
+
+    CMiniserver miniserver = model->m_searchText.isEmpty() ? model->miniserverlist->at(index.row()) : model->filteredMiniservers->at(index.row());
+    int trueIndex = model->miniserverlist->indexOf(miniserver);
+
     emit  ConnectConfigClicked(index, miniserver);
 }
 
@@ -111,12 +117,19 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
 			QAction* selectedItem = contextMenu.exec(event->globalPos());
 			if (selectedItem)
 			{
+                CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(this->model());
+                if (!model) {
+                    return;
+                }
+
 				QString selectedItemText = selectedItem->text();
-                CMiniserver miniserver = m_model->miniserverlist->at(clickedIndex.row());
+                CMiniserver miniserver = model->m_searchText.isEmpty() ? model->miniserverlist->at(clickedIndex.row()) : model->filteredMiniservers->at(clickedIndex.row());
+                int trueIndex = model->miniserverlist->indexOf(miniserver);
+
 				if (selectedItemText == "Edit Miniserver")
 				{
                     CMiniserver newMiniserver = Qt_CreateEditMiniserver::createDialog("Edit Miniserver", &miniserver, m_model->miniserverlist);
-                    m_model->miniserverlist->replace(clickedIndex.row(), newMiniserver);
+                    m_model->miniserverlist->replace(trueIndex, newMiniserver);
 				}
                 else if (selectedItemText == "Copy SNR")
                 {
@@ -210,7 +223,6 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                 }
                 else if (selectedItemText == "Download Prog Folder (BETA)") {
                     emit downloadProgFolderPressed(miniserver);
-                    //CWebService::DownloadProgFolder(miniserver);
                 }
 				
 			}
@@ -225,8 +237,15 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
             QAction* selectedItem = contextMenu.exec(event->globalPos());
             if (selectedItem)
             {
+                CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(this->model());
+                if (!model) {
+                    return;
+                }
+
                 QString selectedItemText = selectedItem->text();
-                CMiniserver miniserver = m_model->miniserverlist->at(clickedIndex.row());
+                CMiniserver miniserver = model->m_searchText.isEmpty() ? model->miniserverlist->at(clickedIndex.row()) : model->filteredMiniservers->at(clickedIndex.row());
+                int trueIndex = model->miniserverlist->indexOf(miniserver);
+
 
                 if (selectedItemText == "Copy Local IP") {
                     QString project = QString::fromStdString(miniserver.getMiniserverProject());
@@ -239,7 +258,7 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                 else if (selectedItemText == "Use Local IP in column") {
                     QString project = QString::fromStdString(miniserver.getMiniserverProject());
                     miniserver.setLocalIP(CMiniserver::getLocalIPfromListviewProjectText(project).toStdString());
-                    m_model->miniserverlist->replace(clickedIndex.row(), miniserver);
+                    m_model->miniserverlist->replace(trueIndex, miniserver);
 
                 }
             }
@@ -254,8 +273,14 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
 
             QAction* selectedItem = contextMenu.exec(event->globalPos());
             if (selectedItem) {
+                CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(this->model());
+                if (!model) {
+                    return;
+                }
+
                 QString selectedItemText = selectedItem->text();
-                CMiniserver miniserver = m_model->miniserverlist->at(clickedIndex.row());
+                CMiniserver miniserver = model->m_searchText.isEmpty() ? model->miniserverlist->at(clickedIndex.row()) : model->filteredMiniservers->at(clickedIndex.row());
+                int trueIndex = model->miniserverlist->indexOf(miniserver);
                 bool bLocal = !miniserver.getLocalIP().empty();
                 QString webService, updateLevel;
                 QString interestedValue = "value";
@@ -273,7 +298,7 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                 else if (selectedItemText == "AutoUpdate") {
                     webService = "/dev/sys/autoupdate";
                     interestedValue = "Code";
-                    autoUpdateSingleMiniserver(bLocal, miniserver, webService, interestedValue, clickedIndex);
+                    autoUpdateSingleMiniserver(bLocal, miniserver, webService, interestedValue, trueIndex);
                     return;
                 }
 
@@ -288,7 +313,7 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                         miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information_timeout);
                     }
                     
-                    m_model->miniserverlist->replace(clickedIndex.row(), miniserver);
+                    m_model->miniserverlist->replace(trueIndex, miniserver);
                     return;
                 }
                 else if (!bLocal && selectedItemText != "AutoUpdate" && selectedItemText != "AutoUpdate all selected (BETA)") {
@@ -302,7 +327,7 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                         miniserver.setUpdatelevel(updateLevel.toStdString());
                         miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information_timeout);
                     }
-                    m_model->miniserverlist->replace(clickedIndex.row(), miniserver);
+                    m_model->miniserverlist->replace(trueIndex, miniserver);
                     return;
                 }
 
@@ -316,8 +341,9 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                     qDebug() << selectedIndexes;
 
                     for (QModelIndex index : selectedIndexes) {
-                        miniserver = getMiniserverModel()->miniserverlist->operator[](index.row());
-                        autoUpdateSingleMiniserver(bLocal, miniserver, webService, interestedValue, index);
+                        miniserver = model->m_searchText.isEmpty() ? model->miniserverlist->at(clickedIndex.row()) : model->filteredMiniservers->at(clickedIndex.row());
+                        int trueIndex = model->miniserverlist->indexOf(miniserver);
+                        autoUpdateSingleMiniserver(bLocal, miniserver, webService, interestedValue, trueIndex);
                     }
                 }
 
@@ -334,7 +360,7 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
 	}
 }
 
-void Qt_MiniserverTableView::autoUpdateSingleMiniserver(bool bLocal, CMiniserver& miniserver, QString& webService, QString& interestedValue, QModelIndex& clickedIndex)
+void Qt_MiniserverTableView::autoUpdateSingleMiniserver(bool bLocal, CMiniserver& miniserver, QString& webService, QString& interestedValue, int index)
 {
     QString ret;
     if (bLocal) {
@@ -346,38 +372,38 @@ void Qt_MiniserverTableView::autoUpdateSingleMiniserver(bool bLocal, CMiniserver
     }
     if (ret == QString::fromStdString(MyConstants::Strings::WebService_Success_Code)) {
         miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_AutoUpdate);
-        m_model->miniserverlist->replace(clickedIndex.row(), miniserver);
+        m_model->miniserverlist->replace(index, miniserver);
     }
     else {
         miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information_timeout);
-        m_model->miniserverlist->replace(clickedIndex.row(), miniserver);
+        m_model->miniserverlist->replace(index, miniserver);
     }
 }
 
-bool Qt_MiniserverTableView::eventFilter(QObject* object, QEvent* event)
-{
-    if (object == viewport())
-    {
-        if (event->type() == QEvent::MouseMove)
-        {
-            QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
-            QModelIndex index = indexAt(mouseEvent->pos());
-            if (index.isValid() && index.column() == 1) {
-                setLinkCursor(true);
-            }
-            else {
-                setLinkCursor(false);
-            }
-                
-        }
-        else if (event->type() == QEvent::Leave)
-        {
-            setLinkCursor(false);
-        }
-    }
-
-    return QTableView::eventFilter(object, event);
-}
+//bool Qt_MiniserverTableView::eventFilter(QObject* object, QEvent* event)
+//{
+//    if (object == viewport())
+//    {
+//        if (event->type() == QEvent::MouseMove)
+//        {
+//            QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+//            QModelIndex index = indexAt(mouseEvent->pos());
+//            if (index.isValid() && index.column() == 1) {
+//                setLinkCursor(true);
+//            }
+//            else {
+//                setLinkCursor(false);
+//            }
+//                
+//        }
+//        else if (event->type() == QEvent::Leave)
+//        {
+//            setLinkCursor(false);
+//        }
+//    }
+//
+//    return QTableView::eventFilter(object, event);
+//}
 
 
 void Qt_MiniserverTableView::setLinkCursor(bool enabled)
@@ -400,5 +426,6 @@ void Qt_MiniserverTableView::setEnabledTableView(bool state)
 void Qt_MiniserverTableView::handleSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
     emit mySelectionChanged(selected, deselected);
+    repaint();
 }
 
