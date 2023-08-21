@@ -129,7 +129,9 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
 				if (selectedItemText == "Edit Miniserver")
 				{
                     CMiniserver newMiniserver = Qt_CreateEditMiniserver::createDialog("Edit Miniserver", &miniserver, m_model->miniserverlist);
-                    m_model->miniserverlist->replace(trueIndex, newMiniserver);
+                    model->miniserverlist->replace(trueIndex, newMiniserver);
+                    model->printDebugDataChanged(model->index(clickedIndex.row(), clickedIndex.column()), miniserver);
+                    model->dataChanged(model->index(clickedIndex.row(), 0), model->index(clickedIndex.column(), 8), {Qt::DisplayRole, Qt::EditRole});
 				}
                 else if (selectedItemText == "Copy SNR")
                 {

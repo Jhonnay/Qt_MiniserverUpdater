@@ -31,7 +31,7 @@ QVariant CMiniserverTableModel::data(const QModelIndex& index, int role) const
 
     const CMiniserver& miniserver = m_searchText.isEmpty() ? miniserverlist->at(index.row()) : filteredMiniservers->at(index.row());
     
-    qDebug() << "SearchText used in data function: " << this->m_searchText << " " << miniserver.getMiniserverProject() << " Search Text empty: " << m_searchText.isEmpty() << " matches filter: " << miniserver.matchesSearchFilter(m_searchText);
+    //qDebug() << "SearchText used in data function: " << this->m_searchText << " " << miniserver.getMiniserverProject() << " Search Text empty: " << m_searchText.isEmpty() << " matches filter: " << miniserver.matchesSearchFilter(m_searchText);
 
     if (m_searchText.isEmpty() ||  miniserver.matchesSearchFilter(m_searchText)) {
         if (role == Qt::DisplayRole || role == Qt::EditRole)
@@ -115,8 +115,13 @@ bool CMiniserverTableModel::setData(const QModelIndex& index, const QVariant& va
         {
             //refreshing miniservers. 
             CMiniserver miniserver = variant.value<CMiniserver>();
-            miniserverlist->replace(index.row(), miniserver);
-            emit dataChanged(this->index(index.row(), 0), this->index(index.row(), 8), { Qt::DisplayRole, Qt::EditRole });
+            int trueIndex = miniserverlist->indexOf(miniserver);
+
+            miniserverlist->replace(trueIndex, miniserver);
+            if (!m_searchText.isEmpty()) {
+                filteredMiniservers->replace(index.row(), miniserver);
+            }
+            emit dataChanged(this->index(trueIndex, 0), this->index(trueIndex, 8), { Qt::DisplayRole, Qt::EditRole });
             
             printDebugDataChanged(index, miniserver);
             return true;
@@ -132,11 +137,12 @@ bool CMiniserverTableModel::setData(const QModelIndex& index, const QVariant& va
             case 8: miniserver.setConfigLanguage(value.toString().toStdString()); break;
             default: return false;
             }
-            QModelIndex ind = this->index(trueIndex, index.column());
-            printDebugDataChanged(this->index(trueIndex,index.column()), miniserver);
+            miniserverlist->replace(trueIndex, miniserver);
+            printDebugDataChanged(this->index(index.row(), index.column()), miniserver);
+           
 
             //emit dataChanged(index, index);
-            emit dataChanged(this->index(index.row(), 0), this->index(index.row(), 8), { Qt::DisplayRole, Qt::EditRole });
+            emit dataChanged(this->index(trueIndex, 0), this->index(trueIndex, 8), { Qt::DisplayRole, Qt::EditRole });
 
             return true;
         }
@@ -236,5 +242,6 @@ void CMiniserverTableModel::setSearchText(const QString& searchText)
         
         endResetModel();
         
+       
     }
 }

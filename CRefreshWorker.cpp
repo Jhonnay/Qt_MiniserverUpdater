@@ -21,6 +21,13 @@ void CRefreshWorker::run()
     QModelIndexList selectedIndexes = tableViewMiniserver->selectionModel()->selectedRows();
     std::sort(selectedIndexes.begin(), selectedIndexes.end(), [](const QModelIndex& a, const QModelIndex& b) { return a.row() < b.row(); });
 
+
+    CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(tableViewMiniserver->model());
+    if (!model) {
+        qDebug() << "model not casted correctly!";
+        return;
+    }
+
     emit setEnableTableview(false);
     QString configVersionUnformated = CConfig::getConfigFileVersionUnformated(statusbar->getConfigExePath());
     int count = selectedIndexes.count();
@@ -32,7 +39,10 @@ void CRefreshWorker::run()
 
     for (const QModelIndex& index : selectedIndexes)
     {
-        CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
+        
+        CMiniserver miniserver = model->m_searchText.isEmpty() ? model->miniserverlist->at(index.row()) : model->filteredMiniservers->at(index.row());
+        int trueIndex = model->miniserverlist->indexOf(miniserver);
+        
         miniserver.setMiniserverStatus(MyConstants::Strings::StartUp_Listview_MS_Version);
         miniserver.setVersionColor("darkblue");
         miniserver.setMiniserverVersion(MyConstants::Strings::StartUp_Listview_MS_Version);
@@ -50,7 +60,8 @@ void CRefreshWorker::run()
         QString unformatedVersionString;
         QString updateLevel;
         CLoxAppJson cloxapp;
-        CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
+        CMiniserver miniserver = model->m_searchText.isEmpty() ? model->miniserverlist->at(index.row()) : model->filteredMiniservers->at(index.row());
+        int trueIndex = model->miniserverlist->indexOf(miniserver);
 
         progresstext = QStringLiteral("⏳ Retreiving of %1 (%2/%3)").arg(QString::fromStdString(miniserver.getSerialNumber())).arg(QString::number(progress)).arg(QString::number(count));
         emit updateStatusBarProgress(progressInt, progresstext);

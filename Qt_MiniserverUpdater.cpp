@@ -580,6 +580,9 @@ void Qt_MiniserverUpdater::handleSearchTextChanged(const QString& searchText)
         // Access functions of the model
         model->setSearchText(searchText);
         // Call other functions as needed
+        tableViewMiniserver->resizeColumnsToContents();
+        tableViewMiniserver->setColumnWidth(6, 100);
+        
     }
 
     tableViewMiniserver->viewport()->repaint();

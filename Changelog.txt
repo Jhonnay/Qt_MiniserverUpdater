@@ -21,11 +21,11 @@ V0.2.0
  - delete with correct indexes
  - STRG + R refresh with correct indexes
  - edit miniserver does not update UI
- - changing IP with correct indexes
- - changing language with correct indexes
- - Clicking on WI - done
- - connect config with correct indexes -done
-
+ - changing IP with correct indexes			-done
+ - changing language with correct indexes	-done
+ - Clicking on WI							-done
+ - connect config with correct indexes		-done
+ - remove filter when strg+o, strg+n
 
 V0.1.9
 *Adjusted Strings
