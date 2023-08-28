@@ -38,7 +38,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     checkUpdater = new CUpdateChecker(this);
     searchField = new QLineEdit(this);
     searchField->setPlaceholderText("Search...");
-    searchField->setVisible(false);  // Initially invisible
+    searchField->setVisible(false);  //invisible on startup
     searchField->setContentsMargins(10, 0, 10, 10);
     
     actionDeselectAll->setShortcut(QKeySequence("Ctrl+D"));
@@ -47,7 +47,6 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     addAction(actionRemoveMiniserverWithDelete);
     addAction(actionDeselectAll);
     addAction(actionRefreshSelected);
-
 
     vBox->addWidget(menubar);
     vBox->addWidget(tableViewMiniserver);
@@ -80,7 +79,6 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(refreshWorker, &CRefreshWorker::setEnableTableview, tableViewMiniserver, &Qt_MiniserverTableView::setEnabledTableView);
     connect(updateWorker, &CUpdateWorker::updateStatusBarProgress, statusbar, &Qt_Statusbar::updateProgress);
     connect(updateWorker, &CUpdateWorker::setEnableTableview, tableViewMiniserver, &Qt_MiniserverTableView::setEnabledTableView);
-
 
     connect(tableViewMiniserver, &Qt_MiniserverTableView::enabledStateChanged, menubar, &Qt_Menubar::updateFileMenuState);
     connect(tableViewMiniserver, &Qt_MiniserverTableView::downloadProgFolderPressed, this, &Qt_MiniserverUpdater::onDownloadProgFolder);
@@ -152,6 +150,7 @@ void Qt_MiniserverUpdater::updateMiniserverList(QList<CMiniserver>* list)
     tableViewMiniserver->setModel(new CMiniserverTableModel(list, this));
     tableViewMiniserver->resizeColumnsToContents();
     tableViewMiniserver->setColumnWidth(6, 100);
+    clearSearch();
 }
 
 void Qt_MiniserverUpdater::setConfigEXEPath(QString path)
@@ -276,6 +275,7 @@ void Qt_MiniserverUpdater::onOpenFileClicked()
         // Save the Miniservers to the selected JSON file
         *miniservers = FileParser::parseMiniserverJsonFile(filePath);
         setMiniserverList(miniservers);
+        clearSearch();
     }
 
 }
@@ -288,6 +288,7 @@ void Qt_MiniserverUpdater::onNewFileClicked()
     if (msgBox.exec() == QMessageBox::Yes) {
         miniservers->clear();
         setMiniserverList(miniservers);
+        clearSearch();
     }
 }
 
@@ -452,21 +453,49 @@ void Qt_MiniserverUpdater::onAddMiniserverPressed()
         miniservers->append(miniserver);
         updateMiniserverList(miniservers);
         qDebug() << "--------------------- Miniserver ADDED -------------\n" << miniserver.toString();
+        setMiniserverList(miniservers);
+        clearSearch();
     }
 
 }
 
+void Qt_MiniserverUpdater::clearSearch()
+{
+    qDebug() << "Filter deactivated with STRG+F: ";
+    searchField->clear();
+    searchField->clearFocus();
+    handleSearchTextChanged(""); // Reset the filter when search field is hidden
+    tableViewMiniserver->resizeColumnsToContents();
+    tableViewMiniserver->setColumnWidth(6, 100);
+}
+
 void Qt_MiniserverUpdater::onRemoveMiniserverPressed()
 {
-    
+    CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(tableViewMiniserver->model());
+    if (!model) {
+        return;
+    }
+
     QModelIndexList selectedIndexes = tableViewMiniserver->selectionModel()->selectedRows();
     
     QModelIndexList indexlist = tableViewMiniserver->selectionModel()->selectedRows();
     std::sort(selectedIndexes.begin(), selectedIndexes.end(), [](const QModelIndex& a, const QModelIndex& b) { return a.row() > b.row(); });
 
     for (const QModelIndex& index : selectedIndexes) {
-        miniservers->removeAt(index.row());   
+        if (!model->filteredMiniservers->empty()) {
+            //model->miniserverlist->removeAt(model->miniserverlist->indexOf(model->filteredMiniservers->at(index.row())));
+            miniservers->removeAt(miniservers->indexOf(model->filteredMiniservers->at(index.row())));
+            model->filteredMiniservers->removeAt(index.row());
+            //model->dataChanged(model->index(index.row(), 0), model->index(index.column(), 8), { Qt::DisplayRole, Qt::EditRole });
+        }
+        else {
+            //model->miniserverlist->removeAt(index.row());
+            miniservers->removeAt(index.row());
+            //model->dataChanged(model->index(index.row(), 0), model->index(index.column(), 8), { Qt::DisplayRole, Qt::EditRole });
+        }
     }
+   
+
     updateMiniserverList(miniservers);
     
 }
@@ -592,18 +621,18 @@ void Qt_MiniserverUpdater::handleSearchTextChanged(const QString& searchText)
 void Qt_MiniserverUpdater::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_F && (event->modifiers() & Qt::ControlModifier)) {
-        searchField->setHidden(searchField->isVisible());
-        if (searchField->isVisible()) {
-            searchField->setFocus();
+        if (!searchField->isVisible()) {
+            searchField->setHidden(false);
         }
-        else
-        {
-            qDebug() << "Filter deactivated with STRG+F: ";
-            searchField->clear();
-            searchField->clearFocus();
-            handleSearchTextChanged(""); // Reset the filter when search field is hidden
-            tableViewMiniserver->resizeColumnsToContents();
-            tableViewMiniserver->setColumnWidth(6, 100);
+
+        if (searchField->isVisible() && searchField->hasFocus()) {
+            searchField->setHidden(true);
+            clearSearch();
+        }
+
+        if (searchField->isVisible() && !searchField->hasFocus()) {
+            searchField->setFocus();
+            searchField->selectAll();
         }
     }
     else {
@@ -611,16 +640,3 @@ void Qt_MiniserverUpdater::keyPressEvent(QKeyEvent* event)
     }
 }
 
-// Handle Ctrl+F key release event to hide the search field
-//void Qt_MiniserverUpdater::keyReleaseEvent(QKeyEvent* event)
-//{
-//    if (event->key() == Qt::Key_F && (event->modifiers() & Qt::ControlModifier)) {
-//        qDebug() << "Key Release Search Function: " ;
-//        searchField->clear();
-//        searchField->setHidden(true);
-//        handleSearchTextChanged(""); // Reset the filter when search field is hidden
-//    }
-//    else {
-//        QWidget::keyReleaseEvent(event);
-//    }
-//}

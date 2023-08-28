@@ -128,9 +128,11 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
 
 				if (selectedItemText == "Edit Miniserver")
 				{
-                    CMiniserver newMiniserver = Qt_CreateEditMiniserver::createDialog("Edit Miniserver", &miniserver, m_model->miniserverlist);
+                    CMiniserver newMiniserver = Qt_CreateEditMiniserver::createDialog("Edit Miniserver", &miniserver, model->miniserverlist);
                     model->miniserverlist->replace(trueIndex, newMiniserver);
-                    model->printDebugDataChanged(model->index(clickedIndex.row(), clickedIndex.column()), miniserver);
+                    if (!model->filteredMiniservers->empty())
+                        model->filteredMiniservers->replace(clickedIndex.row(), newMiniserver);
+                    model->printDebugDataChanged(model->index(clickedIndex.row(), clickedIndex.column()), newMiniserver);
                     model->dataChanged(model->index(clickedIndex.row(), 0), model->index(clickedIndex.column(), 8), {Qt::DisplayRole, Qt::EditRole});
 				}
                 else if (selectedItemText == "Copy SNR")
@@ -232,7 +234,7 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
         else if (clickedIndex.column() == 3) {
             QMenu contextMenu;
             contextMenu.addAction("Copy Local IP");
-            contextMenu.addAction("Get Local IP from Miniserver");
+            //contextMenu.addAction("Get Local IP from Miniserver");
             contextMenu.addAction("Use Local IP in column");
             
 
@@ -243,24 +245,26 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                 if (!model) {
                     return;
                 }
-
-                QString selectedItemText = selectedItem->text();
                 CMiniserver miniserver = model->m_searchText.isEmpty() ? model->miniserverlist->at(clickedIndex.row()) : model->filteredMiniservers->at(clickedIndex.row());
                 int trueIndex = model->miniserverlist->indexOf(miniserver);
-
-
+                QString selectedItemText = selectedItem->text();
+                
                 if (selectedItemText == "Copy Local IP") {
                     QString project = QString::fromStdString(miniserver.getMiniserverProject());
                     QClipboard* clipboard = QApplication::clipboard();
                     clipboard->setText(CMiniserver::getLocalIPfromListviewProjectText(project));
                 }
-                else if (selectedItemText == "Get Local IP from Miniserver") {
-
-                }
+                //else if (selectedItemText == "Get Local IP from Miniserver") {
+                //
+                //}
                 else if (selectedItemText == "Use Local IP in column") {
                     QString project = QString::fromStdString(miniserver.getMiniserverProject());
                     miniserver.setLocalIP(CMiniserver::getLocalIPfromListviewProjectText(project).toStdString());
-                    m_model->miniserverlist->replace(trueIndex, miniserver);
+                    model->miniserverlist->replace(trueIndex, miniserver);
+                    if (!model->filteredMiniservers->empty())
+                        model->filteredMiniservers->replace(clickedIndex.row(), miniserver);
+                    model->printDebugDataChanged(model->index(clickedIndex.row(), clickedIndex.column()), miniserver);
+                    model->dataChanged(model->index(clickedIndex.row(), 0), model->index(clickedIndex.column(), 8), { Qt::DisplayRole, Qt::EditRole });
 
                 }
             }
@@ -315,7 +319,11 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                         miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information_timeout);
                     }
                     
-                    m_model->miniserverlist->replace(trueIndex, miniserver);
+                    model->miniserverlist->replace(trueIndex, miniserver);
+                    if (!model->filteredMiniservers->empty())
+                        model->filteredMiniservers->replace(clickedIndex.row(), miniserver);
+                    model->printDebugDataChanged(model->index(clickedIndex.row(), clickedIndex.column()), miniserver);
+                    model->dataChanged(model->index(clickedIndex.row(), 0), model->index(clickedIndex.column(), 8), { Qt::DisplayRole, Qt::EditRole });
                     return;
                 }
                 else if (!bLocal && selectedItemText != "AutoUpdate" && selectedItemText != "AutoUpdate all selected (BETA)") {
@@ -329,7 +337,11 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                         miniserver.setUpdatelevel(updateLevel.toStdString());
                         miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information_timeout);
                     }
-                    m_model->miniserverlist->replace(trueIndex, miniserver);
+                    model->miniserverlist->replace(trueIndex, miniserver);
+                    if (!model->filteredMiniservers->empty())
+                        model->filteredMiniservers->replace(clickedIndex.row(), miniserver);
+                    model->printDebugDataChanged(model->index(clickedIndex.row(), clickedIndex.column()), miniserver);
+                    model->dataChanged(model->index(clickedIndex.row(), 0), model->index(clickedIndex.column(), 8), { Qt::DisplayRole, Qt::EditRole });
                     return;
                 }
 

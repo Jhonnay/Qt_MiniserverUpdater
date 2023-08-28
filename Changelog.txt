@@ -18,14 +18,18 @@ TODO's:
 
 V0.2.0
 *Added Search Functionality with STRG+F (WIP)
- - delete with correct indexes
- - STRG + R refresh with correct indexes
- - edit miniserver does not update UI
+ - delete with correct indexes				-
+ - STRG + R refresh with correct indexes	-done
+ - edit miniserver does not update UI		-done
  - changing IP with correct indexes			-done
  - changing language with correct indexes	-done
  - Clicking on WI							-done
  - connect config with correct indexes		-done
- - remove filter when strg+o, strg+n
+ - remove filter when strg+o, strg+n		-done
+ *fixed translations
+ *changed behaviour of STRG+F 
+	-if focus and visible -> search disabled
+	-Text highlighted if available
 
 V0.1.9
 *Adjusted Strings

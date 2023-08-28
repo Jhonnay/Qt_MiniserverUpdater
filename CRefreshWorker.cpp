@@ -112,7 +112,9 @@ void CRefreshWorker::run()
         miniserver.setMiniserverVersion(CMiniserver::formatMiniserverVersionQString(unformatedVersionString).toStdString());
         miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information_successfull);
         miniserver.setUpdatelevel(updateLevel.toStdString());
-        miniserver.setMiniserverProject(cloxapp.projectName + "/" + cloxapp.localUrl);
+        if (!cloxapp.projectName.empty()) {
+            miniserver.setMiniserverProject(cloxapp.projectName + "/" + cloxapp.localUrl);
+        }
         miniserver.setVersionColor(miniserver.calculateVersionColor(configVersionUnformated));
 
         if (miniserver.getMiniserverVersion() == "0.0.0.0") {
