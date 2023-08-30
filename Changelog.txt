@@ -19,7 +19,7 @@ TODO's:
 
 V0.2.0
 *Added Search Functionality with STRG+F (WIP)
- - update miniservers with correct indexes  -TBD
+ - update miniservers with correct indexes  -done
  - delete with correct indexes				-done
  - STRG + R refresh with correct indexes	-done
  - edit miniserver does not update UI		-done
