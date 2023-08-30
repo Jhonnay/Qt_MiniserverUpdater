@@ -30,13 +30,21 @@ void CUpdateWorker::run()
     QString progresstext = QStringLiteral("⏳ Updating %1 Miniserver(s)").arg(QString::number(count));
     emit updateStatusBarProgress(1, progresstext);
     tableViewMiniserver->clearSelection();
+    CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(tableViewMiniserver->model());
+    if (!model) {
+        return;
+    }
 
     //Update Listview for selected miniservers --> to be updated. 
     for (const QModelIndex& index : selectedIndexes)
     {
-        CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
+        CMiniserver miniserver = model->m_searchText.isEmpty() ? model->miniserverlist->at(index.row()) : model->filteredMiniservers->at(index.row());
+        int trueIndex = model->miniserverlist->indexOf(miniserver);
         miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Update_pending);
-        tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
+        if (!model->filteredMiniservers->empty())
+            model->filteredMiniservers->replace(index.row(), miniserver);
+        model->miniserverlist->replace(trueIndex, miniserver);
+        //tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
         tableViewMiniserver->resizeColumnsToContents();
         tableViewMiniserver->setColumnWidth(6, 100);
     }
@@ -44,7 +52,8 @@ void CUpdateWorker::run()
     for (const QModelIndex& index : selectedIndexes)
     {
         int row = index.row();
-        CMiniserver miniserver = tableViewMiniserver->getMiniserverModel()->miniserverlist->operator[](index.row());
+        CMiniserver miniserver = model->m_searchText.isEmpty() ? model->miniserverlist->at(index.row()) : model->filteredMiniservers->at(index.row());
+        int trueIndex = model->miniserverlist->indexOf(miniserver);
 
         progresstext = QStringLiteral("⏳ Updating %1 (%2/%3)").arg(QString::fromStdString(miniserver.getSerialNumber())).arg(QString::number(progress)).arg(QString::number(count));
         emit updateStatusBarProgress(progressInt, progresstext);
@@ -52,7 +61,9 @@ void CUpdateWorker::run()
         //check if interrupted and set to "canceled" and skip FOR interation
         if (isInterruptionRequested()) {
             miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Refresh_canceled);
-            tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
+            if (!model->filteredMiniservers->empty())
+                model->filteredMiniservers->replace(index.row(), miniserver);
+            model->miniserverlist->replace(trueIndex, miniserver);
             tableViewMiniserver->resizeColumnsToContents();
             tableViewMiniserver->setColumnWidth(6, 100);
             progressInt = (progress * 100) / count;
@@ -62,7 +73,9 @@ void CUpdateWorker::run()
 
         //set status to "updating" 
         miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_Updating_Emoji);
-        tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
+        if (!model->filteredMiniservers->empty())
+            model->filteredMiniservers->replace(index.row(), miniserver);
+        model->miniserverlist->replace(trueIndex, miniserver);
         tableViewMiniserver->resizeColumnsToContents();
         tableViewMiniserver->setColumnWidth(6, 100);
 
@@ -114,7 +127,9 @@ void CUpdateWorker::run()
         
 
         //TODO Refresh Minisever Information
-        tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
+        if (!model->filteredMiniservers->empty())
+            model->filteredMiniservers->replace(index.row(), miniserver);
+        model->miniserverlist->replace(trueIndex, miniserver);
         tableViewMiniserver->resizeColumnsToContents();
         tableViewMiniserver->setColumnWidth(6, 100);
 

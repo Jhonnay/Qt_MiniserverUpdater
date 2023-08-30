@@ -87,7 +87,6 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(tableViewMiniserver, &Qt_MiniserverTableView::mySelectionChanged, this, &Qt_MiniserverUpdater::onSelectionChanged);
     connect(downloadProgFolderWorker, &CDownloadProgFolderWorker::updateStatusBarProgress, statusbar, &Qt_Statusbar::updateProgress);
 
-
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonAddClicked, this, &Qt_MiniserverUpdater::onAddMiniserverPressed);
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonRemoveClicked, this, &Qt_MiniserverUpdater::onRemoveMiniserverPressed);
     connect(menubar, &Qt_Menubar::applicationSettingsClicked, this, &Qt_MiniserverUpdater::onApplicationSettingsClicked);
@@ -111,8 +110,6 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(searchField, &QLineEdit::textChanged, this, &Qt_MiniserverUpdater::handleSearchTextChanged);
 
     this->setCentralWidget(centralWidget);
-
-    //ui.setupUi(this);
 }
 
 Qt_MiniserverUpdater::~Qt_MiniserverUpdater()
@@ -133,24 +130,17 @@ void Qt_MiniserverUpdater::setMiniserverList(QList<CMiniserver>* list)
 
     CMiniserverTableModel* model = tableViewMiniserver->getMiniserverModel();
     qDebug() << "Address of Model after setting Miniservers: " << model;
-
 }
 
-void Qt_MiniserverUpdater::updateMiniserverList(QList<CMiniserver>* list)
+void Qt_MiniserverUpdater::PrintupdatedMiniserverList()
 {
-    for (int i = 0; i < list->count(); i++) {
-        if ((*list)[i].getMiniserverVersion() == "") { //if it is a new Miniserver, change to TBD. Leave all others unchanged. 
-            (*list)[i].setMiniserverStatus(MyConstants::Strings::StartUp_Listview_MS_Status);
-            (*list)[i].setMiniserverVersion(MyConstants::Strings::StartUp_Listview_MS_Version);
-            (*list)[i].setVersionColor("darkblue");
-        }
-        qDebug() << "Row: " << i << " - " << list->at(i).toString();
+    CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(tableViewMiniserver->model());
+    if (!model) {
+        return;
     }
-    this->miniservers = list;
-    tableViewMiniserver->setModel(new CMiniserverTableModel(list, this));
-    tableViewMiniserver->resizeColumnsToContents();
-    tableViewMiniserver->setColumnWidth(6, 100);
-    clearSearch();
+    for (int i = 0; i < model->miniserverlist->count(); i++) {
+        qDebug() << "Row: " << i << " - " << model->miniserverlist->at(i).toString();
+    }
 }
 
 void Qt_MiniserverUpdater::setConfigEXEPath(QString path)
@@ -176,7 +166,6 @@ void Qt_MiniserverUpdater::setApplicationsettings(ApplicationSettings* settings)
         return; 
 
     }
-
     this->applicationSettings = settings;
 }
 
@@ -185,7 +174,6 @@ void Qt_MiniserverUpdater::setApplicationVersion(QString version)
     this->applicationVersion = version;
     this->checkUpdater->setApplicationVersion(version);
 }
-
 
 
 void Qt_MiniserverUpdater::onApplicationSettingsClicked() {
@@ -205,7 +193,6 @@ void Qt_MiniserverUpdater::onApplicationSettingsClicked() {
         jsonObj["StrDefaultConfigPath"] = QString::fromStdString(settings.getStrDefaultConfigPath());
 
         QJsonDocument jsonDoc(jsonObj);
-
         QFile file(filePath);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
         {
@@ -229,9 +216,7 @@ void Qt_MiniserverUpdater::onApplicationSettingsClicked() {
             tableViewMiniserver->resizeColumnsToContents();
             tableViewMiniserver->setColumnWidth(6, 100);
         }
-        
     }
-    
 }
 
 void Qt_MiniserverUpdater::onConfigFilePathChanged() {
@@ -259,7 +244,6 @@ void Qt_MiniserverUpdater::onSaveFileClicked()
         // Save the Miniservers to the selected JSON file
         FileParser::saveMiniserverJsonFile(*miniservers, filePath);
     }
-
 }
 
 void Qt_MiniserverUpdater::onOpenFileClicked()
@@ -273,22 +257,39 @@ void Qt_MiniserverUpdater::onOpenFileClicked()
     // Check if the user selected a file
     if (!filePath.isEmpty()) {
         // Save the Miniservers to the selected JSON file
-        *miniservers = FileParser::parseMiniserverJsonFile(filePath);
-        setMiniserverList(miniservers);
+        QList<CMiniserver> list = FileParser::parseMiniserverJsonFile(filePath);
+        CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(tableViewMiniserver->model());
+        if (!model) {
+            return;
+        }
+        model->miniserverlist->clear();
+        for (int i = 0; i < list.size(); i++) {
+            list[i].setMiniserverStatus(MyConstants::Strings::StartUp_Listview_MS_Status);
+            list[i].setMiniserverVersion(MyConstants::Strings::StartUp_Listview_MS_Version);
+            list[i].setVersionColor("darkblue");
+            model->miniserverlist->append(list.at(i));
+        }
+        tableViewMiniserver->clearSelection();
+        tableViewMiniserver->resizeColumnsToContents();
+        tableViewMiniserver->model()->layoutChanged();
         clearSearch();
     }
-
 }
 
 void Qt_MiniserverUpdater::onNewFileClicked()
 {
     QMessageBox msgBox(QMessageBox::Question, "New Miniserver List", QString::fromUtf8(MyConstants::Strings::MessageBox_AskUser_On_New_File), QMessageBox::Yes | QMessageBox::No, this);
 
-    // if the user clicked yes, 
+    // if the user clicked yes
     if (msgBox.exec() == QMessageBox::Yes) {
-        miniservers->clear();
-        setMiniserverList(miniservers);
+        CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(tableViewMiniserver->model());
+        if (!model) {
+            return;
+        }
+        model->miniserverlist->clear();
         clearSearch();
+        tableViewMiniserver->model()->layoutChanged();
+        PrintupdatedMiniserverList();
     }
 }
 
@@ -296,9 +297,7 @@ void Qt_MiniserverUpdater::onStartAppClicked()
 {
     int runningAppInstances = CLoxoneApp::getRunningLoxoneApps();
     if (runningAppInstances > 0) {
-
         QMessageBox::warning(nullptr, "App already open", QString::fromStdString(MyConstants::Strings::MessageBox_App_already_open));
-        
         return;
     }
 
@@ -332,8 +331,6 @@ void Qt_MiniserverUpdater::onStartDebugAppClicked()
         arguments << "--debug";
         qDebug() << arguments;
         process.startDetached(exeFilePath, arguments);
-
-
     }
 }
 
@@ -434,29 +431,39 @@ void Qt_MiniserverUpdater::onAddMiniserverPressed()
 {
     CMiniserver miniserver = Qt_CreateEditMiniserver::createDialog("Add Miniserver",nullptr,miniservers);
     if (!miniserver.isDummy()) {
+        CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(tableViewMiniserver->model());
+        if (!model) {
+            return;
+        }
+        miniserver.setMiniserverStatus(MyConstants::Strings::StartUp_Listview_MS_Status);
+        miniserver.setMiniserverVersion(MyConstants::Strings::StartUp_Listview_MS_Version);
+        miniserver.setVersionColor("darkblue");
 
-        ////CMiniserverTableModel* model = tableViewMiniserver->getMiniserverModel();
-        //
-        ////int row = model->rowCount();
-        ////tableViewMiniserver->getMiniserverModel()->insertRow(miniserver);
-        //
-        //CMiniserverTableModel* model = tableViewMiniserver->getMiniserverModel();
-        //model->insertRow(miniserver);
-        //
-        //// Notify the view about the changes
-        //int row = model->rowCount() - 1; // Index of the newly inserted row
-        //QModelIndex topLeft = model->index(row, 0);
-        //QModelIndex bottomRight = model->index(row, model->columnCount() - 1);
-        //emit model->dataChanged(topLeft, bottomRight);
+        if (!searchField->text().isEmpty()) {
+            model->miniserverlist->append(miniserver);
+            if (miniserver.matchesSearchFilter(searchField->text())); {
+                model->filteredMiniservers->append(miniserver);
+            }
+        }
+        else {
+            model->miniserverlist->append(miniserver);
+        }
 
-        //tableViewMiniserver->insertRow(miniserver);
-        miniservers->append(miniserver);
-        updateMiniserverList(miniservers);
         qDebug() << "--------------------- Miniserver ADDED -------------\n" << miniserver.toString();
-        setMiniserverList(miniservers);
-        clearSearch();
+        tableViewMiniserver->model()->layoutChanged();
+        tableViewMiniserver->clearSelection();
+        tableViewMiniserver->resizeColumnsToContents();
+        tableViewMiniserver->setColumnWidth(6, 100);
+        
+        if (!searchField->text().isEmpty()) {
+            tableViewMiniserver->selectRow(model->filteredMiniservers->size() - 1);
+        }
+        else {
+            tableViewMiniserver->selectRow(model->miniserverlist->size() - 1);
+        }
+        tableViewMiniserver->scrollToBottom();
     }
-
+    PrintupdatedMiniserverList();
 }
 
 void Qt_MiniserverUpdater::clearSearch()
@@ -480,24 +487,24 @@ void Qt_MiniserverUpdater::onRemoveMiniserverPressed()
     
     QModelIndexList indexlist = tableViewMiniserver->selectionModel()->selectedRows();
     std::sort(selectedIndexes.begin(), selectedIndexes.end(), [](const QModelIndex& a, const QModelIndex& b) { return a.row() > b.row(); });
+    
 
     for (const QModelIndex& index : selectedIndexes) {
+       
         if (!model->filteredMiniservers->empty()) {
-            //model->miniserverlist->removeAt(model->miniserverlist->indexOf(model->filteredMiniservers->at(index.row())));
-            miniservers->removeAt(miniservers->indexOf(model->filteredMiniservers->at(index.row())));
+            model->miniserverlist->removeAt(model->miniserverlist->indexOf(model->filteredMiniservers->at(index.row())));
             model->filteredMiniservers->removeAt(index.row());
-            //model->dataChanged(model->index(index.row(), 0), model->index(index.column(), 8), { Qt::DisplayRole, Qt::EditRole });
+            model->removeRow(index.row(), index);
         }
         else {
-            //model->miniserverlist->removeAt(index.row());
-            miniservers->removeAt(index.row());
-            //model->dataChanged(model->index(index.row(), 0), model->index(index.column(), 8), { Qt::DisplayRole, Qt::EditRole });
+            model->miniserverlist->removeAt(index.row());
+            model->removeRow(index.row(),index);
         }
     }
-   
-
-    updateMiniserverList(miniservers);
-    
+    tableViewMiniserver->model()->layoutChanged();
+    tableViewMiniserver->clearSelection();
+    qDebug() << "--------------------- Miniserver(s) REMOVED -------------";
+    PrintupdatedMiniserverList();
 }
 
 void Qt_MiniserverUpdater::onConnectConfigFinished() {
@@ -515,7 +522,6 @@ void Qt_MiniserverUpdater::onRefreshMiniserversFinished() {
 }
 
 
-
 void Qt_MiniserverUpdater::onRefreshClicked()
 {
     if (tableViewMiniserver->selectionModel()->selectedRows().count() == 0) {
@@ -526,9 +532,7 @@ void Qt_MiniserverUpdater::onRefreshClicked()
     refreshWorker->start();
     
     qDebug() << "Printing all miniservers after RefreshButton was clicked!";
-    for (int i = 0; i < miniservers->count(); i++) {
-        qDebug() << "Row: " << i << " - " << miniservers->at(i).toString();
-    }
+    PrintupdatedMiniserverList();
 }
 
 void Qt_MiniserverUpdater::onConnectConfig()
@@ -538,13 +542,10 @@ void Qt_MiniserverUpdater::onConnectConfig()
 
 void Qt_MiniserverUpdater::onUpdateMiniserverClicked()
 {
-    //prevent crashing
     if (tableViewMiniserver->selectionModel()->selectedRows().count() == 0) {
         qDebug() << "No Miniserver are selected for Update!";
         return;
     }
-
-
     int configCount = CConfigMSUpdate::getRunningConfigInstances();
     QString configPath = statusbar->getConfigExePath();
 
@@ -606,14 +607,10 @@ void Qt_MiniserverUpdater::handleSearchTextChanged(const QString& searchText)
 
     CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(tableViewMiniserver->model());
     if (model) {
-        // Access functions of the model
         model->setSearchText(searchText);
-        // Call other functions as needed
         tableViewMiniserver->resizeColumnsToContents();
         tableViewMiniserver->setColumnWidth(6, 100);
-        
     }
-
     tableViewMiniserver->viewport()->repaint();
 }
 
@@ -625,7 +622,7 @@ void Qt_MiniserverUpdater::keyPressEvent(QKeyEvent* event)
             searchField->setHidden(false);
         }
 
-        if (searchField->isVisible() && searchField->hasFocus()) {
+        if (searchField->isVisible() && searchField->hasFocus() && searchField->text().isEmpty()) {
             searchField->setHidden(true);
             clearSearch();
         }
