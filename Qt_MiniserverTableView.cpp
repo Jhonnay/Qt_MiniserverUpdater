@@ -134,6 +134,8 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                         model->filteredMiniservers->replace(clickedIndex.row(), newMiniserver);
                     model->printDebugDataChanged(model->index(clickedIndex.row(), clickedIndex.column()), newMiniserver);
                     model->dataChanged(model->index(clickedIndex.row(), 0), model->index(clickedIndex.column(), 8), {Qt::DisplayRole, Qt::EditRole});
+                    clearSelection();
+                    selectRow(clickedIndex.row());
 				}
                 else if (selectedItemText == "Copy SNR")
                 {

@@ -71,7 +71,10 @@ void CRefreshWorker::run()
             miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Refresh_canceled);
             miniserver.setVersionColor("RED");
             miniserver.setMiniserverVersion("0.0.0.0");
-            tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
+            model->miniserverlist->replace(trueIndex, miniserver);
+            if (!model->filteredMiniservers->empty())
+                model->filteredMiniservers->replace(index.row(), miniserver);
+            //tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
             tableViewMiniserver->resizeColumnsToContents();
             tableViewMiniserver->setColumnWidth(6, 100);
             progressInt = (progress * 100) / count;
@@ -85,7 +88,11 @@ void CRefreshWorker::run()
         miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information);
         miniserver.setMiniserverVersion(MyConstants::Strings::StartUp_Listview_MS_Version);
         miniserver.setVersionColor("darkblue");
-        tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
+        model->miniserverlist->replace(trueIndex, miniserver);
+        if (!model->filteredMiniservers->empty())
+            model->filteredMiniservers->replace(index.row(), miniserver);
+        
+        //tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
         tableViewMiniserver->resizeColumnsToContents();
         tableViewMiniserver->setColumnWidth(6, 100);
 
@@ -136,8 +143,10 @@ void CRefreshWorker::run()
 
         progressInt = (progress * 100) / count;
         progress++;
-
-        tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
+        model->miniserverlist->replace(trueIndex, miniserver);
+        if (!model->filteredMiniservers->empty())
+            model->filteredMiniservers->replace(index.row(), miniserver);
+        //tableViewMiniserver->model()->setData(index, QVariant::fromValue(miniserver), Qt::EditRole);
         tableViewMiniserver->resizeColumnsToContents();
         tableViewMiniserver->setColumnWidth(6, 100);
         

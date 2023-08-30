@@ -8,6 +8,7 @@ Known Issues:
 * Changing local IP or other data will not sort the list
 * onselectionchanged does not work in Qt_MiniserverUpdater neither in Qt_MiniserverTableview
 * sometimes the program crashes while refreshing the data. 
+* if one Miniserver in a client gateway does not update -> Program crashes. 
 
 TODO's:
 * CSS Tableview Selection: make it light blue similar to Config
@@ -18,7 +19,8 @@ TODO's:
 
 V0.2.0
 *Added Search Functionality with STRG+F (WIP)
- - delete with correct indexes				-
+ - update miniservers with correct indexes  -TBD
+ - delete with correct indexes				-done
  - STRG + R refresh with correct indexes	-done
  - edit miniserver does not update UI		-done
  - changing IP with correct indexes			-done
@@ -30,6 +32,7 @@ V0.2.0
  *changed behaviour of STRG+F 
 	-if focus and visible -> search disabled
 	-Text highlighted if available
+ *reworded removing/changing entries to not load the whole miniserverlist again. (i.e. STRG+O/N)
 
 V0.1.9
 *Adjusted Strings

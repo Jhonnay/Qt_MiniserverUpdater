@@ -90,6 +90,10 @@ CMiniserver Qt_CreateEditMiniserver::createDialog(const QString& title, CMiniser
 
         CMiniserver result = dialog.getMiniserver();
         result.setSerialNumber(serial.toStdString());
+        result.setMiniserverProject(miniserver->getMiniserverProject());
+        result.setMiniserverVersion(MyConstants::Strings::StartUp_Listview_MS_Version); 
+        result.setVersionColor("Darblue");
+        result.setMiniserverStatus("Modified");
         return result;
     }
 

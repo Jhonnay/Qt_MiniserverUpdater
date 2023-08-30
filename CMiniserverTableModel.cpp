@@ -196,7 +196,9 @@ void CMiniserverTableModel::onConnectConfigClicked()
 void CMiniserverTableModel::sort(int column, Qt::SortOrder order)
 {
     // Sort the list of CMiniserver objects based on the selected column
-    std::sort(miniserverlist->begin(), miniserverlist->end(), [&](const CMiniserver& msA, const CMiniserver& msB) {
+    QList<CMiniserver>* list = m_searchText.isEmpty() ? miniserverlist : filteredMiniservers;
+
+    std::sort(list->begin(), list->end(), [&](const CMiniserver& msA, const CMiniserver& msB) {
         switch (column)
         {
         case 0: return msA.getMiniserverStatus() < msB.getMiniserverStatus();
@@ -214,7 +216,7 @@ void CMiniserverTableModel::sort(int column, Qt::SortOrder order)
 
     if (order == Qt::DescendingOrder)
     {
-        std::reverse(miniserverlist->begin(), miniserverlist->end());
+        std::reverse(list->begin(), list->end());
     }
 
     // Emit the layoutChanged signal to notify the view that the data has been sorted

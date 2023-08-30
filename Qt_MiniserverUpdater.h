@@ -25,7 +25,7 @@ public:
     
     QLineEdit* searchField;
     void setMiniserverList(QList<CMiniserver>* list);
-    void updateMiniserverList(QList<CMiniserver>* list); 
+    void PrintupdatedMiniserverList(); 
     void setConfigEXEPath(QString path);
     void setApplicationsettings(ApplicationSettings* settings);
     void setApplicationVersion(QString version);
