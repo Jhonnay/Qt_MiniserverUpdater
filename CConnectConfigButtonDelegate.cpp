@@ -19,6 +19,7 @@ QWidget* CConnectConfigButtonDelegate::createEditor(QWidget* parent, const QStyl
     button->setText("Connect");
     button->setProperty("indexRow", index.row());
     button->setFlat(true);
+    button->setCheckable(false);
     
 
     //emit directly. otherwise 2 clicks are necessary. 

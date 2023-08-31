@@ -1,4 +1,4 @@
-#include "Qt_MiniserverUpdater.h"
+﻿#include "Qt_MiniserverUpdater.h"
 #include "CWebService.h"
 #include "MyConstants.h"
 #include "CConfigMSUpdate.h"
@@ -25,7 +25,8 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     vBox = new QVBoxLayout(this);
     menubar = new Qt_Menubar(this);
     tableViewMiniserver = new Qt_MiniserverTableView(miniservers,this);
-    bottom_buttons = new Qt_Bottom_Action_Buttons(this); 
+    bottom_buttons = new Qt_Bottom_Action_Buttons(this);
+    bottom_buttons->setDisabledAllExceptCancel(true);
     statusbar = new Qt_Statusbar(this);
     updateWorker = new CUpdateWorker(this, tableViewMiniserver, bottom_buttons, statusbar);
     refreshWorker = new CRefreshWorker(this, tableViewMiniserver, bottom_buttons, statusbar);
@@ -71,7 +72,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(refreshWorker, &CRefreshWorker::refreshCanceled, this, &Qt_MiniserverUpdater::onRefreshCancelClicked);
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonCancelClicked, this, &Qt_MiniserverUpdater::onRefreshCancelClicked);
 
-    connect(connectConfigWorker, &CConnectConfigWorker::connectingCompleted, this, &Qt_MiniserverUpdater::onRefreshMiniserversFinished);
+    connect(connectConfigWorker, &CConnectConfigWorker::connectingCompleted, this, &Qt_MiniserverUpdater::onConnectConfigFinished);
     connect(connectConfigWorker, &CConnectConfigWorker::connectingCanceled, this, &Qt_MiniserverUpdater::onCancelConnectConfigClicked);
     connect(bottom_buttons, &Qt_Bottom_Action_Buttons::buttonCancelClicked, this, &Qt_MiniserverUpdater::onCancelConnectConfigClicked);
 
@@ -82,8 +83,6 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
 
     connect(tableViewMiniserver, &Qt_MiniserverTableView::enabledStateChanged, menubar, &Qt_Menubar::updateFileMenuState);
     connect(tableViewMiniserver, &Qt_MiniserverTableView::downloadProgFolderPressed, this, &Qt_MiniserverUpdater::onDownloadProgFolder);
-    //QItemSelectionModel* tableSelectionModel = tableViewMiniserver->selectionModel(); //not working
-    //connect(tableViewMiniserver->selectionModel(), &QItemSelectionModel::selectionChanged, this, &Qt_MiniserverUpdater::onSelectionChanged);
     connect(tableViewMiniserver, &Qt_MiniserverTableView::mySelectionChanged, this, &Qt_MiniserverUpdater::onSelectionChanged);
     connect(downloadProgFolderWorker, &CDownloadProgFolderWorker::updateStatusBarProgress, statusbar, &Qt_Statusbar::updateProgress);
 
@@ -124,7 +123,9 @@ void Qt_MiniserverUpdater::setMiniserverList(QList<CMiniserver>* list)
         qDebug() << "Row: " << i << " - " << list->at(i).toString();
     }
     this->miniservers = list;
+    tableViewMiniserver->disconnect(tableViewMiniserver->selectionModel(), &QItemSelectionModel::selectionChanged, tableViewMiniserver, &Qt_MiniserverTableView::handleSelectionChanged);
     tableViewMiniserver->setModel(new CMiniserverTableModel(list,this));
+    tableViewMiniserver->connect(tableViewMiniserver->selectionModel(), &QItemSelectionModel::selectionChanged, tableViewMiniserver, &Qt_MiniserverTableView::handleSelectionChanged);
     tableViewMiniserver->resizeColumnsToContents();
     tableViewMiniserver->setColumnWidth(6, 100);
 
@@ -399,7 +400,31 @@ void Qt_MiniserverUpdater::onHelp()
 
 void Qt_MiniserverUpdater::onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
-    qDebug() << "selection changed: " + tableViewMiniserver->selectionModel()->selectedRows().count();
+    if (tableViewMiniserver->selectionModel()->selectedRows().count() == 0) {
+        bottom_buttons->setDisabledAllExceptCancel(true);
+    }
+    else {
+        if (!connectConfigWorker->isRunning()) {
+            bottom_buttons->setDisabledAllExceptCancel(false);
+        }
+    }
+    if (!updateWorker->isRunning() &&
+        !refreshWorker->isRunning() &&
+        !downloadProgFolderWorker->isRunning() &&
+        !connectConfigWorker->isRunning()) {
+        CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(tableViewMiniserver->model());
+        if (!model) {
+            return;
+        }
+        if (model->m_searchText.isEmpty()) {
+            statusbar->updateProgress(100, QString::number(tableViewMiniserver->selectionModel()->selectedRows().count()) + " of " + QString::number(miniservers->count()) + " selected");
+        }
+        else {
+            statusbar->updateProgress(100, QString::number(tableViewMiniserver->selectionModel()->selectedRows().count()) + " of " + QString::number(model->filteredMiniservers->count()) + " filtered selected");
+        }
+        
+    }
+    qDebug() << "selection changed: " + QString::number(tableViewMiniserver->selectionModel()->selectedRows().count());
 }
 
 void Qt_MiniserverUpdater::onRefreshSelected()
@@ -409,7 +434,12 @@ void Qt_MiniserverUpdater::onRefreshSelected()
 
 void Qt_MiniserverUpdater::onCancelConnectConfigClicked() {
     this->connectConfigWorker->requestInterruption();
-    connect(connectConfigWorker, &CConnectConfigWorker::finished, this, &Qt_MiniserverUpdater::onConnectConfigFinished);
+    connect(connectConfigWorker, &CConnectConfigWorker::finished, this, &Qt_MiniserverUpdater::onConnectConfigCancelFinished);
+}
+
+void Qt_MiniserverUpdater::onConnectConfigCancelFinished() {
+    tableViewMiniserver->setEnabled(true);
+    statusbar->updateProgress(100, tr("Connecting canceled 🚧"));
 }
 
 void Qt_MiniserverUpdater::onUpdateStatusbarProgress(int progress, QString progresstext)
@@ -507,8 +537,17 @@ void Qt_MiniserverUpdater::onRemoveMiniserverPressed()
     PrintupdatedMiniserverList();
 }
 
-void Qt_MiniserverUpdater::onConnectConfigFinished() {
-    bottom_buttons->setDisabledAllExceptCancel(false);
+void Qt_MiniserverUpdater::onConnectConfigFinished(bool sucessfull) {
+    if (sucessfull) {
+        qDebug() << "---------------------- Connected to Miniserver successfully --- Finished -------";
+        tableViewMiniserver->setEnabled(true);
+        statusbar->updateProgress(100, tr("Connecting finished 🎉"));
+    }
+    else {
+        qDebug() << "---------------------- Connected to Miniserver NOT successfull --- Finished -------";
+        tableViewMiniserver->setEnabled(true);
+        statusbar->updateProgress(100, "Connecting to " + QString::fromStdString(connectConfigWorker->getMiniserver().getSerialNumber()) + " failed. ⛔ Check Network 🚧");
+    }
 }
 
 void Qt_MiniserverUpdater::onRefreshCancelClicked() {
@@ -518,7 +557,7 @@ void Qt_MiniserverUpdater::onRefreshCancelClicked() {
 
 
 void Qt_MiniserverUpdater::onRefreshMiniserversFinished() {
-    bottom_buttons->setDisabledAllExceptCancel(false);
+    //bottom_buttons->setDisabledAllExceptCancel(false);
 }
 
 
@@ -572,11 +611,14 @@ void Qt_MiniserverUpdater::onCancelUpdateClicked()
 
 void Qt_MiniserverUpdater::onUpdateMiniserversFinished()
 {
-    bottom_buttons->setDisabledAllExceptCancel(false);
+    //bottom_buttons->setDisabledAllExceptCancel(false);
 }
 
 void Qt_MiniserverUpdater::onConnectConfigClicked(const QModelIndex& index, const CMiniserver& miniserver) {
     qDebug() << miniserver.toString();
+    if (connectConfigWorker->isRunning()) {
+        return;
+    }
 
     QString configPath = statusbar->getConfigExePath();
     int configCount = CConfigMSUpdate::getRunningConfigInstances();
@@ -591,9 +633,13 @@ void Qt_MiniserverUpdater::onConnectConfigClicked(const QModelIndex& index, cons
         QMessageBox::warning(nullptr, "Error", message);
         return;
     }
+
+    statusbar->updateProgress(50, "Connecting to " + QString::fromStdString(miniserver.getSerialNumber()));
+    tableViewMiniserver->setEnabled(false);
     bottom_buttons->setDisabledAllExceptCancel(true);
     connectConfigWorker->setMiniserver(miniserver);
     connectConfigWorker->start();
+    
 }
 
 
@@ -610,6 +656,9 @@ void Qt_MiniserverUpdater::handleSearchTextChanged(const QString& searchText)
         model->setSearchText(searchText);
         tableViewMiniserver->resizeColumnsToContents();
         tableViewMiniserver->setColumnWidth(6, 100);
+        if (searchText.isEmpty()) {
+            onSelectionChanged(QItemSelection(), QItemSelection()); //trigger manual selection change to switch status text from filtered to unfiltered message
+        }
     }
     tableViewMiniserver->viewport()->repaint();
 }

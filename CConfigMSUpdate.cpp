@@ -213,7 +213,7 @@ int CConfigMSUpdate::performMiniserverUpdate(QThread* thread) {
 
     int updateCycleState = 0;
     int counterCyclesTime = 0; // After 17 Minutes, stop update Progress in this application and show MessageBox and DO NOT KILL CONFIG!
-    int ret = -1;
+    int ret = 0;
     int fails = 0;
     bool oneMiniserverDidNotUpdate = false;
 
@@ -315,7 +315,8 @@ int CConfigMSUpdate::performMiniserverUpdate(QThread* thread) {
                 if (udpL.m_versionConfig != version)
                 {
                     oneMiniserverDidNotUpdate = true;
-                    QMessageBox::warning(nullptr, "Error", "One Miniserver did not update! Update will be aborted!");
+                    //QMessageBox::warning(nullptr, "Error", "One Miniserver did not update! Update will be aborted!");
+                    ret = 0;
                 }
             }
 

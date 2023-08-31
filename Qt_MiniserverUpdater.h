@@ -46,8 +46,9 @@ public slots:
     //void keyReleaseEvent(QKeyEvent* event);
     void onRefreshCancelClicked();
     void onRefreshMiniserversFinished();
-    void onConnectConfigFinished();
+    void onConnectConfigFinished(bool successfull);
     void onCancelConnectConfigClicked();
+    void onConnectConfigCancelFinished();
     void onUpdateStatusbarProgress(int progress, QString progresstext);
     void onAddMiniserverPressed();
     void clearSearch();

@@ -47,12 +47,12 @@ int main(int argc, char* argv[])
             miniservers = FileParser::parseMiniserverJsonFile(QString::fromStdString(applicationSettings.getStrDefaultConfigurationPath()));
             mainwindow->setMiniserverList(&miniservers);
         }
-        mainwindow->setStatusbarProgress(100, "Applications Settings loaded");
+        mainwindow->setStatusbarProgress(100, "Settings loaded / " + QString::number(miniservers.count()) + " Miniservers loaded");
     }
     else {
         applicationSettings =  ApplicationSettings();
         mainwindow->setApplicationsettings(&applicationSettings);
-        mainwindow->setStatusbarProgress(100, "Applications Settings NOT loaded");
+        mainwindow->setStatusbarProgress(100, "Settings NOT loaded / " + QString::number(miniservers.count()) + " Miniservers loaded");
     }
 
     
