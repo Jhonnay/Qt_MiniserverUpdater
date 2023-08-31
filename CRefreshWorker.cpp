@@ -151,7 +151,14 @@ void CRefreshWorker::run()
         tableViewMiniserver->setColumnWidth(6, 100);
         
     }
-    progresstext = QStringLiteral("Successfully retreived (%1 of %2)").arg(QString::number(successfulRetreives)).arg(QString::number(count));
+    
+    if (successfulRetreives == 0) {
+        progresstext = QStringLiteral("Retreived (%1 of %2)").arg(QString::number(successfulRetreives)).arg(QString::number(count)) + ". Retreival failed. ⛔ Check Network 🚧";
+    }
+    else {
+        progresstext = QStringLiteral("Successfully retreived (%1 of %2)").arg(QString::number(successfulRetreives)).arg(QString::number(count));
+    }
+    
     if (isInterruptionRequested()) {
         emit refreshCanceled();
         progresstext = "Canceled! ⛔ " + progresstext;

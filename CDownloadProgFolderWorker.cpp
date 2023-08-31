@@ -50,7 +50,10 @@ void CDownloadProgFolderWorker::run()
     QNetworkAccessManager networkManager;
 
     count = files.count();
-    progressInt = (progress * 100 / 2) / count;
+    if (count != 0) {
+        progressInt = (progress * 100 / 2) / count;
+    }
+    
 
     for (const QString& file : files)
     {
@@ -121,14 +124,12 @@ void CDownloadProgFolderWorker::run()
     if (successes > 0) {
         progresstext = QStringLiteral("Downloaded %1/%2! 💪").arg(successes).arg(count);
         emit updateStatusBarProgress(100, progresstext);
+        openFolderInExplorer(downloadPath);
     }
     else {
-        progresstext = QStringLiteral("Miniserver not reachable! ⛔");
+        progresstext = QStringLiteral("Downloading Failed! Miniserver not reachable! ⛔ Check Network! 🚧");
         emit updateStatusBarProgress(100, progresstext);
     }
-    
-
-    openFolderInExplorer(downloadPath);
 }
 
 void CDownloadProgFolderWorker::openFolderInExplorer(const QString& folderPath)
