@@ -25,7 +25,9 @@ public:
 
 	void onCheckBoxHandsfreeClicked();
 
-	void setDisabledAllExceptCancel(bool setting);
+	void setDisabledAllExceptCancelAdd(bool setting);
+
+	void setDisabledAddMiniserverButton(bool setting);
 
 	//bool isHandsfreeModeEnabled();
 

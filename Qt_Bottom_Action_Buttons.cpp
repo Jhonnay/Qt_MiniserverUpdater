@@ -82,13 +82,16 @@ void Qt_Bottom_Action_Buttons::onCheckBoxHandsfreeClicked()
 	emit checkBoxHandsfreeClicked();
 }
 
-void Qt_Bottom_Action_Buttons::setDisabledAllExceptCancel(bool setting)
+void Qt_Bottom_Action_Buttons::setDisabledAllExceptCancelAdd(bool setting)
 {
-	this->btnAdd->setDisabled(setting);
 	this->btnRefresh->setDisabled(setting);
 	this->btnRemove->setDisabled(setting);
-	this->btnAdd->setDisabled(setting);
 	this->btnUpdate->setDisabled(setting);
+}
+
+void Qt_Bottom_Action_Buttons::setDisabledAddMiniserverButton(bool setting) 
+{
+	this->btnAdd->setDisabled(setting);
 }
 
 //bool Qt_Bottom_Action_Buttons::isHandsfreeModeEnabled()

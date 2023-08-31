@@ -26,7 +26,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     menubar = new Qt_Menubar(this);
     tableViewMiniserver = new Qt_MiniserverTableView(miniservers,this);
     bottom_buttons = new Qt_Bottom_Action_Buttons(this);
-    bottom_buttons->setDisabledAllExceptCancel(true);
+    bottom_buttons->setDisabledAllExceptCancelAdd(true);
     statusbar = new Qt_Statusbar(this);
     updateWorker = new CUpdateWorker(this, tableViewMiniserver, bottom_buttons, statusbar);
     refreshWorker = new CRefreshWorker(this, tableViewMiniserver, bottom_buttons, statusbar);
@@ -48,7 +48,6 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     addAction(actionRemoveMiniserverWithDelete);
     addAction(actionDeselectAll);
     addAction(actionRefreshSelected);
-
     vBox->addWidget(menubar);
     vBox->addWidget(tableViewMiniserver);
     vBox->addWidget(bottom_buttons);
@@ -363,6 +362,12 @@ void Qt_MiniserverUpdater::onDownloadProgFolder(CMiniserver ms)
 {
     this->downloadProgFolderWorker->setMiniserver(ms);
     this->downloadProgFolderWorker->start();
+    connect(downloadProgFolderWorker, &CDownloadProgFolderWorker::finished, this, &Qt_MiniserverUpdater::onDonwloadProgFolderFinished);
+
+}
+
+void Qt_MiniserverUpdater::onDonwloadProgFolderFinished() {
+    bottom_buttons->setDisabledAddMiniserverButton(false);
 }
 
 void Qt_MiniserverUpdater::onDeselectAll()
@@ -401,11 +406,11 @@ void Qt_MiniserverUpdater::onHelp()
 void Qt_MiniserverUpdater::onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
     if (tableViewMiniserver->selectionModel()->selectedRows().count() == 0) {
-        bottom_buttons->setDisabledAllExceptCancel(true);
+        bottom_buttons->setDisabledAllExceptCancelAdd(true);
     }
     else {
         if (!connectConfigWorker->isRunning()) {
-            bottom_buttons->setDisabledAllExceptCancel(false);
+            bottom_buttons->setDisabledAllExceptCancelAdd(false);
         }
     }
     if (!updateWorker->isRunning() &&
@@ -423,6 +428,9 @@ void Qt_MiniserverUpdater::onSelectionChanged(const QItemSelection& selected, co
             statusbar->updateProgress(100, QString::number(tableViewMiniserver->selectionModel()->selectedRows().count()) + " of " + QString::number(model->filteredMiniservers->count()) + " filtered selected");
         }
         
+    }
+    else {
+        bottom_buttons->setDisabledAddMiniserverButton(true);
     }
     qDebug() << "selection changed: " + QString::number(tableViewMiniserver->selectionModel()->selectedRows().count());
 }
@@ -548,6 +556,8 @@ void Qt_MiniserverUpdater::onConnectConfigFinished(bool sucessfull) {
         tableViewMiniserver->setEnabled(true);
         statusbar->updateProgress(100, "Connecting to " + QString::fromStdString(connectConfigWorker->getMiniserver().getSerialNumber()) + " failed. ⛔ Check Network 🚧");
     }
+
+    bottom_buttons->setDisabledAddMiniserverButton(false);
 }
 
 void Qt_MiniserverUpdater::onRefreshCancelClicked() {
@@ -557,7 +567,7 @@ void Qt_MiniserverUpdater::onRefreshCancelClicked() {
 
 
 void Qt_MiniserverUpdater::onRefreshMiniserversFinished() {
-    //bottom_buttons->setDisabledAllExceptCancel(false);
+    bottom_buttons->setDisabledAddMiniserverButton(false);
 }
 
 
@@ -567,7 +577,7 @@ void Qt_MiniserverUpdater::onRefreshClicked()
         qDebug() << "No Miniserver are selected for Refreshing!";
         return;
     }
-    bottom_buttons->setDisabledAllExceptCancel(true);
+    bottom_buttons->setDisabledAllExceptCancelAdd(true);
     refreshWorker->start();
     
     qDebug() << "Printing all miniservers after RefreshButton was clicked!";
@@ -598,7 +608,7 @@ void Qt_MiniserverUpdater::onUpdateMiniserverClicked()
         return;
     }
 
-    bottom_buttons->setDisabledAllExceptCancel(true);
+    bottom_buttons->setDisabledAllExceptCancelAdd(true);
     updateWorker->start();
 
 }
@@ -611,7 +621,7 @@ void Qt_MiniserverUpdater::onCancelUpdateClicked()
 
 void Qt_MiniserverUpdater::onUpdateMiniserversFinished()
 {
-    //bottom_buttons->setDisabledAllExceptCancel(false);
+    bottom_buttons->setDisabledAddMiniserverButton(false);
 }
 
 void Qt_MiniserverUpdater::onConnectConfigClicked(const QModelIndex& index, const CMiniserver& miniserver) {
@@ -636,7 +646,7 @@ void Qt_MiniserverUpdater::onConnectConfigClicked(const QModelIndex& index, cons
 
     statusbar->updateProgress(50, "Connecting to " + QString::fromStdString(miniserver.getSerialNumber()));
     tableViewMiniserver->setEnabled(false);
-    bottom_buttons->setDisabledAllExceptCancel(true);
+    bottom_buttons->setDisabledAllExceptCancelAdd(true);
     connectConfigWorker->setMiniserver(miniserver);
     connectConfigWorker->start();
     

@@ -64,6 +64,7 @@ public slots:
     void onVersionClicked();
     void onChangelogClicked();
     void onDownloadProgFolder(CMiniserver ms);
+    void onDonwloadProgFolderFinished();
     void onDeselectAll();
     void onCheckNewVersionClicked();
     void onHelp();
