@@ -2,6 +2,7 @@
 #include "MyConstants.h"
 #include "CConfigMSUpdate.h"
 #include "CRefreshWorker.h"
+#include "CWebService.h"
 
 CUpdateWorker::CUpdateWorker(QObject *parent)
 	: QThread(parent)
@@ -52,6 +53,7 @@ void CUpdateWorker::run()
     for (const QModelIndex& index : selectedIndexes)
     {
         int row = index.row();
+        int updateSuccessful=0;
         CMiniserver miniserver = model->m_searchText.isEmpty() ? model->miniserverlist->at(index.row()) : model->filteredMiniservers->at(index.row());
         int trueIndex = model->miniserverlist->indexOf(miniserver);
 
@@ -85,17 +87,23 @@ void CUpdateWorker::run()
         config.setPw(QString::fromStdString(miniserver.getAdminPassword()));
         config.SetConfigPath(configPath);
         config.SetConfigLanguage(QString::fromStdString(miniserver.getConfigLanguage()));
+        QString unformatedVersionString;
         if (miniserver.getLocalIP() != "" || !miniserver.getLocalIP().empty()) {
             config.setMsIP(QString::fromStdString(miniserver.getLocalIP()));
+            unformatedVersionString = CWebService::sendCommandRest_Version_Local_Gen1(miniserver, "dev/sys/version", "value");
         }
         else {
             config.setMsIP(QString::fromStdString(miniserver.getSerialNumber()));
+            QString url = CWebService::getCloudDNSLink(miniserver);
+            unformatedVersionString = CWebService::sendCommandRest_Version_Remote_Cloud(miniserver, "dev/sys/version", "value", url);
         }
 
-        //Load from Miniserver and Update
-        config.OpenConfigLoadProject((QThread*)this);
-        int updateSuccessful = config.performMiniserverUpdate((QThread*)this);
-
+        if (unformatedVersionString != "error") {
+            //Load from Miniserver and Update
+            config.OpenConfigLoadProject((QThread*)this);
+            updateSuccessful = config.performMiniserverUpdate((QThread*)this);
+        }
+        
         //Update Status to Updated
         if (updateSuccessful == 1) {
             miniserver.setMiniserverStatus(MyConstants::Strings::Listview_Updated_MS_Status);
@@ -112,7 +120,6 @@ void CUpdateWorker::run()
             //        });
             //    
             //}
-            
         }
         else if(!isInterruptionRequested() && updateSuccessful == 0){
             miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information_timeout);
@@ -124,8 +131,6 @@ void CUpdateWorker::run()
         progressInt = (progress * 100) / count;
         progress++;
 
-        
-
         //TODO Refresh Minisever Information
         if (!model->filteredMiniservers->empty())
             model->filteredMiniservers->replace(index.row(), miniserver);
@@ -136,7 +141,12 @@ void CUpdateWorker::run()
         CConfig::killAllConfigs();
     }
 
-    progresstext = QStringLiteral("Successfully updated (%1 of %2)").arg(QString::number(successfulUpdates)).arg(QString::number(count));
+    if (successfulUpdates == 0) {
+        progresstext = QStringLiteral("Updated (%1 of %2)").arg(QString::number(successfulUpdates)).arg(QString::number(count)) + ". Updates failed. ⛔ Check Network 🚧";
+    }
+    else {
+        progresstext = QStringLiteral("Successfully Updated (%1 of %2)").arg(QString::number(successfulUpdates)).arg(QString::number(count));
+    }
 
     if (isInterruptionRequested()) {
         emit updatingCanceled();

@@ -33,6 +33,7 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
 
     connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, m_model, &CMiniserverTableModel::sort);
     connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, &Qt_MiniserverTableView::handleSelectionChanged);
+   
     //https://stackoverflow.com/questions/18831242/qt-start-editing-of-cell-after-one-click
     //Test
     //QPalette palette;
@@ -54,7 +55,10 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
     setItemDelegateForColumn(8, comboBoxDelegate);
     resizeColumnsToContents();
 
-    
+    //CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(this->model());
+    //if (!model) {
+    //    return;
+    //}    
 }
 
 
@@ -65,6 +69,9 @@ CMiniserverTableModel* Qt_MiniserverTableView::getMiniserverModel()
 {
     return this->m_model;
 }
+
+//void Qt_MiniserverTableView::handleSelectionChange(const QItemSelection& selected, const QItemSelection& deselected) {
+//}
 
 
 void Qt_MiniserverTableView::handleConnectConfigClicked(const QModelIndex& index) {
@@ -83,6 +90,7 @@ void Qt_MiniserverTableView::handleConnectConfigClicked(const QModelIndex& index
 
     CMiniserver miniserver = model->m_searchText.isEmpty() ? model->miniserverlist->at(index.row()) : model->filteredMiniservers->at(index.row());
     int trueIndex = model->miniserverlist->indexOf(miniserver);
+
 
     emit  ConnectConfigClicked(index, miniserver);
 }
@@ -442,6 +450,7 @@ void Qt_MiniserverTableView::setEnabledTableView(bool state)
 void Qt_MiniserverTableView::handleSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
     emit mySelectionChanged(selected, deselected);
-    repaint();
+    qDebug() << "selection changed: " + QString::number(selectionModel()->selectedRows().count());
+
 }
 

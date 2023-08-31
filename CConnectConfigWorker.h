@@ -17,6 +17,8 @@ public:
 	~CConnectConfigWorker();
 
 	void setMiniserver(const CMiniserver ms);
+	bool chanceled;
+	CMiniserver getMiniserver();
 
 private:
 
@@ -30,7 +32,7 @@ protected:
 
 
 signals:
-	void connectingCompleted();
+	void connectingCompleted(bool successfull);
 	void connectingCanceled();
 
 

@@ -28,10 +28,10 @@ public slots:
 	void repaint() { QTableView::repaint(); }
 	void insertRow(const CMiniserver& miniserver);
 	void setEnabledTableView(bool state);
-
-private slots: 
-	void handleConnectConfigClicked(const QModelIndex& index);
 	void handleSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+
+protected slots: 
+	void handleConnectConfigClicked(const QModelIndex& index);
 
 	
 signals:

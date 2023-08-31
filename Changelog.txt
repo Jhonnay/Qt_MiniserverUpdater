@@ -1,33 +1,45 @@
 Feature Wish:
 * Multiedit Row 
-* Search Bar
+* Rearanign Rows via Drag and Drop
 
 Known Issues: 
 * File Menu Text not grey when disabled
-* Updatelevel not refreshed in UI when changing Updatelevel
 * Changing local IP or other data will not sort the list
-* onselectionchanged does not work in Qt_MiniserverUpdater neither in Qt_MiniserverTableview
-* sometimes the program crashes while refreshing the data. 
+* sometimes the program crashes while refreshing the data. -> CMiniserver::calculateVersionColor
 * if one Miniserver in a client gateway does not update -> Program crashes. 
+* connect button cannot be pressed multiple times in a row. 
 
 TODO's:
 * CSS Tableview Selection: make it light blue similar to Config
 * CSS Tableview grey out when disabled
 * Open in Loxone App 
-* Get Local Ip from Context Menu
-* Update, remove, Refresh Buttons have to be disabled if nothing is selected
+
+
+V0.2.1
+*Added: Update, remove, Refresh Buttons have to be disabled if nothing is selected
+*Added: Disable Tableview while connecting to Miniserver
+*Added: Statusbar text updates when connecting to a Miniserver via "Connect" Button
+*Added: Statusbar text updates when selecting miniservers
+*Added: Updating Miniserver without Network is canceled immidiately
+*Added: Connecting to Miniserver without Network is canceled immidiately
+*Fixed: onselectionchanged does not work in Qt_MiniserverUpdater neither in Qt_MiniserverTableview (diconnect and reconnect the signal after new Model set)
+*Fixed: Connect Config Worker not finishing properly. 
+*Fixed: Download Prog Folder opened even if nothing was downloaded
+*Fixed Crash: No Internet when downloading Prog Folder
+*implicitly fixed: Updatelevel not refreshed in UI when changing Updatelevel (progably fixed with properly changing data in model)
+*Adjusted: Texts when no network is available. 
 
 V0.2.0
 *Added Search Functionality with STRG+F (WIP)
- - update miniservers with correct indexes  -TBD
- - delete with correct indexes				-done
- - STRG + R refresh with correct indexes	-done
- - edit miniserver does not update UI		-done
- - changing IP with correct indexes			-done
- - changing language with correct indexes	-done
- - Clicking on WI							-done
- - connect config with correct indexes		-done
- - remove filter when strg+o, strg+n		-done
+ - update miniservers with correct indexes 
+ - delete with correct indexes			
+ - STRG + R refresh with correct indexes
+ - edit miniserver does not update UI	
+ - changing IP with correct indexes		
+ - changing language with correct indexes
+ - Clicking on WI						
+ - connect config with correct indexes	
+ - remove filter when strg+o, strg+n	
  *fixed translations
  *changed behaviour of STRG+F 
 	-if focus and visible -> search disabled
