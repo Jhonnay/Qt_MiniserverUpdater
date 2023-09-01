@@ -14,9 +14,14 @@ TODO's:
 * CSS Tableview Selection: make it light blue similar to Config
 * CSS Tableview grey out when disabled
 * Open in Loxone App 
+* Disabled Search while i.e. updating. 
 
 V0.2.2
 *Fixed: Add Miniserver Button was disabled when no Miniserver was selected
+*Fixed: Add Miniserver Button was disabled on Startup
+*Fixed: Filter not working when adding Miniserver
+*Fixed Crash: Adding new Miniserver
+
 
 V0.2.1
 *Added: Update, remove, Refresh Buttons have to be disabled if nothing is selected

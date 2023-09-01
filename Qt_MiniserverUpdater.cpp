@@ -27,6 +27,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     tableViewMiniserver = new Qt_MiniserverTableView(miniservers,this);
     bottom_buttons = new Qt_Bottom_Action_Buttons(this);
     bottom_buttons->setDisabledAllExceptCancelAdd(true);
+    bottom_buttons->setDisabledAddMiniserverButton(false);
     statusbar = new Qt_Statusbar(this);
     updateWorker = new CUpdateWorker(this, tableViewMiniserver, bottom_buttons, statusbar);
     refreshWorker = new CRefreshWorker(this, tableViewMiniserver, bottom_buttons, statusbar);
@@ -479,7 +480,7 @@ void Qt_MiniserverUpdater::onAddMiniserverPressed()
 
         if (!searchField->text().isEmpty()) {
             model->miniserverlist->append(miniserver);
-            if (miniserver.matchesSearchFilter(searchField->text())); {
+            if (miniserver.matchesSearchFilter(searchField->text())){
                 model->filteredMiniservers->append(miniserver);
             }
         }
