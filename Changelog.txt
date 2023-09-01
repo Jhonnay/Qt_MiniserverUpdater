@@ -8,7 +8,6 @@ Known Issues:
 * sometimes the program crashes while refreshing the data. -> CMiniserver::calculateVersionColor
 * if one Miniserver in a client gateway does not update -> Program crashes. 
 * connect button cannot be pressed multiple times in a row. 
-* "Check Network" when canceling Update process. 
 
 TODO's:
 * CSS Tableview Selection: make it light blue similar to Config
