@@ -141,7 +141,7 @@ void CUpdateWorker::run()
         CConfig::killAllConfigs();
     }
 
-    if (successfulUpdates == 0) {
+    if (successfulUpdates == 0 && !isInterruptionRequested()) {
         progresstext = QStringLiteral("Updated (%1 of %2)").arg(QString::number(successfulUpdates)).arg(QString::number(count)) + ". Updates failed. ⛔ Check Network 🚧";
     }
     else {

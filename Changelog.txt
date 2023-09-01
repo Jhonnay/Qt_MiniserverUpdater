@@ -8,19 +8,22 @@ Known Issues:
 * sometimes the program crashes while refreshing the data. -> CMiniserver::calculateVersionColor
 * if one Miniserver in a client gateway does not update -> Program crashes. 
 * connect button cannot be pressed multiple times in a row. 
+* Check Network Message if Update was canceled
 
 TODO's:
 * CSS Tableview Selection: make it light blue similar to Config
 * CSS Tableview grey out when disabled
 * Open in Loxone App 
-* Disabled Search while i.e. updating. 
+
 
 V0.2.2
+*Added: Shortcut for Adding Miniserver - STRG + (+)
 *Fixed: Add Miniserver Button was disabled when no Miniserver was selected
 *Fixed: Add Miniserver Button was disabled on Startup
 *Fixed: Filter not working when adding Miniserver
+*Fixed: Add Miniserver Button not getting enabled after canceling "Connect to Miniserver"
+*Fixed: Check Network text was shown when Updates were canceled and no Update was successful
 *Fixed Crash: Adding new Miniserver
-
 
 V0.2.1
 *Added: Update, remove, Refresh Buttons have to be disabled if nothing is selected

@@ -93,6 +93,7 @@ private:
     QAction* actionDeselectAll;
     QAction* actionRefreshSelected;
     QAction* actionRemoveMiniserverWithDelete;
+    QAction* actionAddMiniserver;
     CUpdateChecker* checkUpdater;
     CMiniserverTableModel* miniserverModel;
     

@@ -37,6 +37,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     actionDeselectAll = new QAction("Deselect All", this);
     actionRefreshSelected = new QAction("Refresh Selected", this);
     actionRemoveMiniserverWithDelete = new QAction("Remove selected", this);
+    actionAddMiniserver = new QAction("Add new Miniserver", this);
     checkUpdater = new CUpdateChecker(this);
     searchField = new QLineEdit(this);
     searchField->setPlaceholderText("Search...");
@@ -46,9 +47,11 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     actionDeselectAll->setShortcut(QKeySequence("Ctrl+D"));
     actionRefreshSelected->setShortcut(QKeySequence("Ctrl+R"));
     actionRemoveMiniserverWithDelete->setShortcut(QKeySequence::Delete);
+    actionAddMiniserver->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Plus));
     addAction(actionRemoveMiniserverWithDelete);
     addAction(actionDeselectAll);
     addAction(actionRefreshSelected);
+    addAction(actionAddMiniserver);
     vBox->addWidget(menubar);
     vBox->addWidget(tableViewMiniserver);
     vBox->addWidget(bottom_buttons);
@@ -105,6 +108,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(actionDeselectAll, &QAction::triggered, this, &Qt_MiniserverUpdater::onDeselectAll);
     connect(actionRefreshSelected, &QAction::triggered, this, &Qt_MiniserverUpdater::onRefreshSelected);
     connect(actionRemoveMiniserverWithDelete, &QAction::triggered, this, &Qt_MiniserverUpdater::onRemoveMiniserverPressed);
+    connect(actionAddMiniserver, &QAction::triggered, this, &Qt_MiniserverUpdater::onAddMiniserverPressed);
 
     connect(searchField, &QLineEdit::textChanged, this, &Qt_MiniserverUpdater::handleSearchTextChanged);
 
@@ -448,7 +452,8 @@ void Qt_MiniserverUpdater::onCancelConnectConfigClicked() {
 
 void Qt_MiniserverUpdater::onConnectConfigCancelFinished() {
     tableViewMiniserver->setEnabled(true);
-    statusbar->updateProgress(100, tr("Connecting canceled 🚧"));
+    statusbar->updateProgress(100, tr("⛔ Connecting canceled!"));
+    bottom_buttons->setDisabledAddMiniserverButton(false);
 }
 
 void Qt_MiniserverUpdater::onUpdateStatusbarProgress(int progress, QString progresstext)
@@ -468,6 +473,13 @@ void Qt_MiniserverUpdater::checkVersionOnStartup()
 
 void Qt_MiniserverUpdater::onAddMiniserverPressed()
 {
+    if (updateWorker->isRunning() ||
+        refreshWorker->isRunning() ||
+        downloadProgFolderWorker->isRunning() ||
+        connectConfigWorker->isRunning()) {
+        return; //Shortcut "STRG+(+)" --> adding Miniserver - Should not be possible while the worker are doing stuff. 
+    }
+
     CMiniserver miniserver = Qt_CreateEditMiniserver::createDialog("Add Miniserver",nullptr,miniservers);
     if (!miniserver.isDummy()) {
         CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(tableViewMiniserver->model());
@@ -559,6 +571,7 @@ void Qt_MiniserverUpdater::onConnectConfigFinished(bool sucessfull) {
     }
 
     bottom_buttons->setDisabledAddMiniserverButton(false);
+    
 }
 
 void Qt_MiniserverUpdater::onRefreshCancelClicked() {
