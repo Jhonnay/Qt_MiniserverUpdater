@@ -1,20 +1,25 @@
 Feature Wish:
 * Multiedit Row 
-* Rearanign Rows via Drag and Drop
+* Rearaniging Rows via Drag and Drop
 
 Known Issues: 
-* File Menu Text not grey when disabled
 * Changing local IP or other data will not sort the list
 * sometimes the program crashes while refreshing the data. -> CMiniserver::calculateVersionColor
 * if one Miniserver in a client gateway does not update -> Program crashes. 
 * connect button cannot be pressed multiple times in a row. 
 * Check Network Message if Update was canceled
+* AutoUpdate all Selected not working
+* Serial Number Delegate: Background is always darker. 
 
 TODO's:
 * CSS Tableview Selection: make it light blue similar to Config
-* CSS Tableview grey out when disabled
 * Open in Loxone App 
 
+
+V0.2.3
+*Added: CSS Tableview grey out when disabled
+*Fixed: File Menu Text not grey when disabled
+*Changed Selected Backround for QTableview
 
 V0.2.2
 *Added: Shortcut for Adding Miniserver - STRG + (+)

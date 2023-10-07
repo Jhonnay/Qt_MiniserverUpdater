@@ -23,8 +23,8 @@ void CSerialNumberHyperlinkDelegate::paint(QPainter* painter, const QStyleOption
         updatedOption.text = displayText;
         updatedOption.palette.setColor(QPalette::Text, Qt::blue);
         updatedOption.font.setUnderline(true);
-        QApplication::style()->drawControl(QStyle::CE_ItemViewItem, &updatedOption, painter);
-
+        //QApplication::style()->drawControl(QStyle::CE_ItemViewItem, &updatedOption, painter);
+        QStyledItemDelegate::paint(painter, updatedOption, index); // Let the delegate handle text rendering
     }
     else {
         QStyledItemDelegate::paint(painter, option, index);

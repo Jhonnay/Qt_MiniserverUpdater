@@ -23,6 +23,7 @@ protected:
 	void autoUpdateSingleMiniserver(bool bLocal, CMiniserver& miniserver, QString& webService, QString& interestedValue, int index);
 	//bool eventFilter(QObject* object, QEvent* event) override;
 
+
 public slots:
 	void update() { QTableView::update(); }
 	void repaint() { QTableView::repaint(); }

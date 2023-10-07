@@ -22,7 +22,7 @@
 #include <QtConcurrent>
 #include "MyApplication.h"
 
-#define VERSION "0.2.2"
+#define VERSION "0.2.3"
 
 
 int main(int argc, char* argv[])

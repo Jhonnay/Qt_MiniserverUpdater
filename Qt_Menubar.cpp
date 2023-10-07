@@ -7,6 +7,7 @@ Qt_Menubar::Qt_Menubar(QWidget* parent)
     : QWidget(parent)
 {
     menuBar = new QMenuBar(this);
+    menuBar->setObjectName("menuBar");
 
     createFileMenu();
     createSettingsMenu();
@@ -19,6 +20,34 @@ Qt_Menubar::Qt_Menubar(QWidget* parent)
     layout->setContentsMargins(0, 0, 0, 0);
     setLayout(layout);
 
+
+    this->setStyleSheet(R"""(
+        QMenu {
+            background-color: white;
+            border: 1px  lightgray;
+            padding: 2px;
+        }    
+        QMenu::item {
+            padding: 5px 20px 5px 20px;
+        }
+        /* Styles for disabled state */
+        QMenu::item:enabled {
+            /* Add your styles for the enabled state here */
+            color: black;
+        }
+
+        /* Styles for disabled state */
+        QMenu::item:disabled {
+            color: gray;
+        }
+        QMenu::item:selected {
+            background-color: rgba(204, 232, 255, 1); /* Light blue with 100% opacity */
+            color: black;
+            border: 2px solid rgba(153, 209, 255, 1);
+            padding: 3px 18px 3px 18px; /* Adjust padding to accommodate the border */
+        }
+        
+	)""");
 }
 
 Qt_Menubar::~Qt_Menubar()
@@ -92,6 +121,7 @@ void Qt_Menubar::onHelp()
 void Qt_Menubar::createFileMenu()
 {
     fileMenu = menuBar->addMenu(tr("&File"));
+    fileMenu->setObjectName("fileMenu");
 
     saveAct = new QAction(tr("&Save"), this);
     saveAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
@@ -170,5 +200,5 @@ void Qt_Menubar::updateFileMenuState(bool state) {
     saveAct->setEnabled(state);
     openAct->setEnabled(state);
     newAct->setEnabled(state);
-    menuBar->repaint();
+    //menuBar->repaint();
 }

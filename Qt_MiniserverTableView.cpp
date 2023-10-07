@@ -59,6 +59,34 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
     //if (!model) {
     //    return;
     //}    
+
+    this->setStyleSheet(R"""(
+        QTableView {
+            selection-background-color: transparent; /* Clear the default selection background */
+        }
+
+        QTableView:enabled {
+            /* Add your styles for the enabled state here */
+            background-color: white;
+            color: black;
+        }
+
+        /* Styles for disabled state */
+        QTableView:disabled {
+            /* Add your styles for the disabled state here */
+            background-color: pale gray;
+            color: gray;
+        }
+
+        QTableView::item:selected {
+            background-color: rgba(204, 232, 255, 1); /* Light blue with 100% opacity */
+            color: inherit;;
+        }
+
+
+
+	)""");
+
 }
 
 
