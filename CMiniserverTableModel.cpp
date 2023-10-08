@@ -87,6 +87,10 @@ QVariant CMiniserverTableModel::headerData(int section, Qt::Orientation orientat
         default: return QVariant();
         }
     }
+    else {
+        return QString("%1").arg(section + 1);
+    }
+    
     return QVariant();
 }
 
@@ -98,6 +102,7 @@ Qt::ItemFlags CMiniserverTableModel::flags(const QModelIndex& index) const
     {
         if (index.column() == 6 ||index.column() == 7 || index.column() == 8)
             return defaultFlags | Qt::ItemIsEditable;
+
     }
 
     return defaultFlags;

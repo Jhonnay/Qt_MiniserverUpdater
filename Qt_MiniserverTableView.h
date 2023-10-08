@@ -22,6 +22,7 @@ protected:
 	void contextMenuEvent(QContextMenuEvent* event) override;
 	void autoUpdateSingleMiniserver(bool bLocal, CMiniserver& miniserver, QString& webService, QString& interestedValue, int index);
 	//bool eventFilter(QObject* object, QEvent* event) override;
+	//void keyPressEvent(QKeyEvent* event) override;
 
 
 public slots:

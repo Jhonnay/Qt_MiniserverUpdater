@@ -21,6 +21,7 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
     setSelectionBehavior(QAbstractItemView::SelectRows);
     verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     verticalHeader()->setMinimumWidth(35);
+    verticalHeader()->setDefaultAlignment(Qt::AlignHCenter);
     setSortingEnabled(true);
     setMouseTracking(true);
     //setUpdatesEnabled(true);
@@ -63,6 +64,10 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
     this->setStyleSheet(R"""(
         QTableView {
             selection-background-color: transparent; /* Clear the default selection background */
+            outline: none;
+        }
+        QTableView::item {
+            padding: 3px 3px 3px 3px;
         }
 
         QTableView:enabled {
@@ -80,10 +85,15 @@ Qt_MiniserverTableView::Qt_MiniserverTableView(QList<CMiniserver>* miniservers, 
 
         QTableView::item:selected {
             background-color: rgba(204, 232, 255, 1); /* Light blue with 100% opacity */
-            color: inherit;;
+            color: inherit;
+            
         }
-
-
+        QTableView::item:focus {
+            border: 3px solid rgba(32, 148, 250, 1);
+            padding: 0px 0px 0px 0px ;
+        }
+      
+        
 
 	)""");
 
@@ -405,6 +415,36 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
             }
         }
 
+        else if (clickedIndex.column() == 7) {
+            QMenu contextMenu;
+            contextMenu.addAction("Remove all local IPs");
+            
+            QAction* selectedItem = contextMenu.exec(event->globalPos());
+            if (selectedItem)
+            {
+                CMiniserverTableModel* model = qobject_cast<CMiniserverTableModel*>(this->model());
+                if (!model) {
+                    return;
+                }
+
+                QString selectedItemText = selectedItem->text();
+
+                if (selectedItemText == "Remove all local IPs") {
+                    int maxCount = model->m_searchText.isEmpty() ? model->miniserverlist->count() : model->filteredMiniservers->count();
+                    for (int i = 0; i < maxCount; i++) {
+                        CMiniserver miniserver = model->m_searchText.isEmpty() ? model->miniserverlist->at(i) : model->filteredMiniservers->at(i);
+                        int trueIndex = model->miniserverlist->indexOf(miniserver);
+                        miniserver.setLocalIP("");
+                        model->miniserverlist->replace(trueIndex, miniserver);
+                        if (!model->filteredMiniservers->empty())
+                            model->filteredMiniservers->replace(i, miniserver);
+                        model->printDebugDataChanged(model->index(i, 7), miniserver);
+                        model->dataChanged(model->index(i, 0), model->index(clickedIndex.column(), 8), { Qt::DisplayRole, Qt::EditRole });
+                    }
+                }
+            }
+        }
+
 		else
 		{
 			QTableView::contextMenuEvent(event);
@@ -431,6 +471,44 @@ void Qt_MiniserverTableView::autoUpdateSingleMiniserver(bool bLocal, CMiniserver
         m_model->miniserverlist->replace(index, miniserver);
     }
 }
+
+//void Qt_MiniserverTableView::keyPressEvent(QKeyEvent* event)
+//{
+//    if (event->key() == Qt::Key_Up || event->key() == Qt::Key_Down
+//        || event->key() == Qt::Key_Left || event->key() == Qt::Key_Right)
+//    {
+//        // Get the current selected index
+//
+//        int currentColumn = currentIndex().column();
+//        
+//        if (event->key() == Qt::Key_Left)
+//        {
+//            currentColumn--;
+//        }
+//        else if (event->key() == Qt::Key_Right)
+//        {
+//            currentColumn++;
+//        }
+//
+//        //QModelIndex newIndex = model()->index(currentIndex().row(), currentColumn);
+//        //if (newIndex.isValid())
+//        //{
+//        //    setCurrentIndex(newIndex);
+//        //}
+//
+//        // Check if it's the specific row where you don't want to activate editing
+//        if (currentColumn == 6)
+//        {
+//            event->ignore(); // Ignore the arrow key event to prevent editing
+//            return;
+//        }
+//
+//    }
+//
+//    // If not in the specific row or for other keys, allow normal key handling
+//    QTableView::keyPressEvent(event);
+//
+//}
 
 //bool Qt_MiniserverTableView::eventFilter(QObject* object, QEvent* event)
 //{

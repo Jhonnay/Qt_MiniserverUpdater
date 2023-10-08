@@ -9,12 +9,16 @@ Known Issues:
 * connect button cannot be pressed multiple times in a row. 
 * Check Network Message if Update was canceled
 * AutoUpdate all Selected not working
-* Serial Number Delegate: Background is always darker. 
+* Sometimes the file menu is not greyed out in release
 
 TODO's:
 * CSS Tableview Selection: make it light blue similar to Config
 * Open in Loxone App 
 
+V0.2.4
+*Changed outline focus border colour when a cell is foced
+*Added: row enumeration
+*Added: remove all local IP addresses context menu to "local IP" column
 
 V0.2.3
 *Added: CSS Tableview grey out when disabled
