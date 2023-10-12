@@ -21,8 +21,13 @@
 #include "CFileParser.cpp"
 #include <QtConcurrent>
 #include "MyApplication.h"
+#include <QDir>
+#include <QStringList>
 
 #define VERSION "0.2.4"
+
+
+
 
 
 int main(int argc, char* argv[])

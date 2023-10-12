@@ -126,6 +126,7 @@ call "$(SolutionDir)InnoSetup\openCurrentDir.bat"</Command>
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
+    <ClCompile Include="Qt_CleanOldConfigs.cpp" />
     <ClCompile Include="Qt_ComboBoxItem.cpp" />
     <ClCompile Include="Qt_CreateEditMiniserver.cpp" />
     <ClCompile Include="Qt_Menubar.cpp" />
@@ -136,6 +137,7 @@ call "$(SolutionDir)InnoSetup\openCurrentDir.bat"</Command>
     <QtRcc Include="Qt_MiniserverUpdater.qrc" />
     <QtUic Include="Qt_ApplicationSettings.ui" />
     <QtUic Include="Qt_Bottom_Action_Buttons.ui" />
+    <QtUic Include="Qt_CleanOldConfigs.ui" />
     <QtUic Include="Qt_ComboBoxItem.ui" />
     <QtUic Include="Qt_CreateEditMiniserver.ui" />
     <QtUic Include="Qt_Menubar.ui" />
@@ -187,6 +189,7 @@ call "$(SolutionDir)InnoSetup\openCurrentDir.bat"</Command>
     <QtMoc Include="Qt_MiniserverTableView.h" />
     <QtMoc Include="Qt_CreateEditMiniserver.h" />
     <QtMoc Include="Qt_ApplicationSettings.h" />
+    <QtMoc Include="Qt_CleanOldConfigs.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

@@ -11,6 +11,7 @@ Qt_Menubar::Qt_Menubar(QWidget* parent)
 
     createFileMenu();
     createSettingsMenu();
+    createToolsMenu();
     createLoxoneAppMenu();
     createHelpMenu();
 
@@ -115,6 +116,10 @@ void Qt_Menubar::onHelp()
     emit help();
 }
 
+void Qt_Menubar::onCleanConfigsClicked()
+{
+    emit cleanConfigClicked();
+}
 
 
 
@@ -200,5 +205,13 @@ void Qt_Menubar::updateFileMenuState(bool state) {
     saveAct->setEnabled(state);
     openAct->setEnabled(state);
     newAct->setEnabled(state);
-    //menuBar->repaint();
+    menuBar->repaint();
+}
+
+void Qt_Menubar::createToolsMenu() {
+    toolsMenu = menuBar->addMenu(tr("&Tools"));
+
+    cleanConfigsAct = new QAction(tr("&🧹 Config Cleaner"), this);
+    toolsMenu->addAction(cleanConfigsAct);
+    connect(cleanConfigsAct, &QAction::triggered, this, &Qt_Menubar::onCleanConfigsClicked);
 }

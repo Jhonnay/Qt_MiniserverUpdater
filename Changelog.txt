@@ -12,8 +12,10 @@ Known Issues:
 * Sometimes the file menu is not greyed out in release
 
 TODO's:
-* CSS Tableview Selection: make it light blue similar to Config
 * Open in Loxone App 
+
+V0.2.5
+*Added "Clean old Configs Installations" option to via Tools section in Menubar
 
 V0.2.4
 *Changed outline focus border colour when a cell is foced

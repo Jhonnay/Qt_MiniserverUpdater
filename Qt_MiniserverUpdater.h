@@ -43,6 +43,7 @@ public slots:
     void onUpdateMiniserversFinished();
     void handleSearchTextChanged(const QString& searchText);
     void keyPressEvent(QKeyEvent* event);
+    void oncleanConfigs();
     //void keyReleaseEvent(QKeyEvent* event);
     void onRefreshCancelClicked();
     void onRefreshMiniserversFinished();

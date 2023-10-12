@@ -28,6 +28,7 @@ public:
     void onCheckNewVersionClicked();
     void setMiniserverTableView(Qt_MiniserverTableView* tv);
     void onHelp();
+    void onCleanConfigsClicked();
 
 
 public slots:
@@ -47,6 +48,7 @@ signals:
     void changelogClicked();
     void checkVersionClicked();
     void help();
+    void cleanConfigClicked();
 
 
 private:
@@ -54,10 +56,12 @@ private:
     void createSettingsMenu();
     void createLoxoneAppMenu();
     void createHelpMenu();
+    void createToolsMenu();
 
     QMenuBar* menuBar;
     QMenu* fileMenu;
     QMenu* settingsMenu;
+    QMenu* toolsMenu;
     QMenu* loxoneAppMenu;
     QMenu* helpMenu;
 
@@ -65,6 +69,7 @@ private:
     QAction* openAct;
     QAction* newAct;
     QAction* exitAct;
+    QAction* cleanConfigsAct; 
 
     QAction* settingsAct;
 

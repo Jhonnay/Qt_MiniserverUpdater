@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include "CFileParser.cpp"
 #include "CLoxoneApp.h"
+#include "Qt_CleanOldConfigs.h"
 //#include <QWebEngineView>
 
 
@@ -107,6 +108,7 @@ Qt_MiniserverUpdater::Qt_MiniserverUpdater(QList<CMiniserver>* miniserverList, Q
     connect(menubar, &Qt_Menubar::changelogClicked, this, &Qt_MiniserverUpdater::onChangelogClicked);
     connect(menubar, &Qt_Menubar::checkVersionClicked, this, &Qt_MiniserverUpdater::onCheckNewVersionClicked);
     connect(menubar, &Qt_Menubar::help, this, &Qt_MiniserverUpdater::onHelp);
+    connect(menubar, &Qt_Menubar::cleanConfigClicked, this, &Qt_MiniserverUpdater::oncleanConfigs);
 
     connect(actionDeselectAll, &QAction::triggered, this, &Qt_MiniserverUpdater::onDeselectAll);
     connect(actionRefreshSelected, &QAction::triggered, this, &Qt_MiniserverUpdater::onRefreshSelected);
@@ -712,4 +714,21 @@ void Qt_MiniserverUpdater::keyPressEvent(QKeyEvent* event)
         QWidget::keyPressEvent(event);
     }
 }
+
+void Qt_MiniserverUpdater::oncleanConfigs() {
+    QString programFilesPath = QProcessEnvironment::systemEnvironment().value("ProgramFiles(x86)") + "\\Loxone";
+      
+
+    QDir programdata(QStandardPaths::standardLocations(QStandardPaths::AppConfigLocation).at(1)); // "C:/ProgramData/<APPNAME>"
+    programdata.cdUp(); // cd .. "C:/ProgramData"
+    programdata.cd("Loxone");
+    
+
+
+    Qt_CleanOldConfigs dialog =  Qt_CleanOldConfigs(tr("Config Cleaner"), programFilesPath, programdata.path());
+    int dialogResult = dialog.exec();  
+
+}
+
+
 
