@@ -24,7 +24,7 @@
 #include <QDir>
 #include <QStringList>
 
-#define VERSION "0.2.4"
+#define VERSION "0.2.5"
 
 
 
@@ -60,7 +60,22 @@ int main(int argc, char* argv[])
         mainwindow->setStatusbarProgress(100, "Settings NOT loaded / " + QString::number(miniservers.count()) + " Miniservers loaded");
     }
 
-    
+    //QString path = "C:\\ProgramData\\Loxone\\_Loxone Config 8.1";
+    //QDir directory(path);
+    //
+    //if (!directory.exists()) {
+    //    qWarning() << "Directory does not exist: " << path;
+    //    
+    //}
+    //
+    //if (directory.removeRecursively()) {
+    //    qDebug() << "Directory deleted: " << path;
+    //    
+    //}
+    //else {
+    //    qWarning() << "Failed to delete directory: " << path;
+    //    
+    //}
     mainwindow->checkVersionOnStartup();
     //mainWindow.setCentralWidget(centralWidget);
     mainwindow->setWindowTitle("Miniserver Updater (c) Musat Version " + QString::fromStdString(VERSION));
