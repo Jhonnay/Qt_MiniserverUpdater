@@ -13,6 +13,7 @@ Known Issues:
 
 TODO's:
 * Open in Loxone App 
+* Clean Configs: mark duplicates green
 
 V0.2.5
 *Added "Clean old Configs Installations" option to via Tools section in Menubar

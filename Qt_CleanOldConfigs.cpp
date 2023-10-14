@@ -19,14 +19,14 @@ Qt_CleanOldConfigs::Qt_CleanOldConfigs(QString title, QString pathPrograms, QStr
 	hboxScroll = new QHBoxLayout();
 	hboxScroll->setSpacing(50);
 	listWidgetPrograms = new QListWidget();
-	listWidgetProgramData = new QListWidget();
+    listWidgetProgramData = new QListWidget();
     listWidgetPrograms->setSelectionMode(QAbstractItemView::MultiSelection);
     listWidgetProgramData = new QListWidget();
 
-	hboxScroll->addWidget(listWidgetPrograms);
-	hboxScroll->addWidget(listWidgetProgramData);
+    hboxScroll->addWidget(listWidgetPrograms);
+    hboxScroll->addWidget(listWidgetProgramData);
 
-	vbox->addLayout(hboxScroll);
+    vbox->addLayout(hboxScroll);
     hboxSizes = new QHBoxLayout();
     hboxSizes->setSpacing(50);
     sizePrograms = new QLabel("Size: 0 kB");
@@ -38,11 +38,11 @@ Qt_CleanOldConfigs::Qt_CleanOldConfigs(QString title, QString pathPrograms, QStr
     vbox->addWidget(clean);
     connect(clean, &QPushButton::pressed, this, &Qt_CleanOldConfigs::performCleaning);
 
-	buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-	connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
-	vbox->addWidget(buttonBox);
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    vbox->addWidget(buttonBox);
 
-    contextMenuListPrograms = new QMenu(); 
+    contextMenuListPrograms = new QMenu();
     actionContextMenuListPrograms = new QAction(tr("Add selected folders to Clean-up"));
     connect(actionContextMenuListPrograms, &QAction::triggered, this, &Qt_CleanOldConfigs::addSelectedFoldersToCleanUP);
 
@@ -102,29 +102,43 @@ void Qt_CleanOldConfigs::compareDirectories(const QString& dirPath1, const QStri
     folders2 = folders2.filter(regex);
 
     //displayAllFolders(dirPath1, folders1, dirPath2, folders2);
-    
+
     listWidgetPrograms->addItems(folders1);
     listWidgetProgramData->addItems(folders2);
     reduceDirectoryFilenamesToVersionString(dirPath1, folders1);
     reduceDirectoryFilenamesToVersionString(dirPath2, folders2);
 
-    
-   
+
+    //Mark Red
     for (int i = 0; i < listWidgetProgramData->count(); ++i) {
-        
         QListWidgetItem* item = listWidgetProgramData->item(i);
         if (item) {
-            if (!folders1.contains(folders2.at(i)) || item->text().at(0) == '_') { //mark red, if Folder starts with underscore '_'
+            QString str = dirPath2 + "\\" + item->text();
+            if (!folders1.contains(folders2.at(i)) || item->text().at(0) == '_') { //mark red, if Folder starts with underscore '_' 
                 item->setBackground(Qt::red);
                 item->setForeground(Qt::white);
             }
+            if (folders1.contains(folders2.at(i))) { //folder2 < 5MB: check if the small folder from "folders2" is contained in "folders1" and mark folder1 red
+                if (getDirectorySize(std::filesystem::path(dirPath2.toStdString() + "\\" + item->text().toStdString())) < 5 * 1000 * 1000){
+                    item->setBackground(Qt::red); //set programdata red
+                    item->setForeground(Qt::white); //set programdata red          
+                    int index = folders1.indexOf(folders2.at(i));
+                    QListWidgetItem* itemList1 = listWidgetPrograms->item(index);
+                    if (itemList1) {
+                        itemList1->setBackground(Qt::red); //set programs red
+                        itemList1->setForeground(Qt::white); //set programs red
+                        
+                    }
+                }
+            }
         }
     }
-
     for (int i = 0; i < listWidgetPrograms->count(); ++i) {
         QListWidgetItem* item = listWidgetPrograms->item(i);
         if (item) {
-            if (!folders2.contains(folders1.at(i))) {
+            QString str = dirPath1 + "\\" + item->text();
+            if (!folders2.contains(folders1.at(i))   
+                || getDirectorySize(std::filesystem::path(dirPath1.toStdString() + "\\" + item->text().toStdString())) < 5 * 1000 * 1000 ) {
                 item->setBackground(Qt::red);
                 item->setForeground(Qt::white);
             }
@@ -243,11 +257,6 @@ void Qt_CleanOldConfigs::addSelectedFoldersToCleanUP() {
     QList<QListWidgetItem*> selectedItems = listWidgetPrograms->selectedItems();
 
     foreach(QListWidgetItem * item, selectedItems) {
-        //QBrush backgroundBrush = item->background();
-        //QColor backgroundColor = backgroundBrush.color();
-        //
-        //// Get the background color as a text (color name)
-        //QString backgroundColorText = backgroundColor.name();
         if (item->background() != Qt::red && item->background() != Qt::green) {
             qDebug() << "Performing action on item: " << item->text();
             item->setBackground(Qt::green);
@@ -329,8 +338,10 @@ void Qt_CleanOldConfigs::performCleaning() {
 
     if (firstCleaningSuccess && secondCleaningSuccess) {
         QMessageBox::information(nullptr, tr("Config Clean"), tr("Successfully cleaned: ") + formatSize(totalSize));
-        return;
     }
+
+    sizeProgramData->setText("Size: 0 KB");
+    sizePrograms->setText("Size: 0 KB");
 
 }
 
@@ -351,6 +362,8 @@ bool Qt_CleanOldConfigs::cleanFolder(QString dir)
                 if (directory.exists()) {
                     if (directory.removeRecursively()) {
                         qDebug() << "Directory deleted: " << fullPath;
+                        QListWidgetItem* itemToDelete = list->takeItem(i);
+                        delete itemToDelete; // Free the memory
                     }
                     else {
                         QMessageBox::warning(nullptr, "Warning", tr("Could not delete: ") + fullPath);
