@@ -1,6 +1,8 @@
-#include "Qt_CleanOldConfigs.h"
+﻿#include "Qt_CleanOldConfigs.h"
 #include <regex>
 #include <windows.h>
+#include <QDesktopServices>
+#include "CMiniserver.h"
 
 
 Qt_CleanOldConfigs::Qt_CleanOldConfigs(QString title, QString pathPrograms, QString pathProgramData, QWidget *parent)
@@ -8,12 +10,31 @@ Qt_CleanOldConfigs::Qt_CleanOldConfigs(QString title, QString pathPrograms, QStr
 {
 	setWindowTitle(title);
 	vbox = new QVBoxLayout(this);
-	this->pathPrograms = new QLabel(pathPrograms);
-	this->pathProgramData = new QLabel(pathProgramData);
+	btn_PathPrograms = new QPushButton(pathPrograms);
+	btn_PathProgramData = new QPushButton(pathProgramData);
+    this->btn_PathPrograms->setStyleSheet("text-decoration: underline; color: blue; text-align: left;");  // Make it look like a hyperlink
+    this->btn_PathPrograms->setCursor(Qt::PointingHandCursor);  // Change cursor to a hand when hovering
+    this->btn_PathProgramData->setStyleSheet("text-decoration: underline; color: blue; text-align: left;");  // Make it look like a hyperlink
+    this->btn_PathProgramData->setCursor(Qt::PointingHandCursor);  // Change cursor to a hand when hovering
+    // Set a style to make the QPushButton look like a label
+    btn_PathPrograms->setFlat(true);
+    btn_PathProgramData->setFlat(true);
 	hboxLabels = new QHBoxLayout();
-	hboxLabels->addWidget(this->pathPrograms);
-	hboxLabels->addWidget(this->pathProgramData);
+	hboxLabels->addWidget(this->btn_PathPrograms);
+	hboxLabels->addWidget(this->btn_PathProgramData);
 	hboxLabels->setSpacing(50); 
+    
+
+    connect(this->btn_PathPrograms, &QPushButton::clicked, [&]() {
+        QString path = "file:///" + pathPrograms.replace("\\", "/");
+        QDesktopServices::openUrl(QUrl::fromLocalFile(pathPrograms));
+    });
+
+    connect(this->btn_PathProgramData, &QPushButton::clicked, [&]() {
+        QString path = "file:///" + pathProgramData.replace("\\", "/");
+        QDesktopServices::openUrl(QUrl::fromLocalFile(pathProgramData));
+    });
+
 
 	vbox->addLayout(hboxLabels);
 	hboxScroll = new QHBoxLayout();
@@ -21,12 +42,16 @@ Qt_CleanOldConfigs::Qt_CleanOldConfigs(QString title, QString pathPrograms, QStr
 	listWidgetPrograms = new QListWidget();
     listWidgetProgramData = new QListWidget();
     listWidgetPrograms->setSelectionMode(QAbstractItemView::MultiSelection);
-    listWidgetProgramData = new QListWidget();
-
+    listWidgetProgramData->setSelectionMode(QAbstractItemView::MultiSelection);
+    btn_RefreshSizes = new QPushButton("🔁");
     hboxScroll->addWidget(listWidgetPrograms);
+    //hboxScroll->addWidget(btn_RefreshSizes);
     hboxScroll->addWidget(listWidgetProgramData);
-
+    hboxScroll->setAlignment(Qt::AlignVCenter);
+    connect(btn_RefreshSizes, &QPushButton::pressed, this, &Qt_CleanOldConfigs::reCalculateSizes);
     vbox->addLayout(hboxScroll);
+
+  
     hboxSizes = new QHBoxLayout();
     hboxSizes->setSpacing(50);
     sizePrograms = new QLabel("Size: 0 kB");
@@ -34,20 +59,42 @@ Qt_CleanOldConfigs::Qt_CleanOldConfigs(QString title, QString pathPrograms, QStr
     hboxSizes->addWidget(sizePrograms);
     hboxSizes->addWidget(sizeProgramData);
     vbox->addLayout(hboxSizes);
-    clean = new QPushButton(tr("Clean Computer"));
-    vbox->addWidget(clean);
-    connect(clean, &QPushButton::pressed, this, &Qt_CleanOldConfigs::performCleaning);
+
+    // Define the items you want in your legend
+    QCheckBox* legend1 = new QCheckBox("Folder automatically detected for cleaning");
+    legend1->setCheckable(false);  // Make the checkbox not checkable
+    legend1->setStyleSheet("QCheckBox::indicator { background-color: red; }");
+
+    QCheckBox* legend2 = new QCheckBox("Folder manually added for cleaning");
+    legend2->setCheckable(false);
+    legend2->setStyleSheet("QCheckBox::indicator { background-color: #00FF00; }");
+
+    QCheckBox* legend3 = new QCheckBox("Folder manually excluded from cleaning");
+    legend3->setCheckable(false);
+    legend3->setStyleSheet("QCheckBox::indicator { background-color: yellow; }");
+
+    vbox->addWidget(legend1);
+    vbox->addWidget(legend2);
+    vbox->addWidget(legend3);
+
+
+    btn_Clean = new QPushButton(tr("Clean Computer"));
+    vbox->addWidget(btn_Clean);
+    connect(btn_Clean, &QPushButton::pressed, this, &Qt_CleanOldConfigs::performCleaning);
+    
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     vbox->addWidget(buttonBox);
 
     contextMenuListPrograms = new QMenu();
-    actionContextMenuListPrograms = new QAction(tr("Add selected folders to Clean-up"));
-    connect(actionContextMenuListPrograms, &QAction::triggered, this, &Qt_CleanOldConfigs::addSelectedFoldersToCleanUP);
-
+    actionListProgramsAddSelected = new QAction(tr("Add selected folders to Clean-up"));
+    actionListProgramsCleaningProhibited = new QAction(tr("Do not clean this folder"));
+    connect(actionListProgramsAddSelected, &QAction::triggered, this, &Qt_CleanOldConfigs::addSelectedProgramsFoldersToCleanUP);
+    connect(actionListProgramsCleaningProhibited, &QAction::triggered, this, &Qt_CleanOldConfigs::prohibitCleaningPrograms);
     // Add the action to the context menu
-    contextMenuListPrograms->addAction(actionContextMenuListPrograms);
+    contextMenuListPrograms->addAction(actionListProgramsAddSelected);
+    contextMenuListPrograms->addAction(actionListProgramsCleaningProhibited);
 
     // Set the context menu for the list widget
     listWidgetPrograms->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -57,18 +104,63 @@ Qt_CleanOldConfigs::Qt_CleanOldConfigs(QString title, QString pathPrograms, QStr
         contextMenuListPrograms->exec(QCursor::pos());
         });
 
+    contextMenuListProgramData = new QMenu();
+    actionListProgramDataCleaningProhibited = new QAction(tr("Do not clean this folder"));
+    actionListProgramDataAddSelected = new QAction(tr("Add selected folders to Clean-up"));
+    connect(actionListProgramDataCleaningProhibited, &QAction::triggered, this, &Qt_CleanOldConfigs::prohibitCleaningProgramData);
+    connect(actionListProgramDataAddSelected, &QAction::triggered, this, &Qt_CleanOldConfigs::addSelectedProgramDataFoldersToCleanUP);
+    
+    // Add the action to the context menu
+    contextMenuListProgramData->addAction(actionListProgramDataCleaningProhibited);
+    contextMenuListProgramData->addAction(actionListProgramDataAddSelected);
+
+    // Set the context menu for the list widget
+    listWidgetProgramData->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    // Connect the customContextMenuRequested signal to show the context menu
+    connect(listWidgetProgramData, &QListWidget::customContextMenuRequested, this, [this](const QPoint& pos) {
+        contextMenuListProgramData->exec(QCursor::pos());
+        });
 
     InitializeDialogWithSizes(pathPrograms, pathProgramData);
 
 
     this->setStyleSheet(R"""(
-        QListWidget::item: {
-            background-color: lightblue; /* Background color when item is selected */
+        QListWidget {
+            border: 0px;
+            padding-left: 0px;
         }
-      
+
+        QListWidget::item:selected {
+            
+            padding-left: 10px;
+
+        }
+
+
         
 
 	)""");
+
+
+    //this->setStyleSheet(R"""(
+    //    QListWidget {
+    //        margin: 
+    //    }
+    //    QListWidget::item {
+    //        padding: 3px;
+    //        border: 0px solid rgba(32, 148, 250, 1);
+    //    }
+    //
+    //    QListWidget::item:selected {
+    //        color: black; /* Maintain the text color */
+    //        background-color: white; /* Maintain the background color */
+    //        padding: 0px;
+    //        border: 3px solid rgba(32, 148, 250, 1);
+    //    }
+    //    
+    //
+	//)""");
 }
 
 void Qt_CleanOldConfigs::InitializeDialogWithSizes(QString& pathPrograms, QString& pathProgramData)
@@ -163,8 +255,7 @@ void Qt_CleanOldConfigs::displayAllFolders(const QString& dirPath1, QStringList&
 
 void Qt_CleanOldConfigs::reduceDirectoryFilenamesToVersionString(const QString& dirPath, QStringList& folders)
 {
-    QRegularExpression versionRegex("\\d+\\.\\d+\\.\\d+\\.\\d+");
-    QListWidget* list = (dirPath == pathPrograms->text()) ? listWidgetPrograms : listWidgetProgramData;
+    QListWidget* list = (dirPath == btn_PathPrograms->text()) ? listWidgetPrograms : listWidgetProgramData;
 
     if (folders.isEmpty()) {
         return;
@@ -175,13 +266,34 @@ void Qt_CleanOldConfigs::reduceDirectoryFilenamesToVersionString(const QString& 
         if (folders.at(i).at(0) == '_') { 
             continue; //do not include folder starting with underscore in the '_' reduced versions list. 
         }
-        QRegularExpressionMatchIterator matchIterator = versionRegex.globalMatch(folders.at(i));
-        while (matchIterator.hasNext()) {
-            QRegularExpressionMatch match = matchIterator.next();
-            //qDebug() << "Version: " << match.captured();
-            folders.replace(i, match.captured());
+        if (dirPath == btn_PathPrograms->text()) { //in Programs86 folder retreive the version directly from Config Exe
+            QString path = dirPath + "\\" + folders.at(i) + "\\LoxoneConfig.exe";
+            if (!QFile(path).exists()) {
+                qDebug() << "Config Executable does not exist - paht: " + path;
+                continue;
+            }
+            QString version = CConfig::getConfigFileVersionFormated(path);
+            folders.replace(i, version);
+            continue;
         }
-
+        //otherwise use the Regex to retreive the version from foldername
+        else if(folders.at(i).length() < 20){ //e.g. "Locone Config 7.1"
+            QRegularExpression versionRegex("\\d+\\.\\d+");
+            QRegularExpressionMatchIterator matchIterator = versionRegex.globalMatch(folders.at(i));
+            while (matchIterator.hasNext()) {
+                QRegularExpressionMatch match = matchIterator.next();
+                folders.replace(i, match.captured());
+            }
+        }
+        else {
+            QRegularExpression versionRegex("\\d+\\.\\d+\\.\\d+\\.\\d+");
+            QRegularExpressionMatchIterator matchIterator = versionRegex.globalMatch(folders.at(i));
+            while (matchIterator.hasNext()) {
+                QRegularExpressionMatch match = matchIterator.next();
+                folders.replace(i, match.captured());
+            }
+        }
+        
     }
 }
 
@@ -218,13 +330,13 @@ uintmax_t Qt_CleanOldConfigs::getDirectorySize(const std::filesystem::path& dir)
 
 uintmax_t Qt_CleanOldConfigs::calculateDirectorySizeOfQListWidget(QString dir) {
     uintmax_t size = 0;
-    qDebug() << pathPrograms->text();
-    QListWidget* list = (dir == pathPrograms->text()) ? listWidgetPrograms : listWidgetProgramData;
+    qDebug() << btn_PathPrograms->text();
+    QListWidget* list = (dir == btn_PathPrograms->text()) ? listWidgetPrograms : listWidgetProgramData;
     
     for (int i = 0; i < list->count(); ++i) {
         QListWidgetItem* item = list->item(i);
         if (item) {
-            if (item->background() == Qt::red) {
+            if (item->background() == Qt::red || item->background() == Qt::green) {
                 std::filesystem::path path = dir.toStdString() + "\\" + item->text().toStdString();
                 uintmax_t newSize = getDirectorySize(path);
                 qDebug() << "Size: " << formatSize(newSize) << " Path: " << path.string();
@@ -253,23 +365,24 @@ QString Qt_CleanOldConfigs::formatSize(uintmax_t sizeInBytes) {
     }
 }
 
-void Qt_CleanOldConfigs::addSelectedFoldersToCleanUP() {
+void Qt_CleanOldConfigs::addSelectedProgramsFoldersToCleanUP() {
     QList<QListWidgetItem*> selectedItems = listWidgetPrograms->selectedItems();
 
     foreach(QListWidgetItem * item, selectedItems) {
         if (item->background() != Qt::red && item->background() != Qt::green) {
             qDebug() << "Performing action on item: " << item->text();
             item->setBackground(Qt::green);
-            //item->setForeground(Qt::white);
-            std::filesystem::path path = pathPrograms->text().toStdString() + "\\" + item->text().toStdString();
+            item->setForeground(Qt::black);
+            std::filesystem::path path = btn_PathPrograms->text().toStdString() + "\\" + item->text().toStdString();
             uintmax_t newSize = getDirectorySize(path);
-            qDebug() << "Size: " << formatSize(newSize) << " - " << pathPrograms->text().toStdString() + "\\" + item->text().toStdString();
+            qDebug() << "Size: " << formatSize(newSize) << " - " << btn_PathPrograms->text().toStdString() + "\\" + item->text().toStdString();
             qDebug() << "Size to be Cleaned Programs Before: " << formatSize(sizeCleanPrograms);
             sizeCleanPrograms += newSize;
             qDebug() << "Size to be Cleaned Programs After: " << formatSize(sizeCleanPrograms);
 
             sizePrograms->setText("Size: " + formatSize(sizeCleanPrograms));
             
+            //automatically add folders in "ProgramData" if available
             QStringList folders2;
             for (int i = 0; i < listWidgetProgramData->count(); ++i) {
                 QListWidgetItem* item = listWidgetProgramData->item(i);
@@ -277,7 +390,7 @@ void Qt_CleanOldConfigs::addSelectedFoldersToCleanUP() {
                     folders2.append(item->text());
                 }
             }
-            reduceDirectoryFilenamesToVersionString(pathProgramData->text(), folders2);
+            reduceDirectoryFilenamesToVersionString(btn_PathProgramData->text(), folders2);
             QString val = reduceFileNameToVersionString(item->text());
             qDebug() << val; 
             if (folders2.contains(val)) {
@@ -287,25 +400,46 @@ void Qt_CleanOldConfigs::addSelectedFoldersToCleanUP() {
 
                     if (itemToChange) {
                         itemToChange->setBackground(QBrush(Qt::green));
-                        QString val = pathProgramData->text() + "/Loxone Config " + reduceFileNameToVersionString(item->text());
-                        path = pathProgramData->text().toStdString() + "/Loxone Config " + reduceFileNameToVersionString(item->text()).toStdString();
-                        newSize = getDirectorySize(path);
-                        qDebug() << "Size: " << formatSize(newSize) << " - " << pathProgramData->text().toStdString() + "/Loxone Config " + reduceFileNameToVersionString(item->text()).toStdString();
-                        qDebug() << "Size to be Cleaned ProgramData Before: " << formatSize(sizeCleanProgramData);
-                        sizeCleanProgramData += newSize;
-                        qDebug() << "Size to be Cleaned ProgramData After: " << formatSize(sizeCleanProgramData);
-
-                        sizeProgramData->setText("Size: " + formatSize(sizeCleanProgramData));
+                        itemToChange->setForeground(QBrush(Qt::black));
+                        QString val = btn_PathProgramData->text() + "/Loxone Config " + reduceFileNameToVersionString(item->text());
+                        path = btn_PathProgramData->text().toStdString() + "/Loxone Config " + reduceFileNameToVersionString(item->text()).toStdString();
+                        if (QDir(path).exists()) {
+                            newSize = getDirectorySize(path);
+                            qDebug() << "Size: " << formatSize(newSize) << " - " << btn_PathProgramData->text().toStdString() + "/Loxone Config " + reduceFileNameToVersionString(item->text()).toStdString();
+                            qDebug() << "Size to be Cleaned ProgramData Before: " << formatSize(sizeCleanProgramData);
+                            sizeCleanProgramData += newSize;
+                            qDebug() << "Size to be Cleaned ProgramData After: " << formatSize(sizeCleanProgramData);
+                            sizeProgramData->setText("Size: " + formatSize(sizeCleanProgramData));
+                        }
                     }
                 }
             }
-            
-
-
         }
     }
 
     return;
+}
+
+/*
+* folders in "Programs(x86) are not automatically added like in Qt_CleanOldConfigs::addSelectedProgramsFoldersToCleanUP
+*/
+void Qt_CleanOldConfigs::addSelectedProgramDataFoldersToCleanUP() {
+    QList<QListWidgetItem*> selectedItems = listWidgetProgramData->selectedItems();
+    foreach(QListWidgetItem * item, selectedItems) {
+        if (item->background() != Qt::red && item->background() != Qt::green) {
+            qDebug() << "Performing action on item: " << item->text();
+            item->setBackground(Qt::green);
+            item->setForeground(Qt::black);
+            std::filesystem::path path = btn_PathProgramData->text().toStdString() + "\\" + item->text().toStdString();
+            uintmax_t newSize = getDirectorySize(path);
+            qDebug() << "Size: " << formatSize(newSize) << " - " << btn_PathProgramData->text().toStdString() + "\\" + item->text().toStdString();
+            qDebug() << "Size to be Cleaned Programs Before: " << formatSize(sizeCleanProgramData);
+            sizeCleanProgramData += newSize;
+            qDebug() << "Size to be Cleaned Programs After: " << formatSize(sizeCleanProgramData);
+
+            sizeProgramData->setText("Size: " + formatSize(sizeCleanProgramData));
+        }
+    }
 }
 
 bool Qt_CleanOldConfigs::isRunningAsAdmin() {
@@ -323,16 +457,28 @@ bool Qt_CleanOldConfigs::isRunningAsAdmin() {
 }
 
 void Qt_CleanOldConfigs::performCleaning() {
+    // Ask the user for confirmation
+    QMessageBox confirmationBox;
+    confirmationBox.setIcon(QMessageBox::Question);
+    confirmationBox.setWindowTitle(tr("Confirmation"));
+    confirmationBox.setText(tr("Are you sure you want permanently delete the folders?"));
+    confirmationBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
+    // Check the user's response
+    if (confirmationBox.exec() == QMessageBox::No) {
+        return; // User pressed "No," so do not proceed with cleaning
+    }
+        
     if (!isRunningAsAdmin()) {
         QMessageBox::critical(nullptr, tr("Rights?"), tr("You do not have admin rights!\nRestart this application with admin rights. "));
         return;
     }
+
     //listWidgetPrograms
     bool firstCleaningSuccess = true;
     bool secondCleaningSuccess = true;
-    firstCleaningSuccess = cleanFolder(pathPrograms->text());
-    secondCleaningSuccess = cleanFolder(pathProgramData->text());
+    firstCleaningSuccess = cleanFolder(btn_PathPrograms->text());
+    secondCleaningSuccess = cleanFolder(btn_PathProgramData->text());
     uintmax_t totalSize = sizeCleanProgramData + sizeCleanPrograms;
 
 
@@ -350,34 +496,69 @@ bool Qt_CleanOldConfigs::cleanFolder(QString dir)
     if (!QDir(dir).exists()) {
         return false;
     }
-    QListWidget* list = (dir == pathPrograms->text()) ? listWidgetPrograms : listWidgetProgramData;
+    QListWidget* list = (dir == btn_PathPrograms->text()) ? listWidgetPrograms : listWidgetProgramData;
     bool cleanedEverything = true;
-    for (int i = 0; i < list->count(); i++) {
-        QListWidgetItem* item = list->item(i);
+    
+    int listCount = list->count();
 
+    //reverse loop for deleting items
+    for (int i = listCount-1; i >= 0; i--) { 
+        QListWidgetItem* item = list->item(i);
+    
         if (item) {
             if (item->background() == Qt::red || item->background() == Qt::green) {
-                QString fullPath = (dir == pathPrograms->text()) ? pathPrograms->text() + "\\" + item->text() : pathProgramData->text() + "/" + item->text();
+                QString fullPath = (dir == btn_PathPrograms->text()) ? btn_PathPrograms->text() + "\\" + item->text() : btn_PathProgramData->text() + "/" + item->text();
                 QDir directory = QDir(fullPath);
                 if (directory.exists()) {
                     if (directory.removeRecursively()) {
                         qDebug() << "Directory deleted: " << fullPath;
-                        QListWidgetItem* itemToDelete = list->takeItem(i);
+                        QListWidgetItem* itemToDelete = list->takeItem(list->indexFromItem(item).row());
                         delete itemToDelete; // Free the memory
                     }
                     else {
                         QMessageBox::warning(nullptr, "Warning", tr("Could not delete: ") + fullPath);
                         cleanedEverything = false;
                     }
-                } 
+                }
                 else {
                     QMessageBox::warning(nullptr, "Warning", tr("Directory does not exist: ") + fullPath);
                     cleanedEverything = false;
                 }
             }
         }
-        else{
+        else {
             cleanedEverything = false;
         }
+    }
+    return cleanedEverything;
+}
+
+void Qt_CleanOldConfigs::reCalculateSizes() {
+    qDebug() << "Re-Calcualting sizes!"; 
+    sizeCleanPrograms = calculateDirectorySizeOfQListWidget(btn_PathPrograms->text());
+    sizeCleanProgramData = calculateDirectorySizeOfQListWidget(btn_PathProgramData->text());
+    sizeProgramData->setText("Size: " + formatSize(sizeCleanProgramData));
+    sizePrograms->setText("Size: " + formatSize(sizeCleanPrograms));
+}
+
+void Qt_CleanOldConfigs::prohibitCleaningPrograms() {
+    QListWidgetItem* selectedItem = listWidgetPrograms->currentItem();
+    if (selectedItem) {
+        QString text = selectedItem->text();
+        selectedItem->setBackground(Qt::yellow);
+        selectedItem->setForeground(Qt::black);
+        qDebug() << "Action performed on: " << text;
+        reCalculateSizes();
+    }
+}
+
+void Qt_CleanOldConfigs::prohibitCleaningProgramData() {
+    QListWidgetItem* selectedItem = listWidgetProgramData->currentItem();
+    if (selectedItem) {
+        QString text = selectedItem->text();
+        selectedItem->setBackground(Qt::yellow);
+        selectedItem->setForeground(Qt::black);
+        qDebug() << "Action performed on: " << text;
+        reCalculateSizes();
     }
 }

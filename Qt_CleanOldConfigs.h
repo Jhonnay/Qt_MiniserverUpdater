@@ -30,8 +30,15 @@ public:
 
 	bool cleanFolder(QString path);
 
+	void reCalculateSizes();
+
+	void prohibitCleaningPrograms();
+
+	void prohibitCleaningProgramData();
+
 public slots:
-	void addSelectedFoldersToCleanUP();
+	void addSelectedProgramsFoldersToCleanUP();
+	void addSelectedProgramDataFoldersToCleanUP();
 
 private:
 	QHBoxLayout* hboxScroll;
@@ -39,16 +46,21 @@ private:
 	QHBoxLayout* hboxSizes;
 	QVBoxLayout* vbox; 
 	QPushButton* ok;
-	QLabel* pathProgramData;
-	QLabel* pathPrograms;
+	QPushButton* btn_PathProgramData;
+	QPushButton* btn_PathPrograms;
 	QLabel* sizeProgramData;
 	QLabel* sizePrograms;
 	QListWidget* listWidgetProgramData;
 	QListWidget* listWidgetPrograms;
 	QDialogButtonBox* buttonBox;
 	QMenu* contextMenuListPrograms;
-	QAction* actionContextMenuListPrograms; 
-	QPushButton* clean;
+	QMenu* contextMenuListProgramData;
+	QAction* actionListProgramsAddSelected; 
+	QAction* actionListProgramsCleaningProhibited;
+	QAction* actionListProgramDataCleaningProhibited;
+	QAction* actionListProgramDataAddSelected;
+	QPushButton* btn_Clean;
+	QPushButton* btn_RefreshSizes;
 
 	uintmax_t sizeCleanPrograms = 0; 
 	uintmax_t sizeCleanProgramData = 0; 
