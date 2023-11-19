@@ -22,6 +22,7 @@ QString CWebService::getCloudDNSLink(CMiniserver miniserver)
     QString url = QString::fromStdString(MyConstants::Strings::Link_CloudDNS) + QString::fromStdString(miniserver.getSerialNumber());
     QNetworkAccessManager* manager = new QNetworkAccessManager();
     QNetworkRequest request;
+    request.setTransferTimeout(20000);
     request.setUrl(QUrl(url));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/xml");
 
@@ -34,11 +35,12 @@ QString CWebService::getCloudDNSLink(CMiniserver miniserver)
 
     // send the request
     QNetworkReply* reply = manager->get(request);
+    reply->setReadBufferSize(0);  // Optional, can improve performance
     QEventLoop loop;
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
 
-    if (reply->error() == QNetworkReply::NoError)
+    if (reply->error() == QNetworkReply::NoError || reply->error() == QNetworkReply::InsecureRedirectError) //insecure redirect error --> Gen1
     {
         // check for Unauthorized status code
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 401)
@@ -62,7 +64,13 @@ QString CWebService::getCloudDNSLink(CMiniserver miniserver)
             str_cloudLink = reply->url().toString();
         }
     }
-
+    else if (reply->error() == QNetworkReply::TimeoutError) {
+        // Handle timeouts
+        qDebug() << "Request timed out";
+        // Inform the user about the slow response
+    }
+    
+    //qDebug() << reply->error();
     delete manager;
     
     //delete reply;
@@ -82,6 +90,9 @@ QString CWebService::sendCommandRest_Version_Remote_Cloud(CMiniserver miniserver
 
     qDebug() << "Url: " << url;
     if (!url.isEmpty()) {
+        if (url.endsWith('/') && command.startsWith('/')) { //Gen1
+            url.removeLast();
+        }
         url = url + command;
         QNetworkAccessManager* manager = new QNetworkAccessManager();
         QNetworkRequest request;
@@ -99,13 +110,16 @@ QString CWebService::sendCommandRest_Version_Remote_Cloud(CMiniserver miniserver
         QEventLoop loop;
         QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
         loop.exec();
+        qDebug() << "reply error: " << reply->error();
 
-        if (reply->error() == QNetworkReply::NoError)
+        if (reply->error() == QNetworkReply::NoError || reply->error() == QNetworkReply::InsecureRedirectError || reply->error() ==QNetworkReply::AuthenticationRequiredError) //insecure redirect error --> Gen1)
         {
+            
             // check for Unauthorized status code
-            if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 401)
+            if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 401 && !reply->error() == QNetworkReply::AuthenticationRequiredError)
             {
                 QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+                //qDebug() << "redirect url: " << redirectUrl.toString();
                 QNetworkRequest redirectRequest(redirectUrl);
                 redirectRequest.setRawHeader("Authorization", headerData.toUtf8());
                 QNetworkReply* redirectReply = manager->get(redirectRequest);
@@ -118,6 +132,36 @@ QString CWebService::sendCommandRest_Version_Remote_Cloud(CMiniserver miniserver
                 {
                     receivedData = reply->readAll();
                 }
+            }
+
+            if (reply->error() == QNetworkReply::AuthenticationRequiredError) {
+                // Extract username and password from your miniserver object
+                QString username = QString::fromStdString(miniserver.getAdminUser());
+                QString password = QString::fromStdString(miniserver.getAdminPassword());
+
+                // Set up the URL with authentication credentials
+                QUrl urlGen1(url);
+                urlGen1.setUserName(username);
+                urlGen1.setPassword(password);
+
+                // Create a new QNetworkRequest for the authenticated request
+                QNetworkRequest requestGen1(urlGen1);
+
+                // Set up authentication directly for this request
+                requestGen1.setRawHeader("Authorization", "Basic " +
+                    QByteArray(QString("%1:%2").arg(username, password).toUtf8().toBase64()));
+
+                // Make the authenticated request
+                QNetworkReply* gen1reply = manager->get(requestGen1);
+
+                // Execute the event loop to wait for the reply to finish
+                QEventLoop gen1;
+                QObject::connect(gen1reply, &QNetworkReply::finished, &gen1, &QEventLoop::quit);
+                gen1.exec();
+
+                // Assign the new reply to the original reply variable
+                reply = gen1reply;
+
             }
 
             QByteArray data = reply->readAll();
@@ -136,6 +180,7 @@ QString CWebService::sendCommandRest_Version_Remote_Cloud(CMiniserver miniserver
         
         }
 
+        qDebug() << reply->error();
         delete manager;
         
 
@@ -171,6 +216,8 @@ QString CWebService::sendCommandRest_Version_Local_Gen1(CMiniserver miniserver, 
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
 
+
+    qDebug() << reply->error();
     if (reply->error() == QNetworkReply::NoError)
     {
         // check for Unauthorized status code
@@ -224,6 +271,9 @@ CLoxAppJson CWebService::sendCommandRest_LoxAppJson_Remote_Cloud(CMiniserver min
 
     if (!url.isEmpty()) {
         url = url + command;
+        if (url.endsWith('/') && command.startsWith('/')) { //Gen1
+            url.removeLast();
+        }
         QNetworkAccessManager* manager = new QNetworkAccessManager();
         QNetworkRequest request;
         request.setUrl(QUrl(url));
@@ -240,11 +290,12 @@ CLoxAppJson CWebService::sendCommandRest_LoxAppJson_Remote_Cloud(CMiniserver min
         QEventLoop loop;
         QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
         loop.exec();
+        qDebug() << reply->error();
 
-        if (reply->error() == QNetworkReply::NoError)
+        if (reply->error() == QNetworkReply::NoError || reply->error() == QNetworkReply::InsecureRedirectError || reply->error() == QNetworkReply::AuthenticationRequiredError)
         {
             // check for Unauthorized status code
-            if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 401)
+            if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 401 && !reply->error() == QNetworkReply::AuthenticationRequiredError)
             {
                 QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
                 QNetworkRequest redirectRequest(redirectUrl);
@@ -260,6 +311,37 @@ CLoxAppJson CWebService::sendCommandRest_LoxAppJson_Remote_Cloud(CMiniserver min
                     receivedData = reply->readAll();
                 }
             }
+
+            if (reply->error() == QNetworkReply::AuthenticationRequiredError) { //Gen1
+                // Extract username and password from your miniserver object
+                QString username = QString::fromStdString(miniserver.getAdminUser());
+                QString password = QString::fromStdString(miniserver.getAdminPassword());
+
+                // Set up the URL with authentication credentials
+                QUrl urlGen1(url);
+                urlGen1.setUserName(username);
+                urlGen1.setPassword(password);
+
+                // Create a new QNetworkRequest for the authenticated request
+                QNetworkRequest requestGen1(urlGen1);
+
+                // Set up authentication directly for this request
+                requestGen1.setRawHeader("Authorization", "Basic " +
+                    QByteArray(QString("%1:%2").arg(username, password).toUtf8().toBase64()));
+
+                // Make the authenticated request
+                QNetworkReply* gen1reply = manager->get(requestGen1);
+
+                // Execute the event loop to wait for the reply to finish
+                QEventLoop gen1;
+                QObject::connect(gen1reply, &QNetworkReply::finished, &gen1, &QEventLoop::quit);
+                gen1.exec();
+
+                // Assign the new reply to the original reply variable
+                reply = gen1reply;
+
+            }
+
 
             try
             {
