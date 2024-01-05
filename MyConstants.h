@@ -115,6 +115,8 @@ public:
         static std::string MessageBox_SerialNumber_duplicate;
         static std::string MessageBox_AskUser_On_New_File;
         static std::string MessageBox_ApplicationSettingsPaths_not_correct;
+        static std::string MessageBox_ApplicationSettings_Config_Path_invalid;
+        static std::string MessageBox_ApplicationSettings_MiniserverList_Path_invalid;
         static std::string MessageBox_ApplicationSettings_could_not_parse;
         static std::string MessageBox_MiniserverList_could_not_parse;
 

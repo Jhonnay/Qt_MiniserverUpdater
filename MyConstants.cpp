@@ -104,6 +104,8 @@ std::string MyConstants::Strings::MessageBox_CheckUpdate_no_Update_available = "
 std::string MyConstants::Strings::MessageBox_SerialNumber_duplicate = "Serial Number is already in list!";
 std::string MyConstants::Strings::MessageBox_AskUser_On_New_File = "Are you sure that you want to create start a new file and remove all Minsierver from the list? Please save the JSON beforehand!";
 std::string MyConstants::Strings::MessageBox_ApplicationSettingsPaths_not_correct = "Please check the file Paths of your ApplicationSettings again!";
+std::string MyConstants::Strings::MessageBox_ApplicationSettings_Config_Path_invalid = "The path of the Config Exe does not exist!\nCheck if the folder still exists.";
+std::string MyConstants::Strings::MessageBox_ApplicationSettings_MiniserverList_Path_invalid = "The path of the Miniserver list is not valid.\nCheck if the file still exists.";
 std::string MyConstants::Strings::MessageBox_ApplicationSettings_could_not_parse = "Application Settings JSON could not be parsed!";
 std::string MyConstants::Strings::MessageBox_MiniserverList_could_not_parse = "Miniserver List JSON could not be parsed!";
 

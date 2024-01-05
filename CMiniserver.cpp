@@ -238,7 +238,7 @@ int CMiniserver::unformatVersionToInteger() {
 }
 
 std::string CMiniserver::calculateVersionColor(QString configVersion) {
-
+    if (configVersion.isEmpty()) { return "black"; };
     if (miniserverVersion == "0.0.0.0") { return "red"; };
     if (miniserverVersion == MyConstants::Strings::StartUp_Listview_MS_Version) { return "darkblue"; };
     int miniserver = unformatVersionToInteger();

@@ -15,6 +15,11 @@ TODO's:
 * Open in Loxone App 
 * Clean Configs: mark duplicates green
 
+
+V0.2.7
+*Fixed Crash when refreshing Miniserver and no Config Exe path was specified.
+*Added more clear dialog messages on startup when paths are not valid. 
+
 V0.2.6
 *Fixed Remote Connect with Gen1 not working
 
