@@ -14,6 +14,8 @@ public:
 
 	void compareDirectories(const QString& dirPath1, const QString& dirPath2);
 
+	bool isVersionLessThan(const QString& version, const QString& referenceVersion);
+
 	void displayAllFolders(const QString& dirPath1, QStringList& folders1, const QString& dirPath2, QStringList& folders2);
 
 	void reduceDirectoryFilenamesToVersionString(const QString& dirPath1, QStringList& folders1);

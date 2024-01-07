@@ -17,8 +17,12 @@ TODO's:
 
 
 V0.2.7
+*Changed: Clean Configs Dialog excludes initial check if version number < "10.2.3.26"
+
 *Fixed Crash when refreshing Miniserver and no Config Exe path was specified.
 *Added more clear dialog messages on startup when paths are not valid. 
+*Fixed Context Menu not consistent in "Clean Configs Dialog"
+
 
 V0.2.6
 *Fixed Remote Connect with Gen1 not working

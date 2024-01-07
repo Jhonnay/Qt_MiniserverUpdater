@@ -24,7 +24,7 @@
 #include <QDir>
 #include <QStringList>
 
-#define VERSION "0.2.6"
+#define VERSION "0.2.7"
 
 
 

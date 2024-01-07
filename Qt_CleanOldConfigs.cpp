@@ -4,6 +4,8 @@
 #include <QDesktopServices>
 #include "CMiniserver.h"
 
+#define VERSION_WITH_FOUR_SEGMENTS "10.2.3.26"
+
 
 Qt_CleanOldConfigs::Qt_CleanOldConfigs(QString title, QString pathPrograms, QString pathProgramData, QWidget *parent)
 	: QDialog(parent)
@@ -111,8 +113,8 @@ Qt_CleanOldConfigs::Qt_CleanOldConfigs(QString title, QString pathPrograms, QStr
     connect(actionListProgramDataAddSelected, &QAction::triggered, this, &Qt_CleanOldConfigs::addSelectedProgramDataFoldersToCleanUP);
     
     // Add the action to the context menu
-    contextMenuListProgramData->addAction(actionListProgramDataCleaningProhibited);
     contextMenuListProgramData->addAction(actionListProgramDataAddSelected);
+    contextMenuListProgramData->addAction(actionListProgramDataCleaningProhibited);
 
     // Set the context menu for the list widget
     listWidgetProgramData->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -205,7 +207,10 @@ void Qt_CleanOldConfigs::compareDirectories(const QString& dirPath1, const QStri
     for (int i = 0; i < listWidgetProgramData->count(); ++i) {
         QListWidgetItem* item = listWidgetProgramData->item(i);
         if (item) {
-            QString str = dirPath2 + "\\" + item->text();
+            //QString str = dirPath2 + "\\" + item->text();
+            if (isVersionLessThan(folders2.at(i), VERSION_WITH_FOUR_SEGMENTS)) {
+                continue;
+            }
             if (!folders1.contains(folders2.at(i)) || item->text().at(0) == '_') { //mark red, if Folder starts with underscore '_' 
                 item->setBackground(Qt::red);
                 item->setForeground(Qt::white);
@@ -228,7 +233,10 @@ void Qt_CleanOldConfigs::compareDirectories(const QString& dirPath1, const QStri
     for (int i = 0; i < listWidgetPrograms->count(); ++i) {
         QListWidgetItem* item = listWidgetPrograms->item(i);
         if (item) {
-            QString str = dirPath1 + "\\" + item->text();
+            //QString str = dirPath1 + "\\" + item->text();
+            if (isVersionLessThan(folders1.at(i), VERSION_WITH_FOUR_SEGMENTS)) {
+                continue;
+            }
             if (!folders2.contains(folders1.at(i))   
                 || getDirectorySize(std::filesystem::path(dirPath1.toStdString() + "\\" + item->text().toStdString())) < 5 * 1000 * 1000 ) {
                 item->setBackground(Qt::red);
@@ -237,6 +245,13 @@ void Qt_CleanOldConfigs::compareDirectories(const QString& dirPath1, const QStri
         }
     }
 
+}
+
+bool Qt_CleanOldConfigs::isVersionLessThan (const QString& version, const QString& referenceVersion) {
+    QVersionNumber versionNumber = QVersionNumber::fromString(version);
+    QVersionNumber referenceVersionNumber = QVersionNumber::fromString(referenceVersion);
+
+    return versionNumber < referenceVersionNumber;
 }
 
 void Qt_CleanOldConfigs::displayAllFolders(const QString& dirPath1, QStringList& folders1, const QString& dirPath2, QStringList& folders2)
