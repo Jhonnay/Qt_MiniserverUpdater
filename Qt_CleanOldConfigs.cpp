@@ -501,9 +501,7 @@ void Qt_CleanOldConfigs::performCleaning() {
         QMessageBox::information(nullptr, tr("Config Clean"), tr("Successfully cleaned: ") + formatSize(totalSize));
     }
 
-    sizeProgramData->setText("Size: 0 KB");
-    sizePrograms->setText("Size: 0 KB");
-
+    reCalculateSizes();
 }
 
 bool Qt_CleanOldConfigs::cleanFolder(QString dir)
@@ -545,6 +543,7 @@ bool Qt_CleanOldConfigs::cleanFolder(QString dir)
             cleanedEverything = false;
         }
     }
+
     return cleanedEverything;
 }
 

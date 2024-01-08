@@ -11,10 +11,16 @@ Known Issues:
 * AutoUpdate all Selected not working
 * Sometimes the file menu is not greyed out in release
 
+
 TODO's:
 * Open in Loxone App 
 * Clean Configs: mark duplicates green
+*Use the version number of the Config EXE instead of the Version Number from the Folder
+  - otherwise folders that are labeled incorrectly break the functionality
+  - this is true for "Add Selected Folder"
 
+V0.2.8
+*Fixed pressing "clean" after cleaning configs a second time, shows last SIZE of cleanup.
 
 V0.2.7
 *Changed: Clean Configs Dialog excludes initial check if version number < "10.2.3.26"
