@@ -24,10 +24,7 @@
 #include <QDir>
 #include <QStringList>
 
-#define VERSION "0.2.9"
-
-
-
+#define VERSION "0.2.8"
 
 
 int main(int argc, char* argv[])

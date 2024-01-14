@@ -16,15 +16,12 @@ TODO's:
 * Open in Loxone App 
 * Clean Configs: mark duplicates green
 
-V0.2.9
-*Changed The version number of the Config EXE is used instead of the version string in the folder name
-*Changed Remove filters "alpha|beta|release|loxone".
-*Fixed Cleaning message = 0B shown after cleaning folders.
-
 
 V0.2.8
 *Fixed pressing "clean" after cleaning configs a second time, shows last SIZE of cleanup.
-
+*Changed The version number of the Config EXE is used instead of the version string in the folder name
+*Changed Remove filters "alpha|beta|release|loxone".
+*Fixed Cleaning message = 0B shown after cleaning folders.
 
 V0.2.7
 *Changed: Clean Configs Dialog excludes initial check if version number < "10.2.3.26"
