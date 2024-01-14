@@ -189,11 +189,11 @@ void Qt_CleanOldConfigs::compareDirectories(const QString& dirPath1, const QStri
     QStringList folders1 = directory1.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
     QStringList folders2 = directory2.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
 
-    QRegularExpression regex("(alpha|beta|release|loxone)", QRegularExpression::CaseInsensitiveOption);
-
-    // Filter folders using the regular expression
-    folders1 = folders1.filter(regex);
-    folders2 = folders2.filter(regex);
+    //QRegularExpression regex("(alpha|beta|release|loxone)", QRegularExpression::CaseInsensitiveOption);
+    //
+    //// Filter folders using the regular expression
+    //folders1 = folders1.filter(regex);
+    //folders2 = folders2.filter(regex);
 
     //displayAllFolders(dirPath1, folders1, dirPath2, folders2);
 
@@ -406,7 +406,7 @@ void Qt_CleanOldConfigs::addSelectedProgramsFoldersToCleanUP() {
                 }
             }
             reduceDirectoryFilenamesToVersionString(btn_PathProgramData->text(), folders2);
-            QString val = reduceFileNameToVersionString(item->text());
+            QString val = CConfig::getConfigFileVersionFormated(btn_PathPrograms->text() + "\\" + item->text() + "\\LoxoneConfig.exe");
             qDebug() << val; 
             if (folders2.contains(val)) {
                 int index = folders2.indexOf(val);
@@ -510,6 +510,7 @@ bool Qt_CleanOldConfigs::cleanFolder(QString dir)
         return false;
     }
     QListWidget* list = (dir == btn_PathPrograms->text()) ? listWidgetPrograms : listWidgetProgramData;
+    uintmax_t cleanedSizeTotal = 0;
     bool cleanedEverything = true;
     
     int listCount = list->count();
@@ -523,10 +524,12 @@ bool Qt_CleanOldConfigs::cleanFolder(QString dir)
                 QString fullPath = (dir == btn_PathPrograms->text()) ? btn_PathPrograms->text() + "\\" + item->text() : btn_PathProgramData->text() + "/" + item->text();
                 QDir directory = QDir(fullPath);
                 if (directory.exists()) {
+                    uintmax_t cleanedSize = getDirectorySize(directory.filesystemAbsolutePath());
                     if (directory.removeRecursively()) {
                         qDebug() << "Directory deleted: " << fullPath;
                         QListWidgetItem* itemToDelete = list->takeItem(list->indexFromItem(item).row());
                         delete itemToDelete; // Free the memory
+                        cleanedSizeTotal += cleanedSize;
                     }
                     else {
                         QMessageBox::warning(nullptr, "Warning", tr("Could not delete: ") + fullPath);
@@ -542,6 +545,13 @@ bool Qt_CleanOldConfigs::cleanFolder(QString dir)
         else {
             cleanedEverything = false;
         }
+    }
+
+    if (dir == btn_PathPrograms->text()) {
+        sizeCleanPrograms = cleanedSizeTotal;
+    }
+    else {
+        sizeCleanProgramData = cleanedSizeTotal;
     }
 
     return cleanedEverything;

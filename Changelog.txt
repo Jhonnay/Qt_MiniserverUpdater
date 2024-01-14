@@ -15,12 +15,16 @@ Known Issues:
 TODO's:
 * Open in Loxone App 
 * Clean Configs: mark duplicates green
-*Use the version number of the Config EXE instead of the Version Number from the Folder
-  - otherwise folders that are labeled incorrectly break the functionality
-  - this is true for "Add Selected Folder"
+
+V0.2.9
+*Changed The version number of the Config EXE is used instead of the version string in the folder name
+*Changed Remove filters "alpha|beta|release|loxone".
+*Fixed Cleaning message = 0B shown after cleaning folders.
+
 
 V0.2.8
 *Fixed pressing "clean" after cleaning configs a second time, shows last SIZE of cleanup.
+
 
 V0.2.7
 *Changed: Clean Configs Dialog excludes initial check if version number < "10.2.3.26"
