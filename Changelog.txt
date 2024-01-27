@@ -11,11 +11,15 @@ Known Issues:
 * AutoUpdate all Selected not working
 * Sometimes the file menu is not greyed out in release
 
-
 TODO's:
-* Open in Loxone App 
 * Clean Configs: mark duplicates green
 
+
+V0.2.9
+*New: Open in Loxone App (BETA)
+	- opens the selected Miniserver in the Loxone App
+	- local IP is used when available
+	- otherwise dns.loxonecloud.com is used
 
 V0.2.8
 *Fixed pressing "clean" after cleaning configs a second time, shows last SIZE of cleanup.

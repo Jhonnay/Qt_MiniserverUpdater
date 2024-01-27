@@ -272,6 +272,7 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                 }
                 else if (selectedItemText == "Open in Loxone APP (BETA)") {
 
+                    openInLoxoneApp(miniserver);
                 }
                 else if (selectedItemText == "Download Prog Folder (BETA)") {
                     emit downloadProgFolderPressed(miniserver);
@@ -470,6 +471,32 @@ void Qt_MiniserverTableView::autoUpdateSingleMiniserver(bool bLocal, CMiniserver
         miniserver.setMiniserverStatus(MyConstants::Strings::Listview_MS_Status_retreiving_information_timeout);
         m_model->miniserverlist->replace(index, miniserver);
     }
+}
+
+void Qt_MiniserverTableView::openInLoxoneApp(CMiniserver& miniserver)
+{
+    QString link; 
+
+    if (miniserver.getLocalIP().empty()) {
+        link = QString("loxone://ms?host=%1&usr=%2&pwd=%3")
+            .arg(QUrl::toPercentEncoding("dns.loxonecloud.com/" + QString::fromStdString(miniserver.getSerialNumber())),
+                QUrl::toPercentEncoding(QString::fromStdString(miniserver.getAdminUser())),
+                QUrl::toPercentEncoding(QString::fromStdString(miniserver.getAdminPassword())));
+    }
+    else {
+        link = QString("loxone://ms?host=%1&usr=%2&pwd=%3")
+            .arg(QUrl::toPercentEncoding(QString::fromStdString(miniserver.getLocalIP())),
+                QUrl::toPercentEncoding(QString::fromStdString(miniserver.getAdminUser())),
+                QUrl::toPercentEncoding(QString::fromStdString(miniserver.getAdminPassword())));
+    }
+
+    if (QDesktopServices::openUrl(QUrl(link))) {
+        qDebug() << "Link opened successfully.";
+    }
+    else {
+        qDebug() << "Failed to open the link.";
+    }
+
 }
 
 //void Qt_MiniserverTableView::keyPressEvent(QKeyEvent* event)
