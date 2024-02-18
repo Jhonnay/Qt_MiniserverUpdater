@@ -8,12 +8,19 @@ Known Issues:
 * if one Miniserver in a client gateway does not update -> Program crashes. 
 * connect button cannot be pressed multiple times in a row. 
 * Check Network Message if Update was canceled
-* AutoUpdate all Selected not working
+* AutoUpdate all Selected not working --> evaluate. 
 * Sometimes the file menu is not greyed out in release
 
 TODO's:
 * Clean Configs: mark duplicates green
+* STRG+R not working when not whole row is selected/marked
+* Settings not saved dialog when canceling dialog and there is no diff in settings. 
+* refactor code in Qt_MiniserverTableView::contextMenuEvent
 
+V0.3.0
+*Added "LoxApp3.json" and "Reboot" Options to contextmenu
+*Fixed ConfigExe needed to be correct when "use Config Exe" was not checked. 
+*Fixed invalid ConfigExe on startup when "use Config Exe " was not checked. 
 
 V0.2.9
 *New: Open in Loxone App (BETA)

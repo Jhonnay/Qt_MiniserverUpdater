@@ -110,7 +110,7 @@ ApplicationSettings Qt_ApplicationSettings::createDialog(const QString& title, A
 		if (dialog.lineEditDefaulMiniserverList->text() == "not set" ) { miniserverlistValid = true; }
 		if (dialog.lineEditDefaultConfigExe->text() == "not set") { configexeValid = true; };
 
-		if (!miniserverlistValid || !configexeValid) {
+		if (!(miniserverlistValid && dialog.checkBoxDefaultMiniserverList->isChecked())|| (!configexeValid && dialog.checkBoxDefaultConfigExe->isChecked())) {
 			QMessageBox::warning(nullptr, "Warning", QString::fromStdString(MyConstants::Strings::MessageBox_ApplicationSettingsPaths_not_correct));
 			return ApplicationSettings();
 		}

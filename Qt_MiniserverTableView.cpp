@@ -156,7 +156,9 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
 			contextMenu.addAction("Deflog");
 			contextMenu.addAction("FTP");
 			contextMenu.addAction("LPH");
+            contextMenu.addAction("LoxApp3.json");
 			contextMenu.addAction("CrashLog Server");
+            contextMenu.addAction("Reboot");
 			contextMenu.addAction("Open in Loxone APP (BETA)");
 			contextMenu.addAction("Download Prog Folder (BETA)");
 
@@ -172,6 +174,8 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                 CMiniserver miniserver = model->m_searchText.isEmpty() ? model->miniserverlist->at(clickedIndex.row()) : model->filteredMiniservers->at(clickedIndex.row());
                 int trueIndex = model->miniserverlist->indexOf(miniserver);
 
+
+                
 				if (selectedItemText == "Edit Miniserver")
 				{
                     CMiniserver newMiniserver = Qt_CreateEditMiniserver::createDialog("Edit Miniserver", &miniserver, model->miniserverlist);
@@ -276,6 +280,45 @@ void Qt_MiniserverTableView::contextMenuEvent(QContextMenuEvent* event)
                 }
                 else if (selectedItemText == "Download Prog Folder (BETA)") {
                     emit downloadProgFolderPressed(miniserver);
+                }
+                else if (selectedItemText == "Reboot") {
+                    QString serialNumber = QString::fromStdString(miniserver.getSerialNumber());
+                    QString localIP = QString::fromStdString(miniserver.getLocalIP());
+                    QString link = CSerialNumberHyperlinkDelegate::generateLink(serialNumber, localIP);
+                    link += "/dev/sys/reboot";
+                    QUrl url = QUrl(link);
+
+                    if (localIP.isEmpty()) {
+                        QString cloudlink = CWebService::getCloudDNSLink(miniserver);
+                        cloudlink += "dev/sys/reboot";
+                        url.setUrl(cloudlink);
+                    }
+
+                    QDesktopServices::openUrl(url);
+                }
+                else if (selectedItemText == "LoxApp3.json") {
+                    QString serialNumber = QString::fromStdString(miniserver.getSerialNumber());
+                    QString localIP = QString::fromStdString(miniserver.getLocalIP());
+                    QString username = QString::fromStdString(miniserver.getAdminUser());
+                    QString password = QString::fromStdString(miniserver.getAdminPassword());
+                    QString link = CSerialNumberHyperlinkDelegate::generateLink(serialNumber, localIP);
+                    link += "/data/LoxAPP3.json";
+                    QUrl url = QUrl(link);
+
+                    if (!localIP.isEmpty()) {
+                        url.setUserName(username);
+                        url.setPassword(password);
+
+                    }
+                    else {
+                        QString cloudlink = CWebService::getCloudDNSLink(miniserver);
+                        cloudlink += "data/LoxAPP3.json";
+                        url.setUrl(cloudlink);
+                        url.setUserName(username);
+                        url.setPassword(password);
+                    }
+
+                    QDesktopServices::openUrl(url);
                 }
 				
 			}

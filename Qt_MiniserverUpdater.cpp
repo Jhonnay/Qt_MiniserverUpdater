@@ -170,12 +170,12 @@ void Qt_MiniserverUpdater::setApplicationsettings(ApplicationSettings* settings)
     if (miniserverListpath == "not set") { miniserverlistValid = true; }
     if (configpath == "not set") { configexeValid = true; };
 
-    if (!miniserverlistValid) {
+    if (!miniserverlistValid && settings->getBUseDefaultConfiguration()) {
         QMessageBox::warning(nullptr, "Warning", QString::fromStdString(MyConstants::Strings::MessageBox_ApplicationSettings_MiniserverList_Path_invalid));
         settings->setStrDefaultConfigurationPath("");
     }
 
-    if (!configexeValid) {
+    if (!configexeValid && settings->getBUseDefaultConfig()) {
         QMessageBox::warning(nullptr, "Warning", QString::fromStdString(MyConstants::Strings::MessageBox_ApplicationSettings_Config_Path_invalid));
         settings->setStrDefaultConfigPath(MyConstants::Strings::Statusbar_TextBlockConfig_No_Config_selected);
     }
