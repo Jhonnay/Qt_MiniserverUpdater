@@ -1,7 +1,8 @@
 #pragma once
 
-#include "stdafx.h"
+#include "../stdafx.h"
 #include <QDialog>
+
 
 class Qt_CleanOldConfigs : public QDialog
 {

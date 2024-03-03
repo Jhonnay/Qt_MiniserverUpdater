@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/QtConfigCleaner">
+        <file>QtConfigCleaner.manifest</file>
+        <file>QtConfigCleaner.ico</file>
+    </qresource>
+</RCC>

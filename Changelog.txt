@@ -16,6 +16,12 @@ TODO's:
 * STRG+R not working when not whole row is selected/marked
 * Settings not saved dialog when canceling dialog and there is no diff in settings. 
 * refactor code in Qt_MiniserverTableView::contextMenuEvent
+* Add Icon to InnoSetup. 
+* Ask for elevated privilages when starting Config Cleaner.  https://stackoverflow.com/questions/6418791/requesting-administrator-privileges-at-run-time
+* Show current Config Exe Vesion in left side of Config Cleaner Dialog. 
+
+V0.3.1
+*
 
 V0.3.0
 *Added "LoxApp3.json" and "Reboot" Options to contextmenu

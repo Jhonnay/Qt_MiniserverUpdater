@@ -58,6 +58,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);</LibraryPath>
+    <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
   </PropertyGroup>
@@ -75,12 +76,15 @@ call "$(SolutionDir)InnoSetup\openCurrentDir.bat"</Command>
     <Link>
       <AdditionalDependencies>%(AdditionalDependencies);$(Qt_LIBS_);Dbghelp.lib</AdditionalDependencies>
     </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)QtConfigCleaner;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
@@ -127,18 +131,19 @@ call "$(SolutionDir)InnoSetup\openCurrentDir.bat"</Command>
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
-    <ClCompile Include="Qt_CleanOldConfigs.cpp" />
     <ClCompile Include="Qt_ComboBoxItem.cpp" />
     <ClCompile Include="Qt_CreateEditMiniserver.cpp" />
     <ClCompile Include="Qt_Menubar.cpp" />
     <ClCompile Include="Qt_MiniserverTableView.cpp" />
     <ClCompile Include="Qt_Miniserver_Listview.cpp" />
     <ClCompile Include="Qt_Statusbar.cpp" />
-    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <QtRcc Include="Qt_MiniserverUpdater.qrc" />
     <QtUic Include="Qt_ApplicationSettings.ui" />
     <QtUic Include="Qt_Bottom_Action_Buttons.ui" />
-    <QtUic Include="Qt_CleanOldConfigs.ui" />
     <QtUic Include="Qt_ComboBoxItem.ui" />
     <QtUic Include="Qt_CreateEditMiniserver.ui" />
     <QtUic Include="Qt_Menubar.ui" />
@@ -164,7 +169,9 @@ call "$(SolutionDir)InnoSetup\openCurrentDir.bat"</Command>
   <ItemGroup>
     <ClInclude Include="CApplicationSettings.h" />
     <QtMoc Include="CComboBoxLanguageDelegate.h" />
-    <ClInclude Include="CConfig.h" />
+    <ClInclude Include="CConfig.h">
+      <DeploymentContent>true</DeploymentContent>
+    </ClInclude>
     <QtMoc Include="CConnectConfigButtonDelegate.h" />
     <ClInclude Include="CConfigMSUpdate.h" />
     <QtMoc Include="CConnectConfigWorker.h" />
@@ -190,7 +197,6 @@ call "$(SolutionDir)InnoSetup\openCurrentDir.bat"</Command>
     <QtMoc Include="Qt_MiniserverTableView.h" />
     <QtMoc Include="Qt_CreateEditMiniserver.h" />
     <QtMoc Include="Qt_ApplicationSettings.h" />
-    <QtMoc Include="Qt_CleanOldConfigs.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

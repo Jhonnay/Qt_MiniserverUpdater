@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "MiniserverUpdater"
-#define MyAppVersion "0.3.0"
+#define MyAppVersion "0.3.1"
 #define MyAppPublisher "Musat"
 #define MyAppExeName "Qt_MiniserverUpdater.exe"
 
@@ -24,7 +24,9 @@ SetupIconFile=C:\Users\musatbe\source\repos\Qt_MiniserverUpdater\Qt_MiniserverUp
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
-;DisableDirPage=yes
+;WizardImageFile=C:\Users\musatbe\source\repos\Qt_MiniserverUpdater\Qt_MiniserverUpdater-big.bmp; 
+;WizardSmallImageFile=C:\Users\musatbe\source\repos\Qt_MiniserverUpdater\Qt_MiniserverUpdater-small.bmp;
+DisableDirPage=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -34,6 +36,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "C:\Users\musatbe\source\repos\Qt_MiniserverUpdater\x64\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\musatbe\source\repos\Qt_MiniserverUpdater\x64\Release\QtConfigCleaner.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\musatbe\source\repos\Qt_MiniserverUpdater\x64\Release\Changelog.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\musatbe\source\repos\Qt_MiniserverUpdater\x64\Release\EmptyProject.Loxone"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\musatbe\source\repos\Qt_MiniserverUpdater\x64\Release\Qt6Core.dll"; DestDir: "{app}"; Flags: ignoreversion

@@ -2,7 +2,12 @@
 #include <regex>
 #include <windows.h>
 #include <QDesktopServices>
+#include <stdio.h>
+#include "CConfig.h"
 #include "CMiniserver.h"
+#include <QThread>
+#include <QProgressDialog>
+
 
 #define VERSION_WITH_FOUR_SEGMENTS "10.2.3.26"
 
