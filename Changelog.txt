@@ -21,7 +21,11 @@ TODO's:
 * Show current Config Exe Vesion in left side of Config Cleaner Dialog. 
 
 V0.3.1
-*
+*New:
+- Clean Config: 
+	- is now seperate Exe and starts with elevated priviledges.
+	- Added Progressbar when deleting folders.
+
 
 V0.3.0
 *Added "LoxApp3.json" and "Reboot" Options to contextmenu

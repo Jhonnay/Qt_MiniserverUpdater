@@ -130,8 +130,7 @@ Qt_CleanOldConfigs::Qt_CleanOldConfigs(QString title, QString pathPrograms, QStr
         });
 
     InitializeDialogWithSizes(pathPrograms, pathProgramData);
-
-
+    
     this->setStyleSheet(R"""(
         QListWidget {
             border: 0px;
@@ -488,25 +487,113 @@ void Qt_CleanOldConfigs::performCleaning() {
     if (confirmationBox.exec() == QMessageBox::No) {
         return; // User pressed "No," so do not proceed with cleaning
     }
-        
+
     if (!isRunningAsAdmin()) {
         QMessageBox::critical(nullptr, tr("Rights?"), tr("You do not have admin rights!\nRestart this application with admin rights. "));
         return;
     }
 
+    m_bStopCleaning = FALSE; 
+    m_nProgress = 0; 
+    m_nDeleteCount = GetToDeleteItemsCount();
+
+    // Create a thread for cleaning
+    QThread* cleaningThread = new QThread;
+    moveToThread(cleaningThread);
+
+    // Connect signals for starting and finishing the cleaning process
+    connect(cleaningThread, &QThread::started, this, &Qt_CleanOldConfigs::startCleaning);
+    connect(this, &Qt_CleanOldConfigs::cleaningFinished, cleaningThread, &QThread::quit);
+    connect(cleaningThread, &QThread::finished, cleaningThread, &QThread::deleteLater);
+
+    cleaningThread->start();
+}
+
+int Qt_CleanOldConfigs::GetToDeleteItemsCount() {
+    QListWidget* list = listWidgetPrograms;
+    int nToDeleteItmes = 0;
+    bool cleanedEverything = true;
+
+    int listCount = list->count();
+
+    //reverse loop for deleting items
+    for (int i = listCount - 1; i >= 0; i--) {
+        QListWidgetItem* item = list->item(i);
+
+        if (item) {
+            if (item->background() == Qt::red || item->background() == Qt::green) {
+                nToDeleteItmes++;
+            }
+        }
+    }
+
+    list =  listWidgetProgramData;
+    listCount = list->count();
+
+    for (int i = listCount - 1; i >= 0; i--) {
+        QListWidgetItem* item = list->item(i);
+
+        if (item) {
+            if (item->background() == Qt::red || item->background() == Qt::green) {
+                nToDeleteItmes++;
+            }
+        }
+    }
+
+    return nToDeleteItmes;
+}
+
+void Qt_CleanOldConfigs::startCleaning() {
+    progressDialog = new QProgressDialog(tr("Cleaning in progress..."), tr("Cancel"), 0, 100, this);
+    progressDialog->setWindowTitle(tr("Cleaning Configs"));
+    connect(progressDialog, &QProgressDialog::canceled, this, &Qt_CleanOldConfigs::stopCleaning);
+    progressDialog->show();
+
+    // Set up a timer to update the progress dialog
+    QTimer timer;
+    connect(&timer, &QTimer::timeout, this, &Qt_CleanOldConfigs::updateProgress);
+    timer.start(100); // Update every 100 milliseconds
+
     //listWidgetPrograms
     bool firstCleaningSuccess = true;
     bool secondCleaningSuccess = true;
+
+    // Run the cleaning operation in the background
     firstCleaningSuccess = cleanFolder(btn_PathPrograms->text());
     secondCleaningSuccess = cleanFolder(btn_PathProgramData->text());
+
+    // Stop the timer
+    timer.stop();
+
+    // Disconnect the canceled signal
+    disconnect(progressDialog, &QProgressDialog::canceled, this, &Qt_CleanOldConfigs::stopCleaning);
+
+    // Emit the signal that cleaning has finished
+    emit cleaningFinished();
+
+    // Display a message box with the result
     uintmax_t totalSize = sizeCleanProgramData + sizeCleanPrograms;
-
-
     if (firstCleaningSuccess && secondCleaningSuccess) {
         QMessageBox::information(nullptr, tr("Config Clean"), tr("Successfully cleaned: ") + formatSize(totalSize));
     }
 
+    delete progressDialog;
+    // Update the sizes in the UI
     reCalculateSizes();
+}
+
+void Qt_CleanOldConfigs::stopCleaning() {
+    m_bStopCleaning = TRUE;
+}
+
+void Qt_CleanOldConfigs::updateProgress() {
+    int overallProgress = m_nProgress / m_nDeleteCount * 100;
+
+    progressDialog->setValue(overallProgress);
+
+    if (progressDialog->wasCanceled()) {
+        stopCleaning();
+    }
 }
 
 bool Qt_CleanOldConfigs::cleanFolder(QString dir)
@@ -524,7 +611,7 @@ bool Qt_CleanOldConfigs::cleanFolder(QString dir)
     for (int i = listCount-1; i >= 0; i--) { 
         QListWidgetItem* item = list->item(i);
     
-        if (item) {
+        if (item && !m_bStopCleaning) {
             if (item->background() == Qt::red || item->background() == Qt::green) {
                 QString fullPath = (dir == btn_PathPrograms->text()) ? btn_PathPrograms->text() + "\\" + item->text() : btn_PathProgramData->text() + "/" + item->text();
                 QDir directory = QDir(fullPath);
@@ -550,6 +637,7 @@ bool Qt_CleanOldConfigs::cleanFolder(QString dir)
         else {
             cleanedEverything = false;
         }
+        m_nProgress++; //progressbar
     }
 
     if (dir == btn_PathPrograms->text()) {

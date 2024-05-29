@@ -24,18 +24,7 @@ int main(int argc, char* argv[])
     }
     dialog.setWindowIcon(QIcon("resources/QtConfigCleaner.ico"));
 
-    // Create a QTimer to periodically update the UI while processing data
-    QTimer timer;
-    QObject::connect(&timer, &QTimer::timeout, [&dialog]() {
-        dialog.reCalculateSizes(); // Update the sizes in the dialog
-        dialog.repaint(); // Force a repaint to update the UI
-        });
+   
 
-
-    timer.setInterval(100); // 100 milliseconds interval
-    timer.start();
-    int result = dialog.exec();
-    timer.stop();
-
-    return result;
+    return dialog.exec();
 }

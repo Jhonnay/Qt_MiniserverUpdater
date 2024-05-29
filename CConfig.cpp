@@ -146,15 +146,15 @@ QString CConfig::getConfigFileVersionFormated(const QString& configPath) {
     if (!file.exists()) return QString();
    
     DWORD handle;
-    DWORD size = GetFileVersionInfoSize(file.fileName().toStdWString().c_str(), &handle);
+    DWORD size = GetFileVersionInfoSize((LPCSTR)file.fileName().toStdWString().c_str(), &handle);
     if (size == 0) return QString();
    
     QByteArray data(size, 0);
-    if (!GetFileVersionInfo(file.fileName().toStdWString().c_str(), handle, size, data.data())) return QString();
+    if (!GetFileVersionInfo((LPCSTR)file.fileName().toStdWString().c_str(), handle, size, data.data())) return QString();
    
     VS_FIXEDFILEINFO* info = nullptr;
     UINT len;
-    if (!VerQueryValue(data.constData(), L"\\", reinterpret_cast<void**>(&info), &len)) return QString();
+    if (!VerQueryValue(data.constData(), (LPCSTR)"\\", reinterpret_cast<void**>(&info), &len)) return QString();
    
     return QString("%1.%2.%3.%4")
         .arg(HIWORD(info->dwFileVersionMS))
@@ -169,15 +169,15 @@ QString CConfig::getConfigFileVersionUnformated(const QString& configPath) {
     if (!file.exists()) return QString();
 
     DWORD handle;
-    DWORD size = GetFileVersionInfoSize(file.fileName().toStdWString().c_str(), &handle);
+    DWORD size = GetFileVersionInfoSize((LPCSTR)file.fileName().toStdWString().c_str(), &handle);
     if (size == 0) return QString();
 
     QByteArray data(size, 0);
-    if (!GetFileVersionInfo(file.fileName().toStdWString().c_str(), handle, size, data.data())) return QString();
+    if (!GetFileVersionInfo((LPCSTR)file.fileName().toStdWString().c_str(), handle, size, data.data())) return QString();
 
     VS_FIXEDFILEINFO* info = nullptr;
     UINT len;
-    if (!VerQueryValue(data.constData(), L"\\", reinterpret_cast<void**>(&info), &len)) return QString();
+    if (!VerQueryValue(data.constData(), (LPCSTR)"\\", reinterpret_cast<void**>(&info), &len)) return QString();
 
     return QString("%1%2%3%4")
         .arg(HIWORD(info->dwFileVersionMS), 2, 10, QChar('0'))

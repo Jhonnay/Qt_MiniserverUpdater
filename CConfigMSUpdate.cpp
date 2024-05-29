@@ -196,7 +196,11 @@ int CConfigMSUpdate::getRunningConfigInstances()
     }
 
     do {
-        if (process.szExeFile == target1 || process.szExeFile == target2) {
+        // Convert process.szExeFile to std::wstring before comparison
+        std::string exeFileA = process.szExeFile;
+        std::wstring exeFileW(exeFileA.begin(), exeFileA.end());
+
+        if (exeFileW == target1 || exeFileW == target2) {
             count++;
         }
     } while (Process32Next(snapshot, &process));
