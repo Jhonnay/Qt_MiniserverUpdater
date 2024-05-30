@@ -36,6 +36,8 @@
     <QtBuildConfig>debug</QtBuildConfig>
     <QtToolsDesignTime>false</QtToolsDesignTime>
     <QtHeaderSearchPath>C:\Qt6.6.0\6.5.0\msvc2019_64\include;$(QtHeaderSearchPath)</QtHeaderSearchPath>
+    <QtDeploy>false</QtDeploy>
+    <QtLibrarySearchPath>C:\Qt6.6.0\6.5.0\msvc2019_64\bin;$(QtLibrarySearchPath)</QtLibrarySearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>6.5.0_msvc2019_64</QtInstall>

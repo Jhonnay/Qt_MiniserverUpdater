@@ -38,7 +38,7 @@ LONG WINAPI MyApplication::ExceptionHandler(EXCEPTION_POINTERS* pExceptionInfo) 
     
     QMessageBox::critical(nullptr, "Something happened", exceptionMessage);
 
-    int result = MessageBox(nullptr, L"An exception occurred. Do you want to save a crash dump?", L"Crash Dump", MB_YESNO | MB_ICONERROR);
+    int result = MessageBox(nullptr, (LPCSTR)"An exception occurred. Do you want to save a crash dump?", (LPCSTR)"Crash Dump", MB_YESNO | MB_ICONERROR);
 
     if (result == IDYES) {
         OPENFILENAME ofn;
@@ -46,14 +46,14 @@ LONG WINAPI MyApplication::ExceptionHandler(EXCEPTION_POINTERS* pExceptionInfo) 
 
         ZeroMemory(&ofn, sizeof(ofn));
         ofn.lStructSize = sizeof(ofn);
-        ofn.lpstrFile = szFile;
+        ofn.lpstrFile = (LPSTR)szFile;
         ofn.nMaxFile = sizeof(szFile);
-        ofn.lpstrFilter = L"Dump Files (*.dmp)\0*.dmp\0All Files (*.*)\0*.*\0";
+        ofn.lpstrFilter = (LPCSTR)"Dump Files (*.dmp)\0*.dmp\0All Files (*.*)\0*.*\0";
         ofn.nFilterIndex = 1;
         ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
 
         if (GetSaveFileName(&ofn)) {
-            HANDLE hFile = CreateFile(szFile, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+            HANDLE hFile = CreateFile((LPCSTR)szFile, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
             if (hFile != INVALID_HANDLE_VALUE) {
                 MINIDUMP_EXCEPTION_INFORMATION eInfo;
                 eInfo.ThreadId = GetCurrentThreadId();
@@ -61,14 +61,14 @@ LONG WINAPI MyApplication::ExceptionHandler(EXCEPTION_POINTERS* pExceptionInfo) 
                 eInfo.ClientPointers = FALSE;
                 MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &eInfo, nullptr, nullptr);
                 CloseHandle(hFile);
-                MessageBox(nullptr, L"Crash dump saved successfully.", L"Crash Dump", MB_OK | MB_ICONINFORMATION);
+                MessageBox(nullptr, (LPCSTR)"Crash dump saved successfully.", (LPCSTR)"Crash Dump", MB_OK | MB_ICONINFORMATION);
             }
             else {
-                MessageBox(nullptr, L"Failed to create dump file.", L"Crash Dump", MB_OK | MB_ICONERROR);
+                MessageBox(nullptr, (LPCSTR)"Failed to create dump file.", (LPCSTR)"Crash Dump", MB_OK | MB_ICONERROR);
             }
         }
         else {
-            MessageBox(nullptr, L"Dump file not saved.", L"Crash Dump", MB_OK | MB_ICONINFORMATION);
+            MessageBox(nullptr, (LPCSTR)"Dump file not saved.", (LPCSTR)"Crash Dump", MB_OK | MB_ICONINFORMATION);
         }
     }
 
