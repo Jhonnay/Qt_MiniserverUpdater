@@ -30,6 +30,11 @@ public:
 	QString reduceFileNameToVersionString(QString filename);
 	bool isRunningAsAdmin();
 	void performCleaning();
+	int GetToDeleteItemsCount();
+
+	void startCleaning();
+	void stopCleaning();
+	void updateProgress();
 
 	bool cleanFolder(QString path);
 
@@ -39,9 +44,13 @@ public:
 
 	void prohibitCleaningProgramData();
 
+signals:
+	void cleaningFinished();
+
 public slots:
 	void addSelectedProgramsFoldersToCleanUP();
 	void addSelectedProgramDataFoldersToCleanUP();
+
 
 private:
 	QHBoxLayout* hboxScroll;
@@ -64,9 +73,14 @@ private:
 	QAction* actionListProgramDataAddSelected;
 	QPushButton* btn_Clean;
 	QPushButton* btn_RefreshSizes;
+	QProgressDialog* progressDialog;
 
 	uintmax_t sizeCleanPrograms = 0; 
 	uintmax_t sizeCleanProgramData = 0; 
+
+	BOOL m_bStopCleaning;
+	int m_nDeleteCount;
+	int m_nProgress;
 
 
 
